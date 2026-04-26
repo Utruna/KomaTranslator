@@ -1,0 +1,23 @@
+# Core image processing
+opencv-python>=4.8.0
+Pillow>=10.0.0
+numpy>=1.24.0
+
+# OCR
+paddleocr>=2.7.0
+paddlepaddle>=2.5.0  # CPU build; replace with paddlepaddle-gpu for CUDA
+
+# Deep-learning backend (required by LaMa inpainting and PaddleOCR)
+torch>=2.0.0
+torchvision>=0.15.0
+
+# LLM client libraries
+# TODO: uncomment / add the provider library that matches config.yaml → translation.provider
+openai>=1.0.0            # OpenAI / any OpenAI-compatible endpoint
+# anthropic>=0.25.0      # Anthropic Claude
+# httpx>=0.27.0          # generic HTTP client for custom REST endpoints
+
+# Configuration & utilities
+pyyaml>=6.0
+requests>=2.31.0
+tqdm>=4.66.0
