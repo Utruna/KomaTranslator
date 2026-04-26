@@ -1,0 +1,45 @@
+# ─────────────────────────────────────────────
+#  KomaTranslator – centralised configuration
+# ─────────────────────────────────────────────
+
+paths:
+  input_dir: "input"        # folder containing source images
+  output_dir: "output"      # folder where translated images are written
+  font_dir: "fonts"         # folder containing .ttf / .otf fonts
+  model_dir: "models"       # folder for locally cached AI models (LaMa, etc.)
+
+ocr:
+  language: "ch"            # PaddleOCR language code  (e.g. "ch", "en", "japan")
+  use_gpu: false            # set to true if a CUDA-capable GPU is available
+  det_db_thresh: 0.3        # detection threshold for the DB model
+  rec_batch_num: 6          # recognition batch size
+
+translation:
+  # TODO: replace with your actual API key (or load from the environment variable
+  #       OPENAI_API_KEY / ANTHROPIC_API_KEY / DEEPSEEK_API_KEY depending on the
+  #       provider you choose in translation_engine.py)
+  api_key: "YOUR_API_KEY_HERE"
+  provider: "openai"        # "openai" | "anthropic" | "deepseek" | "custom"
+  model: "gpt-4o"
+  source_language: "Chinese"
+  target_language: "French"
+  max_tokens: 256
+  temperature: 0.3
+
+inpainting:
+  method: "lama"            # "lama" (deep-learning) | "opencv" (telea / ns)
+  device: "cpu"             # "cpu" | "cuda"
+  # TODO: set model_path to the local LaMa checkpoint when method == "lama"
+  model_path: "models/lama"
+  opencv_method: "telea"    # "telea" | "ns"  – used when method == "opencv"
+  dilation_kernel: 5        # pixels added around each text mask before inpainting
+
+typesetting:
+  font_path: "fonts/default.ttf"
+  font_size: 18  # base font size in points
+  font_color: [0, 0, 0]  # RGB tuple
+  line_spacing: 6  # extra pixels between lines
+  max_font_size: 28  # upper bound for auto-size fitting
+  min_font_size: 8  # lower bound for auto-size fitting
+  stroke_width: 0  # outline width in pixels (0 = no outline)
+  stroke_color: [255, 255, 255]  # RGB outline colour

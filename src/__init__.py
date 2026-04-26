@@ -1,0 +1,1 @@
+"""KomaTranslator – src package."""
