@@ -1,0 +1,44 @@
+{
+  "epoch": 1,
+  "scene": {
+    "project": {
+      "name": "koma-ocr-1777311842",
+      "createdAt": "2026-04-27T17:44:02.422726100Z",
+      "updatedAt": "2026-04-27T17:44:02.422726700Z",
+      "style": {
+        "defaultFont": null
+      }
+    },
+    "pages": {
+      "019dd00a-80a1-7153-b8ad-2a530b261f7e": {
+        "id": "019dd00a-80a1-7153-b8ad-2a530b261f7e",
+        "name": "page.png",
+        "width": 800,
+        "height": 1131,
+        "nodes": {
+          "019dd00a-80a1-7153-b8ad-2a61f56583c6": {
+            "id": "019dd00a-80a1-7153-b8ad-2a61f56583c6",
+            "transform": {
+              "x": 0.0,
+              "y": 0.0,
+              "width": 0.0,
+              "height": 0.0,
+              "rotationDeg": 0.0
+            },
+            "visible": true,
+            "kind": {
+              "image": {
+                "role": "source",
+                "blob": "bc1a63f290903ed6c19fef5caceae866dbec5e9017d60b3fdeeb3e1e32149350",
+                "opacity": 1.0,
+                "naturalWidth": 800,
+                "naturalHeight": 1131,
+                "name": "page.png"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

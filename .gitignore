@@ -26,6 +26,7 @@ htmlcov/
 .idea/
 .vscode/
 *.swp
+.continue/*
 
 # ── OS ───────────────────────────────────────────────────────────────────
 .DS_Store
@@ -44,3 +45,5 @@ models/*
 
 # ── PaddleOCR auto-downloaded model cache ────────────────────────────────
 ~/.paddleocr/
+koharu_windows_x64.exe
+src/police/*

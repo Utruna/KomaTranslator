@@ -58,21 +58,24 @@ class TranslationEngine:
 
     def __init__(
         self,
-        api_key: str,
+        api_key: str = "ollama",
         provider: str = "openai",
-        model: str = "gpt-4o",
+        model: str = "llama3.1",
         source_language: str = "Chinese",
         target_language: str = "French",
         max_tokens: int = 256,
         temperature: float = 0.3,
+        base_url: str = "http://localhost:11434/v1",
     ) -> None:
         self.api_key = api_key
         self.provider = provider.lower()
         self.model = model
+        self.base_url = base_url
         self.source_language = source_language
         self.target_language = target_language
         self.max_tokens = max_tokens
         self.temperature = temperature
+        
 
         self._client: Any = self._build_client()
 
@@ -112,7 +115,10 @@ class TranslationEngine:
         """
         try:
             from openai import OpenAI  # type: ignore[import]
-            return OpenAI(api_key=self.api_key)
+            return OpenAI(
+                api_key=self.api_key, 
+                base_url=self.base_url
+            )
         except ImportError as exc:
             raise ImportError(
                 "openai package is not installed.  Run: pip install openai"
@@ -187,19 +193,23 @@ class TranslationEngine:
         TODO: Adjust model parameters (``top_p``, ``presence_penalty``, …)
               to fine-tune output quality for your use case.
         """
+        user_msg = self._build_user_message(text)
+        logger.info("\n--- LLM API INPUT ---\nModel: %s\nPrompt:\n%s\n---------------------", self.model, user_msg)
+        
         response = self._client.chat.completions.create(
             model=self.model,
             messages=[
                 {"role": "system", "content": _SYSTEM_PROMPT},
-                {"role": "user", "content": self._build_user_message(text)},
+                {"role": "user", "content": user_msg},
             ],
             max_tokens=self.max_tokens,
             temperature=self.temperature,
         )
 
         if not response.choices:
-            raise RuntimeError("OpenAI returned an empty response.")
+            raise RuntimeError("OpenAI/Local LLM returned an empty response.")
 
         translated = response.choices[0].message.content or ""
-        logger.debug("Translation result: '%s'", translated.strip())
+        logger.info("\n--- LLM API OUTPUT ---\n%s\n----------------------", translated.strip())
+        
         return translated.strip()

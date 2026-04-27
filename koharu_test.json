@@ -1,0 +1,44 @@
+{
+  "epoch": 1,
+  "scene": {
+    "project": {
+      "name": "test",
+      "createdAt": "2026-04-27T17:37:44.719932100Z",
+      "updatedAt": "2026-04-27T17:37:44.719932500Z",
+      "style": {
+        "defaultFont": null
+      }
+    },
+    "pages": {
+      "019dd004-bd27-70b2-b749-faf918d4fc67": {
+        "id": "019dd004-bd27-70b2-b749-faf918d4fc67",
+        "name": "input.jpg",
+        "width": 800,
+        "height": 1067,
+        "nodes": {
+          "019dd004-bd27-70b2-b749-fb01b0f76fa6": {
+            "id": "019dd004-bd27-70b2-b749-fb01b0f76fa6",
+            "transform": {
+              "x": 0.0,
+              "y": 0.0,
+              "width": 0.0,
+              "height": 0.0,
+              "rotationDeg": 0.0
+            },
+            "visible": true,
+            "kind": {
+              "image": {
+                "role": "source",
+                "blob": "8daa803f522bf11b345de984b7d1aafaf51b7cb195dbae728635dbe4433cfae9",
+                "opacity": 1.0,
+                "naturalWidth": 800,
+                "naturalHeight": 1067,
+                "name": "input.jpg"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

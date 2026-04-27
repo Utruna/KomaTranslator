@@ -35,13 +35,21 @@ def get_logger(name: str, level: int = logging.INFO) -> logging.Logger:
     """
     logger = logging.getLogger(name)
     if not logger.handlers:
-        handler = logging.StreamHandler()
         formatter = logging.Formatter(
             "[%(asctime)s] %(levelname)-8s %(name)s – %(message)s",
-            datefmt="%H:%M:%S",
+            datefmt="%Y-%m-%d %H:%M:%S",
         )
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+        
+        # 1. Console Handler
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(formatter)
+        logger.addHandler(console_handler)
+        
+        # 2. File Handler (traces everything into 'komatranslator.log')
+        file_handler = logging.FileHandler("komatranslator.log", mode="a", encoding="utf-8")
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+        
     logger.setLevel(level)
     return logger
 

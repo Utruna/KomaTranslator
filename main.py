@@ -16,6 +16,9 @@ Usage::
 
 from __future__ import annotations
 
+import os
+os.environ['FLAGS_use_mkldnn'] = '0'
+
 import argparse
 import sys
 from pathlib import Path
@@ -48,14 +51,14 @@ def _parse_args() -> argparse.Namespace:
         "--input",
         default=None,
         metavar="PATH",
-        help="Path to a single input image.  Overrides config.paths.input_dir.",
+        help="Path to an input image or directory. Overrides config.paths.input_dir.",
     )
     parser.add_argument(
         "--output",
         default=None,
         metavar="PATH",
         help=(
-            "Path for the translated output image (single-file mode only).  "
+            "Path for the translated output image or directory.  "
             "Overrides config.paths.output_dir."
         ),
     )
@@ -123,13 +126,13 @@ def build_typesetter(cfg: dict) -> Typesetter:
     font_color_raw = ts_cfg.get("font_color", [0, 0, 0])
     stroke_color_raw = ts_cfg.get("stroke_color", [255, 255, 255])
     return Typesetter(
-        font_path=ts_cfg.get("font_path", "fonts/default.ttf"),
-        font_size=ts_cfg.get("font_size", 18),
+        font_path=ts_cfg.get("font_path", "src/police/animeace2bb_tt/animeace2_reg.ttf"),
+        font_size=ts_cfg.get("font_size", 120),
         font_color=tuple(font_color_raw),        # type: ignore[arg-type]
         line_spacing=ts_cfg.get("line_spacing", 6),
-        max_font_size=ts_cfg.get("max_font_size", 28),
-        min_font_size=ts_cfg.get("min_font_size", 8),
-        stroke_width=ts_cfg.get("stroke_width", 0),
+        max_font_size=ts_cfg.get("max_font_size", 200),
+        min_font_size=ts_cfg.get("min_font_size", 12),
+        stroke_width=ts_cfg.get("stroke_width", 1),
         stroke_color=tuple(stroke_color_raw),    # type: ignore[arg-type]
     )
 
@@ -168,15 +171,20 @@ def main() -> int:
 
     # 4. Run
     if args.input:
-        # ── Single-file mode ─────────────────────────────────────────
         input_path = Path(args.input)
-        output_path = (
-            Path(args.output)
-            if args.output
-            else Path(paths_cfg.get("output_dir", "output")) / input_path.name
-        )
-        ensure_dir(output_path.parent)
-        pipeline.process_file(input_path, output_path)
+        if input_path.is_dir():
+            # ── Batch mode (override input directory) ────────────────
+            output_dir = Path(args.output) if args.output else Path(paths_cfg.get("output_dir", "output"))
+            pipeline.process_directory(input_path, output_dir)
+        else:
+            # ── Single-file mode ─────────────────────────────────────
+            output_path = (
+                Path(args.output)
+                if args.output
+                else Path(paths_cfg.get("output_dir", "output")) / input_path.name
+            )
+            ensure_dir(output_path.parent)
+            pipeline.process_file(input_path, output_path)
     else:
         # ── Batch mode (entire input directory) ──────────────────────
         input_dir = Path(paths_cfg.get("input_dir", "input"))

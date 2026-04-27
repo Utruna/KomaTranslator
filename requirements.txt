@@ -3,9 +3,10 @@ opencv-python>=4.8.0
 Pillow>=10.0.0
 numpy>=1.24.0
 
-# OCR
+# OCR & Detection
 paddleocr>=2.7.0
 paddlepaddle>=2.5.0  # CPU build; replace with paddlepaddle-gpu for CUDA
+ultralytics>=8.1.0   # YOLOv8 for comic text detection
 
 # Deep-learning backend (required by LaMa inpainting and PaddleOCR)
 torch>=2.0.0

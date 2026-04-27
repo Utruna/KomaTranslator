@@ -110,8 +110,10 @@ class Inpainter:
             mask[y_min:y_max, x_min:x_max] = 255
 
         if self.dilation_kernel > 0:
+            # We scale the kernel dynamically for high resolution images so it covers enough background
+            dynamic_kernel_size = max(self.dilation_kernel, int(image_shape[1] * 0.015))
             kernel = np.ones(
-                (self.dilation_kernel, self.dilation_kernel), dtype=np.uint8
+                (dynamic_kernel_size, dynamic_kernel_size), dtype=np.uint8
             )
             mask = cv2.dilate(mask, kernel, iterations=1)
 
@@ -180,8 +182,16 @@ class Inpainter:
             Inpainted RGB image.
         """
         bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        
+        # Hack for mangas: OpenCV inpainting smears high-contrast edges (black text
+        # on white background) if the mask is near the text. Because we strictly use
+        # rectangular bounding-box masks, we first overwrite the masked area with pure
+        # white. This destroys the black text immediately, forcing cv2.inpaint to only
+        # pull colors from OUTSIDE the bounding box (i.e. the bubble background color).
+        bgr[mask == 255] = (255, 255, 255)
+
         flag = cv2.INPAINT_TELEA if self.opencv_method == "telea" else cv2.INPAINT_NS
-        result_bgr = cv2.inpaint(bgr, mask, inpaintRadius=3, flags=flag)
+        result_bgr = cv2.inpaint(bgr, mask, inpaintRadius=5, flags=flag)
         return cv2.cvtColor(result_bgr, cv2.COLOR_BGR2RGB)
 
     def _inpaint_lama(self, image: np.ndarray, mask: np.ndarray) -> np.ndarray:

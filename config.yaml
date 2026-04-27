@@ -15,12 +15,10 @@ ocr:
   rec_batch_num: 6          # recognition batch size
 
 translation:
-  # TODO: replace with your actual API key (or load from the environment variable
-  #       OPENAI_API_KEY / ANTHROPIC_API_KEY / DEEPSEEK_API_KEY depending on the
-  #       provider you choose in translation_engine.py)
-  api_key: "YOUR_API_KEY_HERE"
+  api_key: "ollama"
   provider: "openai"        # "openai" | "anthropic" | "deepseek" | "custom"
-  model: "gpt-4o"
+  base_url: "http://localhost:11434/v1"
+  model: "llama3.1"
   source_language: "Chinese"
   target_language: "French"
   max_tokens: 256
@@ -29,17 +27,16 @@ translation:
 inpainting:
   method: "lama"            # "lama" (deep-learning) | "opencv" (telea / ns)
   device: "cpu"             # "cpu" | "cuda"
-  # TODO: set model_path to the local LaMa checkpoint when method == "lama"
   model_path: "models/lama"
   opencv_method: "telea"    # "telea" | "ns"  – used when method == "opencv"
   dilation_kernel: 5        # pixels added around each text mask before inpainting
 
 typesetting:
-  font_path: "fonts/default.ttf"
-  font_size: 18  # base font size in points
+  font_path: "src/police/animeace2bb_tt/animeace2_reg.ttf"
+  font_size: 120  # base font size in points
   font_color: [0, 0, 0]  # RGB tuple
   line_spacing: 6  # extra pixels between lines
-  max_font_size: 28  # upper bound for auto-size fitting
-  min_font_size: 8  # lower bound for auto-size fitting
-  stroke_width: 0  # outline width in pixels (0 = no outline)
+  max_font_size: 40  # limits auto-size fitting so it doesn't get ridiculously large
+  min_font_size: 10  # lower bound for auto-size fitting
+  stroke_width: 1  # outline width in pixels (0 = no outline)
   stroke_color: [255, 255, 255]  # RGB outline colour

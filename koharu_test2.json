@@ -1,0 +1,91 @@
+{
+  "epoch": 3,
+  "scene": {
+    "project": {
+      "name": "test-poll",
+      "createdAt": "2026-04-27T17:42:22.267703200Z",
+      "updatedAt": "2026-04-27T17:42:22.267703800Z",
+      "style": {
+        "defaultFont": null
+      }
+    },
+    "pages": {
+      "019dd008-f946-7ff1-bfca-782f5ceb69d4": {
+        "id": "019dd008-f946-7ff1-bfca-782f5ceb69d4",
+        "name": "input.jpg",
+        "width": 800,
+        "height": 1067,
+        "nodes": {
+          "019dd008-f946-7ff1-bfca-78305ef41cce": {
+            "id": "019dd008-f946-7ff1-bfca-78305ef41cce",
+            "transform": {
+              "x": 0.0,
+              "y": 0.0,
+              "width": 0.0,
+              "height": 0.0,
+              "rotationDeg": 0.0
+            },
+            "visible": true,
+            "kind": {
+              "image": {
+                "role": "source",
+                "blob": "8daa803f522bf11b345de984b7d1aafaf51b7cb195dbae728635dbe4433cfae9",
+                "opacity": 1.0,
+                "naturalWidth": 800,
+                "naturalHeight": 1067,
+                "name": "input.jpg"
+              }
+            }
+          },
+          "019dd008-fbcb-7cd2-97c2-e16132904666": {
+            "id": "019dd008-fbcb-7cd2-97c2-e16132904666",
+            "transform": {
+              "x": 0.0,
+              "y": 0.0,
+              "width": 0.0,
+              "height": 0.0,
+              "rotationDeg": 0.0
+            },
+            "visible": false,
+            "kind": {
+              "mask": {
+                "role": "segment",
+                "blob": "52cbe1040216c01c92e7b53fe1702481034cd777d040e1afe00c2108cc8a2fe2"
+              }
+            }
+          },
+          "019dd008-fbcb-7cd2-97c2-e174ec7a6181": {
+            "id": "019dd008-fbcb-7cd2-97c2-e174ec7a6181",
+            "transform": {
+              "x": 134.59322,
+              "y": 5.772949,
+              "width": 289.87482,
+              "height": 151.00488,
+              "rotationDeg": 0.0
+            },
+            "visible": true,
+            "kind": {
+              "text": {
+                "confidence": 0.921875,
+                "sourceLang": null,
+                "sourceDirection": null,
+                "renderedDirection": null,
+                "linePolygons": null,
+                "rotationDeg": null,
+                "detectedFontSizePx": null,
+                "detector": "ctd",
+                "text": "\u4e0d\u8fbb\u53ea\u8981\u4f60\u80fd\u5065\u5eb7\u5175\u5927\uff0c\u8fd4\u4e00\u5207\u90fd\u5024\u5f97",
+                "translation": null,
+                "style": null,
+                "fontPrediction": null,
+                "sprite": null,
+                "spriteTransform": null,
+                "lockLayoutBox": false
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
