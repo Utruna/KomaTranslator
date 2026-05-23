@@ -76,6 +76,7 @@ def build_ocr(cfg: dict) -> OCREngine:
     """
     ocr_cfg = cfg.get("ocr", {})
     return OCREngine(
+        engine=ocr_cfg.get("engine", "paddle-ocr"),
         language=ocr_cfg.get("language", "ch"),
         use_gpu=ocr_cfg.get("use_gpu", False),
         det_db_thresh=ocr_cfg.get("det_db_thresh", 0.3),
@@ -137,6 +138,20 @@ def build_typesetter(cfg: dict) -> Typesetter:
     )
 
 
+def build_pipeline(cfg: dict, ocr: OCREngine, translator: TranslationEngine, inpainter: Inpainter, typesetter: Typesetter) -> Pipeline:
+    """Instantiate :class:`~src.pipeline.Pipeline` from the config dict."""
+    pipeline_cfg = cfg.get("pipeline", {})
+    return Pipeline(
+        ocr,
+        translator,
+        inpainter,
+        typesetter,
+        min_confidence=pipeline_cfg.get("min_confidence", 0.4),
+        cluster_threshold=pipeline_cfg.get("cluster_threshold", 0.8),
+        max_cluster_distance_px=pipeline_cfg.get("max_cluster_distance_px", 80),
+    )
+
+
 # ──────────────────────────────────────────────────────────────────────
 # Main
 # ──────────────────────────────────────────────────────────────────────
@@ -167,7 +182,7 @@ def main() -> int:
     typesetter = build_typesetter(cfg)
 
     # 3. Assemble pipeline
-    pipeline = Pipeline(ocr, translator, inpainter, typesetter)
+    pipeline = build_pipeline(cfg, ocr, translator, inpainter, typesetter)
 
     # 4. Run
     if args.input:

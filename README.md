@@ -76,6 +76,17 @@ python main.py --config config.yaml --input input/ --output output/
 
 Il traitera toutes les images présentes dans le dossier d'entrée défini et recrachera les versions traduites dans le dossier de sortie.
 
+## 🧾 Compte rendu des avancées
+
+Les points suivants ont déjà été stabilisés dans le projet :
+
+- **Typesetter** : mesure correcte du texte multiligne, centrage vertical corrigé avec `anchor="mm"`, et cohérence entre `font_size` et `max_font_size`.
+- **OCR / Koharu** : polling plus robuste sur `GET /operations`, délai d'attente suffisant avant lecture de `scene.json`, logs DEBUG ajoutés, et fallback vers un engine OCR chinois valide.
+- **Configuration** : paramètres rendus configurables dans `config.yaml` pour l'engine OCR et le seuil de clustering du pipeline.
+- **Pipeline** : regroupement des blocs de texte resserré pour éviter les fusions excessives entre bulles distinctes.
+
+État actuel : le pipeline OCR → Traduction → Inpainting → Typesetting fonctionne de bout en bout sur une image de test, avec sortie générée dans `output/`.
+
 ## 🗺️ Roadmap & TODOs
 
 Une fondation solide est en place, les prochaines étapes documentées dans le code (stubs `TODO`) sont :

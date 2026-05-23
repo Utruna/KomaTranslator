@@ -13,6 +13,7 @@ ocr:
   use_gpu: false            # set to true if a CUDA-capable GPU is available
   det_db_thresh: 0.3        # detection threshold for the DB model
   rec_batch_num: 6          # recognition batch size
+  engine: "paddle-ocr"      # Koharu OCR engine for Chinese text
 
 translation:
   api_key: "ollama"
@@ -33,10 +34,15 @@ inpainting:
 
 typesetting:
   font_path: "src/police/animeace2bb_tt/animeace2_reg.ttf"
-  font_size: 120  # base font size in points
+  font_size: 40  # base font size in points
   font_color: [0, 0, 0]  # RGB tuple
   line_spacing: 6  # extra pixels between lines
-  max_font_size: 40  # limits auto-size fitting so it doesn't get ridiculously large
+  max_font_size: 120  # limits auto-size fitting so it doesn't get ridiculously large
   min_font_size: 10  # lower bound for auto-size fitting
   stroke_width: 1  # outline width in pixels (0 = no outline)
   stroke_color: [255, 255, 255]  # RGB outline colour
+
+pipeline:
+  cluster_threshold: 0.8       # proximity factor (ratio of char size) to group text boxes
+  max_cluster_distance_px: 80  # hard pixel cap — boxes farther apart are never merged
+  min_confidence: 0.4          # minimum OCR confidence to process a text box

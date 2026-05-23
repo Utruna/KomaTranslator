@@ -31,7 +31,9 @@ TODO integration points are marked with ``# TODO`` comments below.
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
+from typing import Literal
 
 import numpy as np
 
@@ -67,17 +69,44 @@ class Pipeline:
         translator: TranslationEngine,
         inpainter: Inpainter,
         typesetter: Typesetter,
-        min_confidence: float = 0.5,
+        min_confidence: float = 0.4,
+        cluster_threshold: float = 0.8,
+        max_cluster_distance_px: int = 80,
     ) -> None:
         self.ocr = ocr
         self.translator = translator
         self.inpainter = inpainter
         self.typesetter = typesetter
         self.min_confidence = min_confidence
+        self.cluster_threshold = cluster_threshold
+        self.max_cluster_distance_px = max_cluster_distance_px
 
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
+
+    @staticmethod
+    def _classify_text(text: str, is_bubble: bool) -> Literal["dialogue", "sfx", "skip"]:
+        """Classify out-of-bubble text to route translation and rendering.
+
+        - dialogue : normal translation + render()
+        - sfx      : short SFX/UI text → translate_sfx() + render_sfx()
+        - skip     : pure artistic brushstroke / illegible → leave untouched
+        """
+        if is_bubble:
+            return "dialogue"
+        stripped = text.strip()
+        has_sentence = bool(re.search(r'[。！？，、；：]', stripped))
+        # Very short + no sentence markers → likely pure artistic SFX, leave it
+        if len(stripped) <= 2 and not has_sentence:
+            return "skip"
+        # Game/cultivation UI: short formula with number operators
+        if re.search(r'[+\-]\s*\d', stripped) and len(stripped) <= 10:
+            return "sfx"
+        # Short isolated fragment without sentence structure → SFX
+        if len(stripped) <= 5 and not has_sentence:
+            return "sfx"
+        return "dialogue"
 
     def _find_bubble_bbox(self, image: np.ndarray, bbox: list[int]) -> tuple[list[int], bool]:
         """Try to find the actual white speech bubble enclosing this text box."""
@@ -200,6 +229,17 @@ class Pipeline:
             dy = max(0, max(b1[1], b2[1]) - min(b1[3], b2[3]))
             return float((dx**2 + dy**2)**0.5)
 
+        def overlap_ratio(b1: list[int], b2: list[int], axis: str) -> float:
+            if axis == "x":
+                overlap = max(0, min(b1[2], b2[2]) - max(b1[0], b2[0]))
+                smaller = min(b1[2] - b1[0], b2[2] - b2[0])
+            else:
+                overlap = max(0, min(b1[3], b2[3]) - max(b1[1], b2[1]))
+                smaller = min(b1[3] - b1[1], b2[3] - b2[1])
+            if smaller <= 0:
+                return 0.0
+            return overlap / smaller
+
         groups: list[list[TextBox]] = []
         for box in confident_boxes:
             matched_group_idx = -1
@@ -210,9 +250,15 @@ class Pipeline:
                     char_size_gbox = min(gbox.bbox[2] - gbox.bbox[0], gbox.bbox[3] - gbox.bbox[1])
                     char_sz = max(char_size_box, char_size_gbox, 1)
                     dist = boxes_distance(box.bbox, gbox.bbox)
+                    horizontal_overlap = overlap_ratio(box.bbox, gbox.bbox, "x")
+                    vertical_overlap = overlap_ratio(box.bbox, gbox.bbox, "y")
                     
-                    # Threshold factor (1.5x char size) to consider boxes part of the same block
-                    if dist <= char_sz * 1.5:
+                    # Threshold factor to consider boxes part of the same block.
+                    if (
+                        dist <= char_sz * self.cluster_threshold
+                        and dist <= self.max_cluster_distance_px
+                        and (horizontal_overlap > 0.2 or vertical_overlap > 0.2)
+                    ):
                         matched_group_idx = i
                         break
                 if matched_group_idx != -1:
@@ -244,47 +290,66 @@ class Pipeline:
 
         # ------------------------------------------------------------------
         logger.info("── Step 2 / 4  Translation ─────────────────────────────")
-        source_texts = [b.text for b in grouped_boxes]
-        translated_texts = self.translator.translate_batch(source_texts)
 
-        for src, tgt in zip(source_texts, translated_texts):
-            logger.debug("  '%s'  →  '%s'", src, tgt)
+        # Pre-classify each group before translating so we can route to the right prompt
+        # and decide whether to inpaint at all (skip = leave original art intact).
+        bboxes_all = [b.bbox for b in grouped_boxes]
+        bubble_bboxes_pre = []
+        is_bubbles_pre = []
+        for b in bboxes_all:
+            bb, is_b = self._find_bubble_bbox(image, b)
+            bubble_bboxes_pre.append(bb)
+            is_bubbles_pre.append(is_b)
+
+        kinds: list[str] = [
+            self._classify_text(box.text, is_b)
+            for box, is_b in zip(grouped_boxes, is_bubbles_pre)
+        ]
+
+        # Boxes classified as "skip" are left completely untouched (original art preserved).
+        active_indices = [i for i, k in enumerate(kinds) if k != "skip"]
+        skipped = len(grouped_boxes) - len(active_indices)
+        if skipped:
+            logger.info("Skipping %d pure-art SFX box(es) (no inpainting, no translation).", skipped)
+
+        active_boxes   = [grouped_boxes[i]      for i in active_indices]
+        active_bboxes  = [bboxes_all[i]         for i in active_indices]
+        active_bubbles = [bubble_bboxes_pre[i]  for i in active_indices]
+        active_is_b    = [is_bubbles_pre[i]     for i in active_indices]
+        active_kinds   = [kinds[i]              for i in active_indices]
+
+        translated_texts: list[str] = []
+        for box, kind in zip(active_boxes, active_kinds):
+            src = box.text
+            if kind == "sfx":
+                tgt = self.translator.translate_sfx(src)
+            else:
+                tgt = self.translator.translate(src)
+            logger.debug("  [%s] '%s'  →  '%s'", kind, src, tgt)
+            translated_texts.append(tgt)
 
         # ------------------------------------------------------------------
         logger.info("── Step 3 / 4  Inpainting ──────────────────────────────")
-        bboxes = [b.bbox for b in grouped_boxes]
-        clean_image = self.inpainter.erase(image, bboxes)
+        clean_image = self.inpainter.erase(image, active_bboxes, textbox_list=active_boxes)
 
         # ------------------------------------------------------------------
         logger.info("── Step 4 / 4  Typesetting ─────────────────────────────")
-        
-        # Dynamically find full speech bubbles so text is perfectly centered within them.
-        # This will also flag if text is OUTSIDE a bubble (acting as SFX or floating text).
-        bubble_bboxes = []
-        is_bubbles = []
-        for b in bboxes:
-            bubble_bbox, is_bubble = self._find_bubble_bbox(clean_image, b)
-            bubble_bboxes.append(bubble_bbox)
-            is_bubbles.append(is_bubble)
-            
-        # We can pass an extra instruction to the typesetter to render out-of-bubble text differently:
-        # namely, rendering it with an aggressive stroke to remain legible on complex art, 
-        # using the tight bounding box and slightly smaller padding to not spill.
+
+        # Re-detect bubble bboxes on the clean (inpainted) image for accurate centering.
+        bubble_bboxes: list[list[int]] = []
+        is_bubbles: list[bool] = []
+        for b in active_bboxes:
+            bb, is_b = self._find_bubble_bbox(clean_image, b)
+            bubble_bboxes.append(bb)
+            is_bubbles.append(is_b)
+
         result = clean_image.copy()
-        for txt, bbx, is_b in zip(translated_texts, bubble_bboxes, is_bubbles):
-            # For floating SFX text, we might want to pad it tightly and force stroke to contrast.
-            pad = 12 if is_b else 4
-            
-            # Temporary override Typesetter settings for floating text if needed
-            original_stroke_width = self.typesetter.stroke_width
-            if not is_b:
-                self.typesetter.stroke_width = max(3, self.typesetter.stroke_width * 2)
-                
-            try:
+        for txt, bbx, is_b, kind in zip(translated_texts, bubble_bboxes, is_bubbles, active_kinds):
+            if kind == "sfx":
+                result = self.typesetter.render_sfx(result, txt, bbx)
+            else:
+                pad = 12 if is_b else 6
                 result = self.typesetter.render(result, txt, bbx, padding=pad)
-            finally:
-                if not is_b:
-                    self.typesetter.stroke_width = original_stroke_width
 
         return result
 

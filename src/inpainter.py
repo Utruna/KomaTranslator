@@ -19,6 +19,7 @@ from typing import Literal
 import cv2
 import numpy as np
 
+from src.bubble_segmentation import classify_text_region, SegmentationResult
 from src.utils import get_logger
 
 logger = get_logger(__name__)
@@ -94,28 +95,57 @@ class Inpainter:
         self,
         image_shape: tuple[int, int],
         bboxes: list[list[int]],
+        segmentation_data: dict[int, SegmentationResult] | None = None,
     ) -> np.ndarray:
-        """Create a binary inpainting mask from axis-aligned bounding boxes.
+        """Create a binary inpainting mask from axis-aligned bounding boxes or segmentation data.
 
         Args:
             image_shape: ``(height, width)`` of the target image.
             bboxes:      List of ``[x_min, y_min, x_max, y_max]`` rectangles.
+            segmentation_data: Optional dict of SegmentationResult objects from
+                             bubble_segmentation. If provided, uses intelligent masks.
 
         Returns:
-            ``uint8`` mask of shape ``(H, W)`` where ``255`` marks areas to
-            be erased.
+            ``uint8`` mask of shape ``(H, W)`` where ``255`` marks areas to be erased.
         """
         mask = np.zeros(image_shape, dtype=np.uint8)
-        for x_min, y_min, x_max, y_max in bboxes:
-            mask[y_min:y_max, x_min:x_max] = 255
+        
+        if segmentation_data:
+            # Use intelligent segmentation masks (already optimized per-region)
+            for seg_result in segmentation_data.values():
+                mask = cv2.bitwise_or(mask, seg_result.mask)
+            
+            # Validate: mask should not exceed 50% of image (safety check)
+            mask_coverage = np.count_nonzero(mask) / (image_shape[0] * image_shape[1])
+            if mask_coverage > 0.5:
+                logger.warning(
+                    f"Mask coverage {mask_coverage:.1%} exceeds 50%; "
+                    "falling back to simple bbox dilation."
+                )
+                mask = np.zeros(image_shape, dtype=np.uint8)
+                for x_min, y_min, x_max, y_max in bboxes:
+                    mask[y_min:y_max, x_min:x_max] = 255
+                if self.dilation_kernel > 0:
+                    dynamic_kernel_size = max(
+                        self.dilation_kernel, int(image_shape[1] * 0.015)
+                    )
+                    kernel = np.ones(
+                        (dynamic_kernel_size, dynamic_kernel_size), dtype=np.uint8
+                    )
+                    mask = cv2.dilate(mask, kernel, iterations=1)
+        else:
+            # Fallback: simple bbox dilation (original behavior)
+            for x_min, y_min, x_max, y_max in bboxes:
+                mask[y_min:y_max, x_min:x_max] = 255
 
-        if self.dilation_kernel > 0:
-            # We scale the kernel dynamically for high resolution images so it covers enough background
-            dynamic_kernel_size = max(self.dilation_kernel, int(image_shape[1] * 0.015))
-            kernel = np.ones(
-                (dynamic_kernel_size, dynamic_kernel_size), dtype=np.uint8
-            )
-            mask = cv2.dilate(mask, kernel, iterations=1)
+            if self.dilation_kernel > 0:
+                dynamic_kernel_size = max(
+                    self.dilation_kernel, int(image_shape[1] * 0.015)
+                )
+                kernel = np.ones(
+                    (dynamic_kernel_size, dynamic_kernel_size), dtype=np.uint8
+                )
+                mask = cv2.dilate(mask, kernel, iterations=1)
 
         return mask
 
@@ -127,13 +157,19 @@ class Inpainter:
         self,
         image: np.ndarray,
         bboxes: list[list[int]],
+        textbox_list: list | None = None,
     ) -> np.ndarray:
         """Erase text regions from *image*.
 
+        Supports two modes:
+        1. Simple: bboxes only → simple bbox dilation.
+        2. Intelligent: bboxes + textbox_list → bubble segmentation with
+           Flood Fill for bubbles and conservative dilation for floating text.
+
         Args:
             image:  RGB image as ``np.ndarray`` of shape ``(H, W, 3)``.
-            bboxes: List of axis-aligned bounding boxes
-                    ``[x_min, y_min, x_max, y_max]`` to erase.
+            bboxes: List of axis-aligned bounding boxes to erase.
+            textbox_list: Optional list of TextBox objects for intelligent segmentation.
 
         Returns:
             Inpainted image as ``np.ndarray`` of shape ``(H, W, 3)`` in RGB.
@@ -143,7 +179,26 @@ class Inpainter:
             return image.copy()
 
         h, w = image.shape[:2]
-        mask = self._build_mask((h, w), bboxes)
+        
+        # Decide whether to use intelligent segmentation
+        segmentation_data = None
+        if textbox_list is not None:
+            try:
+                segmentation_data = classify_text_region(
+                    image,
+                    textbox_list,
+                    variance_threshold=0.15,
+                )
+                logger.debug(
+                    f"Intelligent segmentation applied: {len(segmentation_data)} regions."
+                )
+            except Exception as e:
+                logger.warning(
+                    f"Intelligent segmentation failed ({e}); "
+                    "falling back to simple bbox dilation."
+                )
+        
+        mask = self._build_mask((h, w), bboxes, segmentation_data=segmentation_data)
 
         if self._effective_method == "lama":
             return self._inpaint_lama(image, mask)

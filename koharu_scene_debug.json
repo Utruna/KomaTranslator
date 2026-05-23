@@ -1,23 +1,23 @@
 {
-  "epoch": 1,
+  "epoch": 2,
   "scene": {
     "project": {
-      "name": "koma-ocr-1777311842",
-      "createdAt": "2026-04-27T17:44:02.422726100Z",
-      "updatedAt": "2026-04-27T17:44:02.422726700Z",
+      "name": "koma-ocr-1779545296",
+      "createdAt": "2026-05-23T14:08:16.766025500Z",
+      "updatedAt": "2026-05-23T14:08:16.766026300Z",
       "style": {
         "defaultFont": null
       }
     },
     "pages": {
-      "019dd00a-80a1-7153-b8ad-2a530b261f7e": {
-        "id": "019dd00a-80a1-7153-b8ad-2a530b261f7e",
+      "019e552a-4fb2-7481-8f35-f7817c584d0d": {
+        "id": "019e552a-4fb2-7481-8f35-f7817c584d0d",
         "name": "page.png",
         "width": 800,
         "height": 1131,
         "nodes": {
-          "019dd00a-80a1-7153-b8ad-2a61f56583c6": {
-            "id": "019dd00a-80a1-7153-b8ad-2a61f56583c6",
+          "019e552a-4fb2-7481-8f35-f7909afc88dc": {
+            "id": "019e552a-4fb2-7481-8f35-f7909afc88dc",
             "transform": {
               "x": 0.0,
               "y": 0.0,
@@ -34,6 +34,173 @@
                 "naturalWidth": 800,
                 "naturalHeight": 1131,
                 "name": "page.png"
+              }
+            }
+          },
+          "019e552a-51a1-72c1-a56c-5a844954d902": {
+            "id": "019e552a-51a1-72c1-a56c-5a844954d902",
+            "transform": {
+              "x": 0.0,
+              "y": 0.0,
+              "width": 0.0,
+              "height": 0.0,
+              "rotationDeg": 0.0
+            },
+            "visible": false,
+            "kind": {
+              "mask": {
+                "role": "segment",
+                "blob": "09fdfa419068f0c7b2ffdb787db9a425f61faef434e4f8bc5b7e7a6bcc0b5100"
+              }
+            }
+          },
+          "019e552a-51a1-72c1-a56c-5a9e1d7f2298": {
+            "id": "019e552a-51a1-72c1-a56c-5a9e1d7f2298",
+            "transform": {
+              "x": 24.414364,
+              "y": 17.362183,
+              "width": 384.32043,
+              "height": 58.605225,
+              "rotationDeg": 0.0
+            },
+            "visible": true,
+            "kind": {
+              "text": {
+                "confidence": 0.4869995,
+                "sourceLang": null,
+                "sourceDirection": null,
+                "renderedDirection": null,
+                "linePolygons": null,
+                "rotationDeg": null,
+                "detectedFontSizePx": null,
+                "detector": "ctd",
+                "text": null,
+                "translation": null,
+                "style": null,
+                "fontPrediction": null,
+                "sprite": null,
+                "spriteTransform": null,
+                "lockLayoutBox": false
+              }
+            }
+          },
+          "019e552a-51a1-72c1-a56c-5aae1e53f12e": {
+            "id": "019e552a-51a1-72c1-a56c-5aae1e53f12e",
+            "transform": {
+              "x": 22.20442,
+              "y": 16.533813,
+              "width": 384.32047,
+              "height": 58.605225,
+              "rotationDeg": 0.0
+            },
+            "visible": true,
+            "kind": {
+              "text": {
+                "confidence": 0.43945312,
+                "sourceLang": null,
+                "sourceDirection": null,
+                "renderedDirection": null,
+                "linePolygons": null,
+                "rotationDeg": null,
+                "detectedFontSizePx": null,
+                "detector": "ctd",
+                "text": null,
+                "translation": null,
+                "style": null,
+                "fontPrediction": null,
+                "sprite": null,
+                "spriteTransform": null,
+                "lockLayoutBox": false
+              }
+            }
+          },
+          "019e552a-51a1-72c1-a56c-5ab89db4d172": {
+            "id": "019e552a-51a1-72c1-a56c-5ab89db4d172",
+            "transform": {
+              "x": 536.56903,
+              "y": 737.9053,
+              "width": 182.11053,
+              "height": 105.822266,
+              "rotationDeg": 0.0
+            },
+            "visible": true,
+            "kind": {
+              "text": {
+                "confidence": 0.9613037,
+                "sourceLang": null,
+                "sourceDirection": null,
+                "renderedDirection": null,
+                "linePolygons": null,
+                "rotationDeg": null,
+                "detectedFontSizePx": null,
+                "detector": "ctd",
+                "text": null,
+                "translation": null,
+                "style": null,
+                "fontPrediction": null,
+                "sprite": null,
+                "spriteTransform": null,
+                "lockLayoutBox": false
+              }
+            }
+          },
+          "019e552a-51a1-72c1-a56c-5ace3e0e20b5": {
+            "id": "019e552a-51a1-72c1-a56c-5ace3e0e20b5",
+            "transform": {
+              "x": 62.53591,
+              "y": 737.353,
+              "width": 250.61877,
+              "height": 168.77832,
+              "rotationDeg": 0.0
+            },
+            "visible": true,
+            "kind": {
+              "text": {
+                "confidence": 0.94207764,
+                "sourceLang": null,
+                "sourceDirection": null,
+                "renderedDirection": null,
+                "linePolygons": null,
+                "rotationDeg": null,
+                "detectedFontSizePx": null,
+                "detector": "ctd",
+                "text": null,
+                "translation": null,
+                "style": null,
+                "fontPrediction": null,
+                "sprite": null,
+                "spriteTransform": null,
+                "lockLayoutBox": false
+              }
+            }
+          },
+          "019e552a-51a1-72c1-a56c-5ad8db9b934b": {
+            "id": "019e552a-51a1-72c1-a56c-5ad8db9b934b",
+            "transform": {
+              "x": 519.99445,
+              "y": 1039.5697,
+              "width": 144.54144,
+              "height": 41.485596,
+              "rotationDeg": 0.0
+            },
+            "visible": true,
+            "kind": {
+              "text": {
+                "confidence": 0.6970825,
+                "sourceLang": null,
+                "sourceDirection": null,
+                "renderedDirection": null,
+                "linePolygons": null,
+                "rotationDeg": null,
+                "detectedFontSizePx": null,
+                "detector": "ctd",
+                "text": null,
+                "translation": null,
+                "style": null,
+                "fontPrediction": null,
+                "sprite": null,
+                "spriteTransform": null,
+                "lockLayoutBox": false
               }
             }
           }

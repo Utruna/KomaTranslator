@@ -3084,3 +3084,1561 @@ Les créatures de la montagne, comme le yōkai, sont connues pour leur capacité
 [2026-04-27 19:51:12] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
 [2026-04-27 19:51:12] INFO     src.pipeline – Saved translated image to 'output\803.jpg'.
 [2026-04-27 19:51:12] INFO     __main__ – Done.
+[2026-04-29 21:24:17] INFO     src.bubble_segmentation – Segmentation complete: 2 textboxes classified (0 bubbles, 2 floating text)
+[2026-04-29 21:24:50] INFO     src.bubble_segmentation – Segmentation complete: 2 textboxes classified (1 bubbles, 1 floating text)
+[2026-04-29 21:24:50] INFO     src.bubble_segmentation – Segmentation complete: 1 textboxes classified (0 bubbles, 1 floating text)
+[2026-04-29 21:24:50] INFO     src.bubble_segmentation – Segmentation complete: 1 textboxes classified (0 bubbles, 1 floating text)
+[2026-04-29 21:27:08] INFO     __main__ – Initialising OCR engine …
+[2026-04-29 21:27:08] INFO     __main__ – Initialising translation engine …
+[2026-04-29 21:27:11] INFO     __main__ – Initialising inpainter …
+[2026-04-29 21:27:11] WARNING  src.inpainter – LaMa model loading is not yet implemented.  Falling back to OpenCV inpainting.
+[2026-04-29 21:27:11] INFO     __main__ – Initialising typesetter …
+[2026-04-29 21:27:11] INFO     src.pipeline – Found 4 image(s) in 'input'.
+[2026-04-29 21:27:11] INFO     src.pipeline – Processing '800.jpg' …
+[2026-04-29 21:27:11] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-04-29 21:27:12] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:27:14] ERROR    src.ocr_engine – Failed to connect to Koharu API: HTTPConnectionPool(host='127.0.0.1', port=4000): Max retries exceeded with url: /api/v1/projects (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=4000): Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée")) 
+ Ensure it's running via: koharu.exe --port 4000 --headless
+[2026-04-29 21:27:14] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-04-29 21:27:14] INFO     src.pipeline – No text to translate; returning original image.
+[2026-04-29 21:27:14] INFO     src.pipeline – Saved translated image to 'output\800.jpg'.
+[2026-04-29 21:27:14] INFO     src.pipeline – Processing '801.jpg' …
+[2026-04-29 21:27:14] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-04-29 21:27:14] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:27:16] ERROR    src.ocr_engine – Failed to connect to Koharu API: HTTPConnectionPool(host='127.0.0.1', port=4000): Max retries exceeded with url: /api/v1/projects (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=4000): Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée")) 
+ Ensure it's running via: koharu.exe --port 4000 --headless
+[2026-04-29 21:27:16] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-04-29 21:27:16] INFO     src.pipeline – No text to translate; returning original image.
+[2026-04-29 21:27:16] INFO     src.pipeline – Saved translated image to 'output\801.jpg'.
+[2026-04-29 21:27:16] INFO     src.pipeline – Processing '802.jpg' …
+[2026-04-29 21:27:16] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-04-29 21:27:16] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:27:18] ERROR    src.ocr_engine – Failed to connect to Koharu API: HTTPConnectionPool(host='127.0.0.1', port=4000): Max retries exceeded with url: /api/v1/projects (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=4000): Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée")) 
+ Ensure it's running via: koharu.exe --port 4000 --headless
+[2026-04-29 21:27:18] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-04-29 21:27:18] INFO     src.pipeline – No text to translate; returning original image.
+[2026-04-29 21:27:18] INFO     src.pipeline – Saved translated image to 'output\802.jpg'.
+[2026-04-29 21:27:18] INFO     src.pipeline – Processing '803.jpg' …
+[2026-04-29 21:27:18] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-04-29 21:27:18] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:27:20] ERROR    src.ocr_engine – Failed to connect to Koharu API: HTTPConnectionPool(host='127.0.0.1', port=4000): Max retries exceeded with url: /api/v1/projects (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=4000): Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée")) 
+ Ensure it's running via: koharu.exe --port 4000 --headless
+[2026-04-29 21:27:20] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-04-29 21:27:20] INFO     src.pipeline – No text to translate; returning original image.
+[2026-04-29 21:27:20] INFO     src.pipeline – Saved translated image to 'output\803.jpg'.
+[2026-04-29 21:27:20] INFO     __main__ – Done.
+[2026-04-29 21:28:24] INFO     __main__ – Initialising OCR engine …
+[2026-04-29 21:28:24] INFO     __main__ – Initialising translation engine …
+[2026-04-29 21:28:24] INFO     __main__ – Initialising inpainter …
+[2026-04-29 21:28:24] WARNING  src.inpainter – LaMa model loading is not yet implemented.  Falling back to OpenCV inpainting.
+[2026-04-29 21:28:24] INFO     __main__ – Initialising typesetter …
+[2026-04-29 21:28:24] INFO     src.pipeline – Found 4 image(s) in 'input'.
+[2026-04-29 21:28:24] INFO     src.pipeline – Processing '800.jpg' …
+[2026-04-29 21:28:24] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-04-29 21:28:24] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:28:26] ERROR    src.ocr_engine – Failed to connect to Koharu API: HTTPConnectionPool(host='127.0.0.1', port=4000): Max retries exceeded with url: /api/v1/projects (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=4000): Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée")) 
+ Ensure it's running via: koharu.exe --port 4000 --headless
+[2026-04-29 21:28:26] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-04-29 21:28:26] INFO     src.pipeline – No text to translate; returning original image.
+[2026-04-29 21:28:26] INFO     src.pipeline – Saved translated image to 'output\800.jpg'.
+[2026-04-29 21:28:26] INFO     src.pipeline – Processing '801.jpg' …
+[2026-04-29 21:28:27] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-04-29 21:28:27] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:28:29] ERROR    src.ocr_engine – Failed to connect to Koharu API: HTTPConnectionPool(host='127.0.0.1', port=4000): Max retries exceeded with url: /api/v1/projects (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=4000): Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée")) 
+ Ensure it's running via: koharu.exe --port 4000 --headless
+[2026-04-29 21:28:29] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-04-29 21:28:29] INFO     src.pipeline – No text to translate; returning original image.
+[2026-04-29 21:28:29] INFO     src.pipeline – Saved translated image to 'output\801.jpg'.
+[2026-04-29 21:28:29] INFO     src.pipeline – Processing '802.jpg' …
+[2026-04-29 21:28:29] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-04-29 21:28:29] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:28:31] ERROR    src.ocr_engine – Failed to connect to Koharu API: HTTPConnectionPool(host='127.0.0.1', port=4000): Max retries exceeded with url: /api/v1/projects (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=4000): Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée")) 
+ Ensure it's running via: koharu.exe --port 4000 --headless
+[2026-04-29 21:28:31] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-04-29 21:28:31] INFO     src.pipeline – No text to translate; returning original image.
+[2026-04-29 21:28:31] INFO     src.pipeline – Saved translated image to 'output\802.jpg'.
+[2026-04-29 21:28:31] INFO     src.pipeline – Processing '803.jpg' …
+[2026-04-29 21:28:31] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-04-29 21:28:31] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:28:33] ERROR    src.ocr_engine – Failed to connect to Koharu API: HTTPConnectionPool(host='127.0.0.1', port=4000): Max retries exceeded with url: /api/v1/projects (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=4000): Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée")) 
+ Ensure it's running via: koharu.exe --port 4000 --headless
+[2026-04-29 21:28:33] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-04-29 21:28:33] INFO     src.pipeline – No text to translate; returning original image.
+[2026-04-29 21:28:33] INFO     src.pipeline – Saved translated image to 'output\803.jpg'.
+[2026-04-29 21:28:33] INFO     __main__ – Done.
+[2026-04-29 21:30:11] INFO     __main__ – Initialising OCR engine …
+[2026-04-29 21:30:11] INFO     __main__ – Initialising translation engine …
+[2026-04-29 21:30:15] INFO     __main__ – Initialising inpainter …
+[2026-04-29 21:30:15] WARNING  src.inpainter – LaMa model loading is not yet implemented.  Falling back to OpenCV inpainting.
+[2026-04-29 21:30:15] INFO     __main__ – Initialising typesetter …
+[2026-04-29 21:30:15] INFO     src.pipeline – Found 4 image(s) in 'input'.
+[2026-04-29 21:30:15] INFO     src.pipeline – Processing '800.jpg' …
+[2026-04-29 21:30:15] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-04-29 21:30:15] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:30:15] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-04-29 21:30:15] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-04-29 21:30:15] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-04-29 21:30:16] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-04-29 21:30:16] WARNING  src.ocr_engine – No text boxes retrieved! Saved Scene JSON to koharu_scene_debug.json for inspection.
+[2026-04-29 21:30:16] INFO     src.ocr_engine – Koharu API returned 0 text regions.
+[2026-04-29 21:30:16] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-04-29 21:30:16] INFO     src.pipeline – No text to translate; returning original image.
+[2026-04-29 21:30:16] INFO     src.pipeline – Saved translated image to 'output\800.jpg'.
+[2026-04-29 21:30:16] INFO     src.pipeline – Processing '801.jpg' …
+[2026-04-29 21:30:16] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-04-29 21:30:16] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:30:16] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-04-29 21:30:17] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-04-29 21:30:17] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-04-29 21:30:18] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-04-29 21:30:18] ERROR    src.ocr_engine – Error during Koharu detection: 'NoneType' object has no attribute 'strip'
+[2026-04-29 21:30:18] ERROR    src.ocr_engine – Traceback (most recent call last):
+  File "E:\Projet\KomaTranslator\src\ocr_engine.py", line 223, in detect
+    if text.strip() and x2 > x1 and y2 > y1:
+       ^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'strip'
+
+[2026-04-29 21:30:18] INFO     src.ocr_engine – Koharu API returned 0 text regions.
+[2026-04-29 21:30:18] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-04-29 21:30:18] INFO     src.pipeline – No text to translate; returning original image.
+[2026-04-29 21:30:18] INFO     src.pipeline – Saved translated image to 'output\801.jpg'.
+[2026-04-29 21:30:18] INFO     src.pipeline – Processing '802.jpg' …
+[2026-04-29 21:30:18] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-04-29 21:30:18] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:30:18] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-04-29 21:30:18] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-04-29 21:30:18] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-04-29 21:30:19] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-04-29 21:30:19] ERROR    src.ocr_engine – Error during Koharu detection: 'NoneType' object has no attribute 'strip'
+[2026-04-29 21:30:19] ERROR    src.ocr_engine – Traceback (most recent call last):
+  File "E:\Projet\KomaTranslator\src\ocr_engine.py", line 223, in detect
+    if text.strip() and x2 > x1 and y2 > y1:
+       ^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'strip'
+
+[2026-04-29 21:30:19] INFO     src.ocr_engine – Koharu API returned 0 text regions.
+[2026-04-29 21:30:19] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-04-29 21:30:19] INFO     src.pipeline – No text to translate; returning original image.
+[2026-04-29 21:30:19] INFO     src.pipeline – Saved translated image to 'output\802.jpg'.
+[2026-04-29 21:30:19] INFO     src.pipeline – Processing '803.jpg' …
+[2026-04-29 21:30:19] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-04-29 21:30:19] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:30:19] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-04-29 21:30:19] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-04-29 21:30:19] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-04-29 21:30:20] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-04-29 21:30:20] INFO     src.ocr_engine – Koharu API returned 5 text regions.
+[2026-04-29 21:30:20] INFO     src.pipeline – 3 / 5 box(es) passed confidence threshold (0.50).
+[2026-04-29 21:30:20] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-04-29 21:30:20] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-04-29 21:30:20] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+蟲然箆滞会受到山豚中夙雪妖曽的変缶，但逐座城池近是在次次毀又性的毖争中不断重建了起来 〈俺比不詩深外面的世界思た４９．１．１０．１．１９時３人以上の一部に入った場所で、不適存在、不足性物の曲子立ちの種類としての種類の人間に対代完整理です。 光輝之城
+---------------------
+[2026-04-29 21:30:43] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Les créatures de la montagne sont souvent victimes des attaques de Yōkai, mais chaque fois que les villes sont détruites, elles sont reconstruites. Moi, j'ai vécu dans un monde qui va au-delà du poème. Il y a 49.1.10.1.19 heures, il y avait plus de trois personnes dans ce lieu, et c'était un endroit où les créatures inadaptées et insuffisantes se comportaient comme des espèces de musique. C'est la ville éclatante de lumière.
+----------------------
+[2026-04-29 21:30:43] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-04-29 21:30:43] INFO     src.bubble_segmentation – Segmentation complete: 1 textboxes classified (0 bubbles, 1 floating text)
+[2026-04-29 21:30:43] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-04-29 21:30:43] INFO     src.pipeline – Saved translated image to 'output\803.jpg'.
+[2026-04-29 21:30:43] INFO     __main__ – Done.
+[2026-04-29 21:30:56] INFO     __main__ – Initialising OCR engine …
+[2026-04-29 21:30:56] INFO     __main__ – Initialising translation engine …
+[2026-04-29 21:30:57] INFO     __main__ – Initialising inpainter …
+[2026-04-29 21:30:57] WARNING  src.inpainter – LaMa model loading is not yet implemented.  Falling back to OpenCV inpainting.
+[2026-04-29 21:30:57] INFO     __main__ – Initialising typesetter …
+[2026-04-29 21:30:57] INFO     src.pipeline – Found 4 image(s) in 'input'.
+[2026-04-29 21:30:57] INFO     src.pipeline – Processing '800.jpg' …
+[2026-04-29 21:30:57] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-04-29 21:30:57] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:30:57] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-04-29 21:30:57] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-04-29 21:30:57] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-04-29 21:30:58] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-04-29 21:30:58] INFO     src.ocr_engine – Koharu API returned 1 text regions.
+[2026-04-29 21:30:58] INFO     src.pipeline – 1 / 1 box(es) passed confidence threshold (0.50).
+[2026-04-29 21:30:58] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-04-29 21:30:58] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-04-29 21:30:58] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+不辻只要你能健康兵大，返一切都値得
+---------------------
+[2026-04-29 21:31:00] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Je ne demande qu'une chose : que tu sois en forme pour le grand exercice, et tout le reste n'a pas d'importance.
+----------------------
+[2026-04-29 21:31:00] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-04-29 21:31:00] INFO     src.bubble_segmentation – Segmentation complete: 1 textboxes classified (0 bubbles, 1 floating text)
+[2026-04-29 21:31:00] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-04-29 21:31:00] INFO     src.pipeline – Saved translated image to 'output\800.jpg'.
+[2026-04-29 21:31:00] INFO     src.pipeline – Processing '801.jpg' …
+[2026-04-29 21:31:00] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-04-29 21:31:00] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:31:00] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-04-29 21:31:00] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-04-29 21:31:00] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-04-29 21:31:01] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-04-29 21:31:01] INFO     src.ocr_engine – Koharu API returned 3 text regions.
+[2026-04-29 21:31:01] INFO     src.pipeline – 3 / 3 box(es) passed confidence threshold (0.50).
+[2026-04-29 21:31:01] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-04-29 21:31:01] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-04-29 21:31:01] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+爺量＃ 能量＋１ あっ、
+---------------------
+[2026-04-29 21:31:02] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Grand-père ! Énergie + 1 Ah,
+----------------------
+[2026-04-29 21:31:02] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-04-29 21:31:02] INFO     src.bubble_segmentation – Segmentation complete: 1 textboxes classified (0 bubbles, 1 floating text)
+[2026-04-29 21:31:02] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-04-29 21:31:02] INFO     src.pipeline – Saved translated image to 'output\801.jpg'.
+[2026-04-29 21:31:02] INFO     src.pipeline – Processing '802.jpg' …
+[2026-04-29 21:31:02] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-04-29 21:31:02] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:31:02] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-04-29 21:31:02] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-04-29 21:31:02] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-04-29 21:31:03] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-04-29 21:31:03] INFO     src.ocr_engine – Koharu API returned 1 text regions.
+[2026-04-29 21:31:03] INFO     src.pipeline – 1 / 1 box(es) passed confidence threshold (0.50).
+[2026-04-29 21:31:03] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-04-29 21:31:03] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-04-29 21:31:03] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+我穿越了，穿越成了ー个大腕迩没有矣育完整的新生／ル
+---------------------
+[2026-04-29 21:31:05] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+J'ai traversé, et je suis devenu un grand patron, sans aucune expérience ou formation.
+----------------------
+[2026-04-29 21:31:05] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-04-29 21:31:05] INFO     src.bubble_segmentation – Segmentation complete: 1 textboxes classified (0 bubbles, 1 floating text)
+[2026-04-29 21:31:05] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-04-29 21:31:05] INFO     src.pipeline – Saved translated image to 'output\802.jpg'.
+[2026-04-29 21:31:05] INFO     src.pipeline – Processing '803.jpg' …
+[2026-04-29 21:31:05] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-04-29 21:31:05] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:31:05] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-04-29 21:31:05] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-04-29 21:31:05] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-04-29 21:31:06] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-04-29 21:31:06] INFO     src.ocr_engine – Koharu API returned 5 text regions.
+[2026-04-29 21:31:06] INFO     src.pipeline – 3 / 5 box(es) passed confidence threshold (0.50).
+[2026-04-29 21:31:06] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-04-29 21:31:06] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-04-29 21:31:06] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+蟲然箆滞会受到山豚中夙雪妖曽的変缶，但逐座城池近是在次次毀又性的毖争中不断重建了起来 〈俺比不詩深外面的世界思た４９．１．１０．１．１９時３人以上の一部に入った場所で、不適存在、不足性物の曲子立ちの種類としての種類の人間に対代完整理です。 光輝之城
+---------------------
+[2026-04-29 21:31:10] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Les créatures de la montagne ont été détruites par les esprits de la neige, mais la ville a été reconstruite à chaque fois. Moi, je suis un être humain qui vit dans ce monde extérieur, où il y a des gens qui sont différents les uns des autres. C'est une ville lumineuse.
+----------------------
+[2026-04-29 21:31:10] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-04-29 21:31:10] INFO     src.bubble_segmentation – Segmentation complete: 1 textboxes classified (0 bubbles, 1 floating text)
+[2026-04-29 21:31:10] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-04-29 21:31:10] INFO     src.pipeline – Saved translated image to 'output\803.jpg'.
+[2026-04-29 21:31:10] INFO     __main__ – Done.
+[2026-04-29 21:38:45] INFO     DetectionZone – Analyse des zones pour : input/803.jpg
+[2026-04-29 21:38:45] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:38:47] ERROR    src.ocr_engine – Failed to connect to Koharu API: HTTPConnectionPool(host='127.0.0.1', port=4000): Max retries exceeded with url: /api/v1/projects (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=4000): Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée")) 
+ Ensure it's running via: koharu.exe --port 4000 --headless
+[2026-04-29 21:38:47] WARNING  DetectionZone – Aucun texte détecté. Vérifiez que Koharu est lancé.
+[2026-04-29 21:39:34] INFO     DetectionZone – Analyse des zones pour : input/803.jpg
+[2026-04-29 21:39:34] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:39:34] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-04-29 21:39:34] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-04-29 21:39:34] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-04-29 21:39:35] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-04-29 21:39:35] WARNING  src.ocr_engine – No text boxes retrieved! Saved Scene JSON to koharu_scene_debug.json for inspection.
+[2026-04-29 21:39:35] INFO     src.ocr_engine – Koharu API returned 0 text regions.
+[2026-04-29 21:39:35] WARNING  DetectionZone – Aucun texte détecté. Vérifiez que Koharu est lancé.
+[2026-04-29 21:43:29] INFO     DetectionZone – Analyse des zones pour : input/803.jpg
+[2026-04-29 21:43:29] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:43:29] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-04-29 21:43:29] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-04-29 21:43:29] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-04-29 21:43:30] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-04-29 21:43:30] INFO     src.ocr_engine – Koharu API returned 5 text regions.
+[2026-04-29 21:43:30] INFO     src.bubble_segmentation – Segmentation complete: 5 textboxes classified (0 bubbles, 5 floating text)
+[2026-04-29 21:43:30] INFO     DetectionZone – Visualisation sauvegardée dans : output/debug_zones_803.png
+[2026-04-29 21:45:11] INFO     DetectionZone – Analyse des zones pour : input/803.jpg
+[2026-04-29 21:45:11] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:45:11] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-04-29 21:45:11] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-04-29 21:45:11] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-04-29 21:45:12] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-04-29 21:45:13] INFO     src.ocr_engine – Koharu API returned 5 text regions.
+[2026-04-29 21:45:13] INFO     src.bubble_segmentation – Segmentation complete: 5 textboxes classified (0 bubbles, 5 floating text)
+[2026-04-29 21:45:13] INFO     DetectionZone – Visualisation sauvegardée dans : output/debug_zones_803.png
+[2026-04-29 21:45:51] INFO     DetectionZone – Analyse des zones pour : input/803.jpg
+[2026-04-29 21:45:51] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:45:51] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-04-29 21:45:51] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-04-29 21:45:51] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-04-29 21:45:52] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-04-29 21:45:53] INFO     src.ocr_engine – Koharu API returned 5 text regions.
+[2026-04-29 21:45:53] INFO     src.bubble_segmentation – Segmentation complete: 5 textboxes classified (0 bubbles, 5 floating text)
+[2026-04-29 21:45:53] INFO     DetectionZone – Visualisation sauvegardée dans : output/debug_zones_803.png
+[2026-04-29 21:46:09] INFO     DetectionZone – Analyse des zones pour : input/803.jpg
+[2026-04-29 21:46:09] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:46:09] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-04-29 21:46:09] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-04-29 21:46:09] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-04-29 21:46:10] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-04-29 21:46:10] INFO     src.ocr_engine – Koharu API returned 5 text regions.
+[2026-04-29 21:46:10] INFO     src.bubble_segmentation – Segmentation complete: 5 textboxes classified (0 bubbles, 5 floating text)
+[2026-04-29 21:46:10] INFO     DetectionZone – Visualisation sauvegardée dans : output/debug_zones_803.png
+[2026-04-29 21:46:26] INFO     DetectionZone – Analyse des zones pour : input/803.jpg
+[2026-04-29 21:46:27] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-04-29 21:46:27] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-04-29 21:46:27] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-04-29 21:46:27] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-04-29 21:46:28] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-04-29 21:46:28] INFO     src.ocr_engine – Koharu API returned 5 text regions.
+[2026-04-29 21:46:28] INFO     src.bubble_segmentation – Segmentation complete: 5 textboxes classified (0 bubbles, 5 floating text)
+[2026-04-29 21:46:28] INFO     DetectionZone – Visualisation sauvegardée dans : output/debug_zones_803.png
+[2026-05-23 15:44:44] INFO     __main__ – Initialising OCR engine …
+[2026-05-23 15:44:44] INFO     __main__ – Initialising translation engine …
+[2026-05-23 15:44:48] INFO     __main__ – Initialising inpainter …
+[2026-05-23 15:44:48] WARNING  src.inpainter – LaMa model loading is not yet implemented.  Falling back to OpenCV inpainting.
+[2026-05-23 15:44:48] INFO     __main__ – Initialising typesetter …
+[2026-05-23 15:44:48] INFO     src.pipeline – Found 4 image(s) in 'input'.
+[2026-05-23 15:44:48] INFO     src.pipeline – Processing '800.jpg' …
+[2026-05-23 15:44:48] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 15:44:50] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 15:44:52] ERROR    src.ocr_engine – Failed to connect to Koharu API: HTTPConnectionPool(host='127.0.0.1', port=4000): Max retries exceeded with url: /api/v1/projects (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=4000): Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée")) 
+ Ensure it's running via: koharu.exe --port 4000 --headless
+[2026-05-23 15:44:52] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-05-23 15:44:52] INFO     src.pipeline – No text to translate; returning original image.
+[2026-05-23 15:44:52] INFO     src.pipeline – Saved translated image to 'output\800.jpg'.
+[2026-05-23 15:44:52] INFO     src.pipeline – Processing '801.jpg' …
+[2026-05-23 15:44:52] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 15:44:52] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 15:44:54] ERROR    src.ocr_engine – Failed to connect to Koharu API: HTTPConnectionPool(host='127.0.0.1', port=4000): Max retries exceeded with url: /api/v1/projects (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=4000): Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée")) 
+ Ensure it's running via: koharu.exe --port 4000 --headless
+[2026-05-23 15:44:54] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-05-23 15:44:54] INFO     src.pipeline – No text to translate; returning original image.
+[2026-05-23 15:44:54] INFO     src.pipeline – Saved translated image to 'output\801.jpg'.
+[2026-05-23 15:44:54] INFO     src.pipeline – Processing '802.jpg' …
+[2026-05-23 15:44:54] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 15:44:54] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 15:44:56] ERROR    src.ocr_engine – Failed to connect to Koharu API: HTTPConnectionPool(host='127.0.0.1', port=4000): Max retries exceeded with url: /api/v1/projects (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=4000): Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée")) 
+ Ensure it's running via: koharu.exe --port 4000 --headless
+[2026-05-23 15:44:56] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-05-23 15:44:56] INFO     src.pipeline – No text to translate; returning original image.
+[2026-05-23 15:44:56] INFO     src.pipeline – Saved translated image to 'output\802.jpg'.
+[2026-05-23 15:44:56] INFO     src.pipeline – Processing '803.jpg' …
+[2026-05-23 15:44:56] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 15:44:56] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 15:44:58] ERROR    src.ocr_engine – Failed to connect to Koharu API: HTTPConnectionPool(host='127.0.0.1', port=4000): Max retries exceeded with url: /api/v1/projects (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=4000): Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée")) 
+ Ensure it's running via: koharu.exe --port 4000 --headless
+[2026-05-23 15:44:58] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-05-23 15:44:58] INFO     src.pipeline – No text to translate; returning original image.
+[2026-05-23 15:44:58] INFO     src.pipeline – Saved translated image to 'output\803.jpg'.
+[2026-05-23 15:44:58] INFO     __main__ – Done.
+[2026-05-23 15:49:29] INFO     __main__ – Initialising OCR engine …
+[2026-05-23 15:49:29] INFO     __main__ – Initialising translation engine …
+[2026-05-23 15:49:29] INFO     __main__ – Initialising inpainter …
+[2026-05-23 15:49:29] WARNING  src.inpainter – LaMa model loading is not yet implemented.  Falling back to OpenCV inpainting.
+[2026-05-23 15:49:29] INFO     __main__ – Initialising typesetter …
+[2026-05-23 15:49:29] INFO     src.pipeline – Found 4 image(s) in 'input'.
+[2026-05-23 15:49:29] INFO     src.pipeline – Processing '800.jpg' …
+[2026-05-23 15:49:29] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 15:49:29] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 15:49:29] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 15:49:29] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-05-23 15:49:29] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 15:49:30] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 15:49:30] WARNING  src.ocr_engine – No text boxes retrieved! Saved Scene JSON to koharu_scene_debug.json for inspection.
+[2026-05-23 15:49:31] INFO     src.ocr_engine – Koharu API returned 0 text regions.
+[2026-05-23 15:49:31] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-05-23 15:49:31] INFO     src.pipeline – No text to translate; returning original image.
+[2026-05-23 15:49:31] INFO     src.pipeline – Saved translated image to 'output\800.jpg'.
+[2026-05-23 15:49:31] INFO     src.pipeline – Processing '801.jpg' …
+[2026-05-23 15:49:31] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 15:49:31] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 15:49:31] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 15:49:31] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-05-23 15:49:31] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 15:49:32] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 15:49:32] WARNING  src.ocr_engine – No text boxes retrieved! Saved Scene JSON to koharu_scene_debug.json for inspection.
+[2026-05-23 15:49:32] INFO     src.ocr_engine – Koharu API returned 0 text regions.
+[2026-05-23 15:49:32] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-05-23 15:49:32] INFO     src.pipeline – No text to translate; returning original image.
+[2026-05-23 15:49:32] INFO     src.pipeline – Saved translated image to 'output\801.jpg'.
+[2026-05-23 15:49:32] INFO     src.pipeline – Processing '802.jpg' …
+[2026-05-23 15:49:32] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 15:49:32] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 15:49:32] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 15:49:32] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-05-23 15:49:32] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 15:49:33] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 15:49:33] WARNING  src.ocr_engine – No text boxes retrieved! Saved Scene JSON to koharu_scene_debug.json for inspection.
+[2026-05-23 15:49:33] INFO     src.ocr_engine – Koharu API returned 0 text regions.
+[2026-05-23 15:49:33] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-05-23 15:49:33] INFO     src.pipeline – No text to translate; returning original image.
+[2026-05-23 15:49:33] INFO     src.pipeline – Saved translated image to 'output\802.jpg'.
+[2026-05-23 15:49:33] INFO     src.pipeline – Processing '803.jpg' …
+[2026-05-23 15:49:33] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 15:49:33] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 15:49:33] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 15:49:33] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-05-23 15:49:33] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 15:49:34] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 15:49:34] WARNING  src.ocr_engine – No text boxes retrieved! Saved Scene JSON to koharu_scene_debug.json for inspection.
+[2026-05-23 15:49:34] INFO     src.ocr_engine – Koharu API returned 0 text regions.
+[2026-05-23 15:49:34] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-05-23 15:49:34] INFO     src.pipeline – No text to translate; returning original image.
+[2026-05-23 15:49:34] INFO     src.pipeline – Saved translated image to 'output\803.jpg'.
+[2026-05-23 15:49:34] INFO     __main__ – Done.
+[2026-05-23 15:49:45] INFO     __main__ – Initialising OCR engine …
+[2026-05-23 15:49:45] INFO     __main__ – Initialising translation engine …
+[2026-05-23 15:49:46] INFO     __main__ – Initialising inpainter …
+[2026-05-23 15:49:46] WARNING  src.inpainter – LaMa model loading is not yet implemented.  Falling back to OpenCV inpainting.
+[2026-05-23 15:49:46] INFO     __main__ – Initialising typesetter …
+[2026-05-23 15:49:46] INFO     src.pipeline – Found 4 image(s) in 'input'.
+[2026-05-23 15:49:46] INFO     src.pipeline – Processing '800.jpg' …
+[2026-05-23 15:49:46] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 15:49:46] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 15:49:46] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 15:49:46] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-05-23 15:49:46] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 15:49:47] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 15:49:47] INFO     src.ocr_engine – Koharu API returned 1 text regions.
+[2026-05-23 15:49:47] INFO     src.pipeline – 1 / 1 box(es) passed confidence threshold (0.50).
+[2026-05-23 15:49:47] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-05-23 15:49:47] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 15:49:47] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+不辻只要你能健康兵大，返一切都値得
+---------------------
+[2026-05-23 15:50:01] ERROR    src.pipeline – Failed to process '800.jpg': Connection error.
+[2026-05-23 15:50:01] INFO     src.pipeline – Processing '801.jpg' …
+[2026-05-23 15:50:01] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 15:50:01] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 15:50:02] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 15:50:02] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-05-23 15:50:02] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 15:50:03] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 15:50:03] INFO     src.ocr_engine – Koharu API returned 3 text regions.
+[2026-05-23 15:50:03] INFO     src.pipeline – 3 / 3 box(es) passed confidence threshold (0.50).
+[2026-05-23 15:50:03] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-05-23 15:50:03] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 15:50:03] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+爺量＃ 能量＋１ あっ、
+---------------------
+[2026-05-23 15:50:16] ERROR    src.pipeline – Failed to process '801.jpg': Connection error.
+[2026-05-23 15:50:16] INFO     src.pipeline – Processing '802.jpg' …
+[2026-05-23 15:50:16] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 15:50:16] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 15:50:16] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 15:50:16] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-05-23 15:50:16] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 15:50:17] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 15:50:17] INFO     src.ocr_engine – Koharu API returned 1 text regions.
+[2026-05-23 15:50:17] INFO     src.pipeline – 1 / 1 box(es) passed confidence threshold (0.50).
+[2026-05-23 15:50:17] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-05-23 15:50:17] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 15:50:17] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+我穿越了，穿越成了ー个大腕迩没有矣育完整的新生／ル
+---------------------
+[2026-05-23 15:50:31] ERROR    src.pipeline – Failed to process '802.jpg': Connection error.
+[2026-05-23 15:50:31] INFO     src.pipeline – Processing '803.jpg' …
+[2026-05-23 15:50:31] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 15:50:31] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 15:50:31] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 15:50:31] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-05-23 15:50:31] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 15:50:32] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 15:50:32] INFO     src.ocr_engine – Koharu API returned 5 text regions.
+[2026-05-23 15:50:32] INFO     src.pipeline – 3 / 5 box(es) passed confidence threshold (0.50).
+[2026-05-23 15:50:32] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-05-23 15:50:32] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 15:50:32] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+蟲然箆滞会受到山豚中夙雪妖曽的変缶，但逐座城池近是在次次毀又性的毖争中不断重建了起来 〈俺比不詩深外面的世界思た４９．１．１０．１．１９時３人以上の一部に入った場所で、不適存在、不足性物の曲子立ちの種類としての種類の人間に対代完整理です。 光輝之城
+---------------------
+[2026-05-23 15:50:45] ERROR    src.pipeline – Failed to process '803.jpg': Connection error.
+[2026-05-23 15:50:45] INFO     __main__ – Done.
+[2026-05-23 15:51:58] INFO     __main__ – Initialising OCR engine …
+[2026-05-23 15:51:58] INFO     __main__ – Initialising translation engine …
+[2026-05-23 15:51:58] INFO     __main__ – Initialising inpainter …
+[2026-05-23 15:51:58] WARNING  src.inpainter – LaMa model loading is not yet implemented.  Falling back to OpenCV inpainting.
+[2026-05-23 15:51:58] INFO     __main__ – Initialising typesetter …
+[2026-05-23 15:51:58] INFO     src.pipeline – Found 4 image(s) in 'input'.
+[2026-05-23 15:51:58] INFO     src.pipeline – Processing '800.jpg' …
+[2026-05-23 15:51:58] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 15:51:58] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 15:51:58] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 15:51:58] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-05-23 15:51:58] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 15:51:59] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 15:51:59] INFO     src.ocr_engine – Koharu API returned 1 text regions.
+[2026-05-23 15:51:59] INFO     src.pipeline – 1 / 1 box(es) passed confidence threshold (0.50).
+[2026-05-23 15:51:59] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-05-23 15:51:59] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 15:51:59] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+不辻只要你能健康兵大，返一切都値得
+---------------------
+[2026-05-23 15:53:10] INFO     __main__ – Initialising OCR engine …
+[2026-05-23 15:53:10] INFO     __main__ – Initialising translation engine …
+[2026-05-23 15:53:11] INFO     __main__ – Initialising inpainter …
+[2026-05-23 15:53:11] WARNING  src.inpainter – LaMa model loading is not yet implemented.  Falling back to OpenCV inpainting.
+[2026-05-23 15:53:11] INFO     __main__ – Initialising typesetter …
+[2026-05-23 15:53:11] INFO     src.pipeline – Found 4 image(s) in 'input'.
+[2026-05-23 15:53:11] INFO     src.pipeline – Processing '800.jpg' …
+[2026-05-23 15:53:11] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 15:53:11] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 15:53:11] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 15:53:11] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-05-23 15:53:11] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 15:53:12] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 15:53:12] WARNING  src.ocr_engine – No text boxes retrieved! Saved Scene JSON to koharu_scene_debug.json for inspection.
+[2026-05-23 15:53:12] INFO     src.ocr_engine – Koharu API returned 0 text regions.
+[2026-05-23 15:53:12] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-05-23 15:53:12] INFO     src.pipeline – No text to translate; returning original image.
+[2026-05-23 15:53:12] INFO     src.pipeline – Saved translated image to 'output\800.jpg'.
+[2026-05-23 15:53:12] INFO     src.pipeline – Processing '801.jpg' …
+[2026-05-23 15:53:12] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 15:53:12] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 15:53:12] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 15:53:12] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-05-23 15:53:12] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 15:53:13] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 15:53:13] WARNING  src.ocr_engine – No text boxes retrieved! Saved Scene JSON to koharu_scene_debug.json for inspection.
+[2026-05-23 15:53:13] INFO     src.ocr_engine – Koharu API returned 0 text regions.
+[2026-05-23 15:53:13] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-05-23 15:53:13] INFO     src.pipeline – No text to translate; returning original image.
+[2026-05-23 15:53:13] INFO     src.pipeline – Saved translated image to 'output\801.jpg'.
+[2026-05-23 15:53:13] INFO     src.pipeline – Processing '802.jpg' …
+[2026-05-23 15:53:13] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 15:53:13] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 15:53:13] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 15:53:13] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-05-23 15:53:13] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 15:53:14] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 15:53:14] WARNING  src.ocr_engine – No text boxes retrieved! Saved Scene JSON to koharu_scene_debug.json for inspection.
+[2026-05-23 15:53:14] INFO     src.ocr_engine – Koharu API returned 0 text regions.
+[2026-05-23 15:53:14] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-05-23 15:53:14] INFO     src.pipeline – No text to translate; returning original image.
+[2026-05-23 15:53:14] INFO     src.pipeline – Saved translated image to 'output\802.jpg'.
+[2026-05-23 15:53:14] INFO     src.pipeline – Processing '803.jpg' …
+[2026-05-23 15:53:14] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 15:53:14] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 15:53:14] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 15:53:14] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-05-23 15:53:14] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 15:53:15] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 15:53:15] INFO     src.ocr_engine – Koharu API returned 5 text regions.
+[2026-05-23 15:53:15] INFO     src.pipeline – 3 / 5 box(es) passed confidence threshold (0.50).
+[2026-05-23 15:53:15] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-05-23 15:53:15] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 15:53:15] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+蟲然箆滞会受到山豚中夙雪妖曽的変缶，但逐座城池近是在次次毀又性的毖争中不断重建了起来 〈俺比不詩深外面的世界思た４９．１．１０．１．１９時３人以上の一部に入った場所で、不適存在、不足性物の曲子立ちの種類としての種類の人間に対代完整理です。 光輝之城
+---------------------
+[2026-05-23 15:53:22] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Les créatures de la montagne sont sujettes aux caprices de la déesse de la neige, mais chaque fois que les villes sont détruites, elles se reconstituent. Je suis un être qui vit dans le monde extérieur et je pense que c'est une énigme. Dans les lieux où trois personnes ou plus entrent, il y a des présences inadaptées, insuffisantes, qui se comportent comme des créatures de la forêt. C'est la ville lumineuse.
+----------------------
+[2026-05-23 15:53:22] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-05-23 15:53:22] INFO     src.bubble_segmentation – Segmentation complete: 1 textboxes classified (0 bubbles, 1 floating text)
+[2026-05-23 15:53:22] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-05-23 15:53:22] INFO     src.pipeline – Saved translated image to 'output\803.jpg'.
+[2026-05-23 15:53:22] INFO     __main__ – Done.
+[2026-05-23 16:01:22] INFO     __main__ – Initialising OCR engine …
+[2026-05-23 16:01:22] INFO     __main__ – Initialising translation engine …
+[2026-05-23 16:01:23] INFO     __main__ – Initialising inpainter …
+[2026-05-23 16:01:23] WARNING  src.inpainter – LaMa model loading is not yet implemented.  Falling back to OpenCV inpainting.
+[2026-05-23 16:01:23] INFO     __main__ – Initialising typesetter …
+[2026-05-23 16:01:23] INFO     src.pipeline – Processing '803.jpg' …
+[2026-05-23 16:01:23] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 16:01:23] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 16:01:23] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 16:01:23] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-05-23 16:01:23] DEBUG    src.ocr_engine – Koharu POST /pipelines response: {'operationId': '6f2dd740-0ff1-4886-ad39-87acf4e30e43'}
+[2026-05-23 16:01:23] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 16:01:24] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': 'c56a0ab0-97e2-4b48-b93b-5d1af0a7645d', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'ba1b34f6-47c7-4350-91b9-769cb6c6fd9c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6f2dd740-0ff1-4886-ad39-87acf4e30e43', 'kind': 'pipeline', 'status': 'completed'}, {'id': '155a7c4f-83c0-47d2-8f1a-2cba09118e1c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1506ec75-7245-42f0-8a4d-09f79203d8c5', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-05-23 16:01:26] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 16:01:26] DEBUG    src.ocr_engine – Koharu scene node preview (first 3): [{'page_id': '019e5524-01d6-7672-b113-64b1f0c9a84f', 'node_id': '019e5524-01d6-7672-b113-64cfdcfc6de6', 'kind': {'image': {'role': 'source', 'blob': 'bc1a63f290903ed6c19fef5caceae866dbec5e9017d60b3fdeeb3e1e32149350', 'opacity': 1.0, 'naturalWidth': 800, 'naturalHeight': 1131, 'name': 'page.png'}}}, {'page_id': '019e5524-01d6-7672-b113-64b1f0c9a84f', 'node_id': '019e5524-03ae-7200-a452-51ed1dc25fa7', 'kind': {'mask': {'role': 'segment', 'blob': '09fdfa419068f0c7b2ffdb787db9a425f61faef434e4f8bc5b7e7a6bcc0b5100'}}}, {'page_id': '019e5524-01d6-7672-b113-64b1f0c9a84f', 'node_id': '019e5524-03ae-7200-a452-51f056e0bee3', 'kind': {'text': {'confidence': 0.4869995, 'sourceLang': None, 'sourceDirection': None, 'renderedDirection': None, 'linePolygons': None, 'rotationDeg': None, 'detectedFontSizePx': None, 'detector': 'ctd', 'text': '全社の入力的には、ご登録のご利用のご注文のご注文下記の日本日本日本日本日本日本日本当におけます。', 'translation': None, 'style': None, 'fontPrediction': None, 'sprite': None, 'spriteTransform': None, 'lockLayoutBox': False}}}]
+[2026-05-23 16:01:26] INFO     src.ocr_engine – Koharu API returned 5 text regions.
+[2026-05-23 16:01:26] INFO     src.pipeline – 3 / 5 box(es) passed confidence threshold (0.50).
+[2026-05-23 16:01:26] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-05-23 16:01:26] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 16:01:26] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+蟲然箆滞会受到山豚中夙雪妖曽的変缶，但逐座城池近是在次次毀又性的毖争中不断重建了起来 〈俺比不詩深外面的世界思た４９．１．１０．１．１９時３人以上の一部に入った場所で、不適存在、不足性物の曲子立ちの種類としての種類の人間に対代完整理です。 光輝之城
+---------------------
+[2026-05-23 16:01:37] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Les créatures de la montagne sont sujettes aux attaques de la neige éternelle, mais chaque fois que les villes sont détruites, elles se reconstruisent. Moi, je suis un être humain qui vit dans ce monde extérieur, et j'ai vu des choses incroyables. Dans le quartier où il y a eu plus de trois personnes, il y avait une chose étrange qui existait en même temps que les êtres insuffisants. C'est la lumière de la ville brillante.
+----------------------
+[2026-05-23 16:01:37] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-05-23 16:01:37] INFO     src.bubble_segmentation – Segmentation complete: 1 textboxes classified (0 bubbles, 1 floating text)
+[2026-05-23 16:01:37] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-05-23 16:01:37] INFO     src.pipeline – Saved translated image to 'output\debug_803.jpg'.
+[2026-05-23 16:01:37] INFO     __main__ – Done.
+[2026-05-23 16:02:09] INFO     __main__ – Initialising OCR engine …
+[2026-05-23 16:02:09] INFO     __main__ – Initialising translation engine …
+[2026-05-23 16:02:09] INFO     __main__ – Initialising inpainter …
+[2026-05-23 16:02:09] WARNING  src.inpainter – LaMa model loading is not yet implemented.  Falling back to OpenCV inpainting.
+[2026-05-23 16:02:09] INFO     __main__ – Initialising typesetter …
+[2026-05-23 16:02:09] INFO     src.pipeline – Found 4 image(s) in 'input'.
+[2026-05-23 16:02:09] INFO     src.pipeline – Processing '800.jpg' …
+[2026-05-23 16:02:09] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 16:02:10] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 16:02:10] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 16:02:10] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-05-23 16:02:10] DEBUG    src.ocr_engine – Koharu POST /pipelines response: {'operationId': '5954f833-f4ec-480c-92dd-ae07ee1f5b9a'}
+[2026-05-23 16:02:10] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 16:02:11] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': 'c56a0ab0-97e2-4b48-b93b-5d1af0a7645d', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'ba1b34f6-47c7-4350-91b9-769cb6c6fd9c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6f2dd740-0ff1-4886-ad39-87acf4e30e43', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5954f833-f4ec-480c-92dd-ae07ee1f5b9a', 'kind': 'pipeline', 'status': 'completed'}, {'id': '155a7c4f-83c0-47d2-8f1a-2cba09118e1c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1506ec75-7245-42f0-8a4d-09f79203d8c5', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-05-23 16:02:13] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 16:02:13] DEBUG    src.ocr_engine – Koharu scene node preview (first 3): [{'page_id': '019e5524-b735-7553-9da2-81717c0e7401', 'node_id': '019e5524-b735-7553-9da2-818fef14267a', 'kind': {'image': {'role': 'source', 'blob': '4ccecaacd80bf5fd37bce77eb157c3a96c14ebb0c05714e9bf6da9076b648699', 'opacity': 1.0, 'naturalWidth': 800, 'naturalHeight': 1067, 'name': 'page.png'}}}, {'page_id': '019e5524-b735-7553-9da2-81717c0e7401', 'node_id': '019e5524-b8d7-7d20-988a-2b10afbe44a7', 'kind': {'mask': {'role': 'segment', 'blob': '6102c9fd2db2ddedaa29b1943b52a0b47360e6954dc09bc0e116bf20c5b12c80'}}}, {'page_id': '019e5524-b735-7553-9da2-81717c0e7401', 'node_id': '019e5524-b8d7-7d20-988a-2b2c2dfad503', 'kind': {'text': {'confidence': 0.921875, 'sourceLang': None, 'sourceDirection': None, 'renderedDirection': None, 'linePolygons': None, 'rotationDeg': None, 'detectedFontSizePx': None, 'detector': 'ctd', 'text': '不辻只要你能健康兵大，返一切都値得', 'translation': None, 'style': None, 'fontPrediction': None, 'sprite': None, 'spriteTransform': None, 'lockLayoutBox': False}}}]
+[2026-05-23 16:02:13] INFO     src.ocr_engine – Koharu API returned 1 text regions.
+[2026-05-23 16:02:13] INFO     src.pipeline – 1 / 1 box(es) passed confidence threshold (0.50).
+[2026-05-23 16:02:13] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-05-23 16:02:13] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 16:02:13] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+不辻只要你能健康兵大，返一切都値得
+---------------------
+[2026-05-23 16:02:14] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Je ne demande qu'une chose : que tu sois en forme pour le prochain entraînement, et tout sera pardonné.
+----------------------
+[2026-05-23 16:02:14] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-05-23 16:02:14] INFO     src.bubble_segmentation – Segmentation complete: 1 textboxes classified (0 bubbles, 1 floating text)
+[2026-05-23 16:02:14] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-05-23 16:02:14] INFO     src.pipeline – Saved translated image to 'output\800.jpg'.
+[2026-05-23 16:02:14] INFO     src.pipeline – Processing '801.jpg' …
+[2026-05-23 16:02:14] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 16:02:14] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 16:02:14] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 16:02:14] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-05-23 16:02:14] DEBUG    src.ocr_engine – Koharu POST /pipelines response: {'operationId': '47ac16c5-a5c3-4068-917d-54eece15b7a0'}
+[2026-05-23 16:02:14] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 16:02:15] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': 'c56a0ab0-97e2-4b48-b93b-5d1af0a7645d', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'ba1b34f6-47c7-4350-91b9-769cb6c6fd9c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6f2dd740-0ff1-4886-ad39-87acf4e30e43', 'kind': 'pipeline', 'status': 'completed'}, {'id': '47ac16c5-a5c3-4068-917d-54eece15b7a0', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5954f833-f4ec-480c-92dd-ae07ee1f5b9a', 'kind': 'pipeline', 'status': 'completed'}, {'id': '155a7c4f-83c0-47d2-8f1a-2cba09118e1c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1506ec75-7245-42f0-8a4d-09f79203d8c5', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-05-23 16:02:17] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 16:02:17] DEBUG    src.ocr_engine – Koharu scene node preview (first 3): [{'page_id': '019e5524-ca1d-7c13-93de-41aea0f386df', 'node_id': '019e5524-ca1d-7c13-93de-41be941c5173', 'kind': {'image': {'role': 'source', 'blob': '944535c072a8fc179d64eebaa688b74ee0d1864c30f9acb4558cf5e5e0b19766', 'opacity': 1.0, 'naturalWidth': 800, 'naturalHeight': 1067, 'name': 'page.png'}}}, {'page_id': '019e5524-ca1d-7c13-93de-41aea0f386df', 'node_id': '019e5524-cbac-7b62-9902-3cbef23afa0b', 'kind': {'mask': {'role': 'segment', 'blob': '468c6e39a27ed9a2484d3dbb68d6500e73d1d84e3ddd5ebc2c72c3b783405e2a'}}}, {'page_id': '019e5524-ca1d-7c13-93de-41aea0f386df', 'node_id': '019e5524-cbac-7b62-9902-3cc45abd12f6', 'kind': {'text': {'confidence': 0.51934814, 'sourceLang': None, 'sourceDirection': None, 'renderedDirection': None, 'linePolygons': None, 'rotationDeg': None, 'detectedFontSizePx': None, 'detector': 'ctd', 'text': '爺量＃', 'translation': None, 'style': None, 'fontPrediction': None, 'sprite': None, 'spriteTransform': None, 'lockLayoutBox': False}}}]
+[2026-05-23 16:02:17] INFO     src.ocr_engine – Koharu API returned 3 text regions.
+[2026-05-23 16:02:17] INFO     src.pipeline – 3 / 3 box(es) passed confidence threshold (0.50).
+[2026-05-23 16:02:17] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-05-23 16:02:17] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 16:02:17] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+爺量＃ 能量＋１ あっ、
+---------------------
+[2026-05-23 16:02:18] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Grand-père ! Puissance + 1 Ah !
+----------------------
+[2026-05-23 16:02:18] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-05-23 16:02:18] INFO     src.bubble_segmentation – Segmentation complete: 1 textboxes classified (0 bubbles, 1 floating text)
+[2026-05-23 16:02:18] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-05-23 16:02:18] INFO     src.pipeline – Saved translated image to 'output\801.jpg'.
+[2026-05-23 16:02:18] INFO     src.pipeline – Processing '802.jpg' …
+[2026-05-23 16:02:18] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 16:02:18] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 16:02:18] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 16:02:18] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-05-23 16:02:18] DEBUG    src.ocr_engine – Koharu POST /pipelines response: {'operationId': 'df173c00-c74f-4775-802f-c8815d6f2b19'}
+[2026-05-23 16:02:18] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 16:02:19] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': 'c56a0ab0-97e2-4b48-b93b-5d1af0a7645d', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'ba1b34f6-47c7-4350-91b9-769cb6c6fd9c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6f2dd740-0ff1-4886-ad39-87acf4e30e43', 'kind': 'pipeline', 'status': 'completed'}, {'id': '47ac16c5-a5c3-4068-917d-54eece15b7a0', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5954f833-f4ec-480c-92dd-ae07ee1f5b9a', 'kind': 'pipeline', 'status': 'completed'}, {'id': '155a7c4f-83c0-47d2-8f1a-2cba09118e1c', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'df173c00-c74f-4775-802f-c8815d6f2b19', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1506ec75-7245-42f0-8a4d-09f79203d8c5', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-05-23 16:02:21] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 16:02:21] DEBUG    src.ocr_engine – Koharu scene node preview (first 3): [{'page_id': '019e5524-d982-78f1-8ef9-7cbb8c89dff5', 'node_id': '019e5524-d982-78f1-8ef9-7cc469ce7046', 'kind': {'image': {'role': 'source', 'blob': 'cc28b1b97d88e73530cb3c064db8478b247ab8daa7cbff36d4e22cbc0715b668', 'opacity': 1.0, 'naturalWidth': 800, 'naturalHeight': 1067, 'name': 'page.png'}}}, {'page_id': '019e5524-d982-78f1-8ef9-7cbb8c89dff5', 'node_id': '019e5524-db27-76b2-962e-02c189468028', 'kind': {'mask': {'role': 'segment', 'blob': '048f21bea483d9f55f96f3735345a4584a73ae3041f222dd0d26e80962fc8edf'}}}, {'page_id': '019e5524-d982-78f1-8ef9-7cbb8c89dff5', 'node_id': '019e5524-db27-76b2-962e-02db89e0f007', 'kind': {'text': {'confidence': 0.921875, 'sourceLang': None, 'sourceDirection': None, 'renderedDirection': None, 'linePolygons': None, 'rotationDeg': None, 'detectedFontSizePx': None, 'detector': 'ctd', 'text': '我穿越了，穿越成了ー个大腕迩没有矣育完整的新生／ル', 'translation': None, 'style': None, 'fontPrediction': None, 'sprite': None, 'spriteTransform': None, 'lockLayoutBox': False}}}]
+[2026-05-23 16:02:21] INFO     src.ocr_engine – Koharu API returned 1 text regions.
+[2026-05-23 16:02:21] INFO     src.pipeline – 1 / 1 box(es) passed confidence threshold (0.50).
+[2026-05-23 16:02:21] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-05-23 16:02:21] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 16:02:21] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+我穿越了，穿越成了ー个大腕迩没有矣育完整的新生／ル
+---------------------
+[2026-05-23 16:02:23] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+J'ai traversé l'espace et temps, devenu un grand patron sans défauts ni incohérences.
+----------------------
+[2026-05-23 16:02:23] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-05-23 16:02:23] INFO     src.bubble_segmentation – Segmentation complete: 1 textboxes classified (0 bubbles, 1 floating text)
+[2026-05-23 16:02:23] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-05-23 16:02:23] INFO     src.pipeline – Saved translated image to 'output\802.jpg'.
+[2026-05-23 16:02:23] INFO     src.pipeline – Processing '803.jpg' …
+[2026-05-23 16:02:23] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 16:02:23] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 16:02:23] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 16:02:23] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, manga-ocr]
+[2026-05-23 16:02:23] DEBUG    src.ocr_engine – Koharu POST /pipelines response: {'operationId': '7cf7ce97-c1e9-40a4-b7c6-9478caa84376'}
+[2026-05-23 16:02:23] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 16:02:24] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': 'c56a0ab0-97e2-4b48-b93b-5d1af0a7645d', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'ba1b34f6-47c7-4350-91b9-769cb6c6fd9c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6f2dd740-0ff1-4886-ad39-87acf4e30e43', 'kind': 'pipeline', 'status': 'completed'}, {'id': '47ac16c5-a5c3-4068-917d-54eece15b7a0', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5954f833-f4ec-480c-92dd-ae07ee1f5b9a', 'kind': 'pipeline', 'status': 'completed'}, {'id': '155a7c4f-83c0-47d2-8f1a-2cba09118e1c', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'df173c00-c74f-4775-802f-c8815d6f2b19', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1506ec75-7245-42f0-8a4d-09f79203d8c5', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7cf7ce97-c1e9-40a4-b7c6-9478caa84376', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-05-23 16:02:26] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 16:02:26] DEBUG    src.ocr_engine – Koharu scene node preview (first 3): [{'page_id': '019e5524-ec1b-7302-b849-8db19f1e4201', 'node_id': '019e5524-ec1b-7302-b849-8dcd4cea479f', 'kind': {'image': {'role': 'source', 'blob': 'bc1a63f290903ed6c19fef5caceae866dbec5e9017d60b3fdeeb3e1e32149350', 'opacity': 1.0, 'naturalWidth': 800, 'naturalHeight': 1131, 'name': 'page.png'}}}, {'page_id': '019e5524-ec1b-7302-b849-8db19f1e4201', 'node_id': '019e5524-edce-7962-83f8-93588f68f560', 'kind': {'mask': {'role': 'segment', 'blob': '09fdfa419068f0c7b2ffdb787db9a425f61faef434e4f8bc5b7e7a6bcc0b5100'}}}, {'page_id': '019e5524-ec1b-7302-b849-8db19f1e4201', 'node_id': '019e5524-edce-7962-83f8-9360663ba45c', 'kind': {'text': {'confidence': 0.4869995, 'sourceLang': None, 'sourceDirection': None, 'renderedDirection': None, 'linePolygons': None, 'rotationDeg': None, 'detectedFontSizePx': None, 'detector': 'ctd', 'text': '全社の入力的には、ご登録のご利用のご注文のご注文下記の日本日本日本日本日本日本日本当におけます。', 'translation': None, 'style': None, 'fontPrediction': None, 'sprite': None, 'spriteTransform': None, 'lockLayoutBox': False}}}]
+[2026-05-23 16:02:26] INFO     src.ocr_engine – Koharu API returned 5 text regions.
+[2026-05-23 16:02:26] INFO     src.pipeline – 3 / 5 box(es) passed confidence threshold (0.50).
+[2026-05-23 16:02:26] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-05-23 16:02:26] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 16:02:26] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+蟲然箆滞会受到山豚中夙雪妖曽的変缶，但逐座城池近是在次次毀又性的毖争中不断重建了起来 〈俺比不詩深外面的世界思た４９．１．１０．１．１９時３人以上の一部に入った場所で、不適存在、不足性物の曲子立ちの種類としての種類の人間に対代完整理です。 光輝之城
+---------------------
+[2026-05-23 16:02:31] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Les créatures de la montagne ont été détruites par le pouvoir de Yōso, mais chaque fois qu'elles sont détruites, elles se reconstituent. Moi, je ne suis pas capable de comprendre ce qui se passe dans le monde extérieur... Il y a des endroits où il est interdit d'entrer avec plus de trois personnes, et là-bas, il existe une présence qui n'est pas adaptée à la nature humaine. La ville lumineuse.
+----------------------
+[2026-05-23 16:02:31] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-05-23 16:02:31] INFO     src.bubble_segmentation – Segmentation complete: 1 textboxes classified (0 bubbles, 1 floating text)
+[2026-05-23 16:02:32] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-05-23 16:02:32] INFO     src.pipeline – Saved translated image to 'output\803.jpg'.
+[2026-05-23 16:02:32] INFO     __main__ – Done.
+[2026-05-23 16:06:50] INFO     __main__ – Initialising OCR engine …
+[2026-05-23 16:06:50] INFO     __main__ – Initialising translation engine …
+[2026-05-23 16:06:50] INFO     __main__ – Initialising inpainter …
+[2026-05-23 16:06:50] WARNING  src.inpainter – LaMa model loading is not yet implemented.  Falling back to OpenCV inpainting.
+[2026-05-23 16:06:50] INFO     __main__ – Initialising typesetter …
+[2026-05-23 16:06:50] INFO     src.pipeline – Processing '803.jpg' …
+[2026-05-23 16:06:50] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 16:06:50] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 16:06:50] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 16:06:50] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr]
+[2026-05-23 16:06:50] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'paddle-ocr'
+[2026-05-23 16:06:50] DEBUG    src.ocr_engine – OCR engine 'paddle-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:06:50] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ppocr]
+[2026-05-23 16:06:50] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ppocr'
+[2026-05-23 16:06:50] DEBUG    src.ocr_engine – OCR engine 'ppocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:06:50] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ch-ocr]
+[2026-05-23 16:06:50] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ch-ocr'
+[2026-05-23 16:06:50] DEBUG    src.ocr_engine – OCR engine 'ch-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:06:50] ERROR    src.ocr_engine – Aucun engine OCR chinois n'a fonctionné. Engines essayés: paddle-ocr, ppocr, ch-ocr
+[2026-05-23 16:06:50] ERROR    src.ocr_engine – Dernière erreur: OCR engine 'ch-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:06:50] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-05-23 16:06:50] INFO     src.pipeline – No text to translate; returning original image.
+[2026-05-23 16:06:50] INFO     src.pipeline – Saved translated image to 'output\debug_803_v2.jpg'.
+[2026-05-23 16:06:50] INFO     __main__ – Done.
+[2026-05-23 16:08:15] INFO     __main__ – Initialising OCR engine …
+[2026-05-23 16:08:15] INFO     __main__ – Initialising translation engine …
+[2026-05-23 16:08:16] INFO     __main__ – Initialising inpainter …
+[2026-05-23 16:08:16] WARNING  src.inpainter – LaMa model loading is not yet implemented.  Falling back to OpenCV inpainting.
+[2026-05-23 16:08:16] INFO     __main__ – Initialising typesetter …
+[2026-05-23 16:08:16] INFO     src.pipeline – Processing '803.jpg' …
+[2026-05-23 16:08:16] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 16:08:16] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 16:08:16] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 16:08:16] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr]
+[2026-05-23 16:08:16] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'paddle-ocr'
+[2026-05-23 16:08:16] DEBUG    src.ocr_engine – OCR engine 'paddle-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:08:16] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ppocr]
+[2026-05-23 16:08:16] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ppocr'
+[2026-05-23 16:08:16] DEBUG    src.ocr_engine – OCR engine 'ppocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:08:16] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ch-ocr]
+[2026-05-23 16:08:16] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ch-ocr'
+[2026-05-23 16:08:16] DEBUG    src.ocr_engine – OCR engine 'ch-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:08:16] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr-vl-1.5]
+[2026-05-23 16:08:16] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 200 for OCR engine 'paddle-ocr-vl-1.5'
+[2026-05-23 16:08:16] DEBUG    src.ocr_engine – Koharu POST /pipelines response: {'operationId': '265b1f8a-1616-4347-808c-ca9011c73536'}
+[2026-05-23 16:08:16] INFO     src.ocr_engine – Using Koharu OCR engine 'paddle-ocr-vl-1.5' with operation 265b1f8a-1616-4347-808c-ca9011c73536.
+[2026-05-23 16:08:16] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 16:08:17] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': 'c56a0ab0-97e2-4b48-b93b-5d1af0a7645d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '265b1f8a-1616-4347-808c-ca9011c73536', 'kind': 'pipeline', 'status': 'running'}, {'id': 'ba1b34f6-47c7-4350-91b9-769cb6c6fd9c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6f2dd740-0ff1-4886-ad39-87acf4e30e43', 'kind': 'pipeline', 'status': 'completed'}, {'id': '47ac16c5-a5c3-4068-917d-54eece15b7a0', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5954f833-f4ec-480c-92dd-ae07ee1f5b9a', 'kind': 'pipeline', 'status': 'completed'}, {'id': '155a7c4f-83c0-47d2-8f1a-2cba09118e1c', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'df173c00-c74f-4775-802f-c8815d6f2b19', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1506ec75-7245-42f0-8a4d-09f79203d8c5', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7cf7ce97-c1e9-40a4-b7c6-9478caa84376', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-05-23 16:08:19] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 16:08:19] DEBUG    src.ocr_engine – Koharu scene node preview (first 3): [{'page_id': '019e552a-4fb2-7481-8f35-f7817c584d0d', 'node_id': '019e552a-4fb2-7481-8f35-f7909afc88dc', 'kind': {'image': {'role': 'source', 'blob': 'bc1a63f290903ed6c19fef5caceae866dbec5e9017d60b3fdeeb3e1e32149350', 'opacity': 1.0, 'naturalWidth': 800, 'naturalHeight': 1131, 'name': 'page.png'}}}, {'page_id': '019e552a-4fb2-7481-8f35-f7817c584d0d', 'node_id': '019e552a-51a1-72c1-a56c-5a844954d902', 'kind': {'mask': {'role': 'segment', 'blob': '09fdfa419068f0c7b2ffdb787db9a425f61faef434e4f8bc5b7e7a6bcc0b5100'}}}, {'page_id': '019e552a-4fb2-7481-8f35-f7817c584d0d', 'node_id': '019e552a-51a1-72c1-a56c-5a9e1d7f2298', 'kind': {'text': {'confidence': 0.4869995, 'sourceLang': None, 'sourceDirection': None, 'renderedDirection': None, 'linePolygons': None, 'rotationDeg': None, 'detectedFontSizePx': None, 'detector': 'ctd', 'text': None, 'translation': None, 'style': None, 'fontPrediction': None, 'sprite': None, 'spriteTransform': None, 'lockLayoutBox': False}}}]
+[2026-05-23 16:08:19] WARNING  src.ocr_engine – No text boxes retrieved! Saved Scene JSON to koharu_scene_debug.json for inspection.
+[2026-05-23 16:08:19] INFO     src.ocr_engine – Koharu API returned 0 text regions.
+[2026-05-23 16:08:19] INFO     src.pipeline – 0 / 0 box(es) passed confidence threshold (0.50).
+[2026-05-23 16:08:19] INFO     src.pipeline – No text to translate; returning original image.
+[2026-05-23 16:08:19] INFO     src.pipeline – Saved translated image to 'output\debug_803_v3.jpg'.
+[2026-05-23 16:08:19] INFO     __main__ – Done.
+[2026-05-23 16:14:17] INFO     __main__ – Initialising OCR engine …
+[2026-05-23 16:14:17] INFO     __main__ – Initialising translation engine …
+[2026-05-23 16:14:17] INFO     __main__ – Initialising inpainter …
+[2026-05-23 16:14:17] WARNING  src.inpainter – LaMa model loading is not yet implemented.  Falling back to OpenCV inpainting.
+[2026-05-23 16:14:17] INFO     __main__ – Initialising typesetter …
+[2026-05-23 16:14:17] INFO     src.pipeline – Processing '803.jpg' …
+[2026-05-23 16:14:18] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 16:14:18] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 16:14:18] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 16:14:18] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr]
+[2026-05-23 16:14:18] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'paddle-ocr'
+[2026-05-23 16:14:18] DEBUG    src.ocr_engine – OCR engine 'paddle-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:14:18] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ppocr]
+[2026-05-23 16:14:18] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ppocr'
+[2026-05-23 16:14:18] DEBUG    src.ocr_engine – OCR engine 'ppocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:14:18] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ch-ocr]
+[2026-05-23 16:14:18] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ch-ocr'
+[2026-05-23 16:14:18] DEBUG    src.ocr_engine – OCR engine 'ch-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:14:18] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr-vl-1.5]
+[2026-05-23 16:14:18] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 200 for OCR engine 'paddle-ocr-vl-1.5'
+[2026-05-23 16:14:18] DEBUG    src.ocr_engine – Koharu POST /pipelines response: {'operationId': '9714e872-889c-479f-92dd-7db56d70a88e'}
+[2026-05-23 16:14:18] INFO     src.ocr_engine – Using Koharu OCR engine 'paddle-ocr-vl-1.5' with operation 9714e872-889c-479f-92dd-7db56d70a88e.
+[2026-05-23 16:14:18] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 16:14:19] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': 'c56a0ab0-97e2-4b48-b93b-5d1af0a7645d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '9714e872-889c-479f-92dd-7db56d70a88e', 'kind': 'pipeline', 'status': 'running'}, {'id': '265b1f8a-1616-4347-808c-ca9011c73536', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'ba1b34f6-47c7-4350-91b9-769cb6c6fd9c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6f2dd740-0ff1-4886-ad39-87acf4e30e43', 'kind': 'pipeline', 'status': 'completed'}, {'id': '47ac16c5-a5c3-4068-917d-54eece15b7a0', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5954f833-f4ec-480c-92dd-ae07ee1f5b9a', 'kind': 'pipeline', 'status': 'completed'}, {'id': '155a7c4f-83c0-47d2-8f1a-2cba09118e1c', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'df173c00-c74f-4775-802f-c8815d6f2b19', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1506ec75-7245-42f0-8a4d-09f79203d8c5', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7cf7ce97-c1e9-40a4-b7c6-9478caa84376', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-05-23 16:14:21] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': 'c56a0ab0-97e2-4b48-b93b-5d1af0a7645d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '9714e872-889c-479f-92dd-7db56d70a88e', 'kind': 'pipeline', 'status': 'completed'}, {'id': '265b1f8a-1616-4347-808c-ca9011c73536', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'ba1b34f6-47c7-4350-91b9-769cb6c6fd9c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6f2dd740-0ff1-4886-ad39-87acf4e30e43', 'kind': 'pipeline', 'status': 'completed'}, {'id': '47ac16c5-a5c3-4068-917d-54eece15b7a0', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5954f833-f4ec-480c-92dd-ae07ee1f5b9a', 'kind': 'pipeline', 'status': 'completed'}, {'id': '155a7c4f-83c0-47d2-8f1a-2cba09118e1c', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'df173c00-c74f-4775-802f-c8815d6f2b19', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1506ec75-7245-42f0-8a4d-09f79203d8c5', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7cf7ce97-c1e9-40a4-b7c6-9478caa84376', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-05-23 16:14:23] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 16:14:23] DEBUG    src.ocr_engine – Koharu scene node preview (first 3): [{'page_id': '019e552f-d334-7593-ad4f-d512614764cd', 'node_id': '019e552f-d334-7593-ad4f-d529317756b9', 'kind': {'image': {'role': 'source', 'blob': 'bc1a63f290903ed6c19fef5caceae866dbec5e9017d60b3fdeeb3e1e32149350', 'opacity': 1.0, 'naturalWidth': 800, 'naturalHeight': 1131, 'name': 'page.png'}}}, {'page_id': '019e552f-d334-7593-ad4f-d512614764cd', 'node_id': '019e552f-d531-7e52-92bc-8a1befe9920c', 'kind': {'mask': {'role': 'segment', 'blob': '09fdfa419068f0c7b2ffdb787db9a425f61faef434e4f8bc5b7e7a6bcc0b5100'}}}, {'page_id': '019e552f-d334-7593-ad4f-d512614764cd', 'node_id': '019e552f-d531-7e52-92bc-8a2449e447af', 'kind': {'text': {'confidence': 0.4869995, 'sourceLang': None, 'sourceDirection': None, 'renderedDirection': None, 'linePolygons': None, 'rotationDeg': None, 'detectedFontSizePx': None, 'detector': 'ctd', 'text': '圣祖山脉之外的世界，已经被妖兽所占领，这里的人们已经有数百年不曾与外界有过联系了。', 'translation': None, 'style': None, 'fontPrediction': None, 'sprite': None, 'spriteTransform': None, 'lockLayoutBox': False}}}]
+[2026-05-23 16:14:23] INFO     src.ocr_engine – Koharu API returned 5 text regions.
+[2026-05-23 16:14:23] INFO     src.pipeline – 3 / 5 box(es) passed confidence threshold (0.50).
+[2026-05-23 16:14:23] INFO     src.pipeline – Grouped into 3 contiguous text block(s) for translation.
+[2026-05-23 16:14:23] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 16:14:23] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+虽然经常会受到山脉中风雪妖兽的袭击，但这座城池还是在次次毁灭性的战争中不断重建了起来。
+---------------------
+[2026-05-23 16:14:31] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Malgré les fréquentes attaques de créatures blanches dans la montagne, cette ville est toujours reconstruite après chaque guerre dévastatrice.
+----------------------
+[2026-05-23 16:14:31] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+谁也不清楚外面的世界是怎样的。传说人类在鼎盛时期有着庞大的帝国，但如今都已灰飞烟灭，不复存在。这座城市由于位置隐秘，才得以从黑暗时代完整保留下来。
+---------------------
+[2026-05-23 16:14:35] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Personne ne sait ce que le monde extérieur ressemble. On dit que les humains avaient un immense empire à l'époque de leur apogée, mais aujourd'hui tout est disparu, réduit à néant. C'est grâce à son emplacement caché qu'elle a pu survivre intacte aux temps sombres.
+----------------------
+[2026-05-23 16:14:35] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+光辉之城
+---------------------
+[2026-05-23 16:14:36] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+La ville lumineuse
+----------------------
+[2026-05-23 16:14:36] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-05-23 16:14:36] INFO     src.bubble_segmentation – Segmentation complete: 3 textboxes classified (0 bubbles, 3 floating text)
+[2026-05-23 16:14:36] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-05-23 16:14:36] INFO     src.pipeline – Saved translated image to 'output\debug_803_v4.jpg'.
+[2026-05-23 16:14:36] INFO     __main__ – Done.
+[2026-05-23 16:17:39] INFO     __main__ – Initialising OCR engine …
+[2026-05-23 16:17:39] INFO     __main__ – Initialising translation engine …
+[2026-05-23 16:17:40] INFO     __main__ – Initialising inpainter …
+[2026-05-23 16:17:40] WARNING  src.inpainter – LaMa model loading is not yet implemented.  Falling back to OpenCV inpainting.
+[2026-05-23 16:17:40] INFO     __main__ – Initialising typesetter …
+[2026-05-23 16:17:40] INFO     src.pipeline – Found 4 image(s) in 'input'.
+[2026-05-23 16:17:40] INFO     src.pipeline – Processing '800.jpg' …
+[2026-05-23 16:17:40] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 16:17:40] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 16:17:40] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 16:17:40] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr]
+[2026-05-23 16:17:40] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'paddle-ocr'
+[2026-05-23 16:17:40] DEBUG    src.ocr_engine – OCR engine 'paddle-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:17:40] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ppocr]
+[2026-05-23 16:17:40] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ppocr'
+[2026-05-23 16:17:40] DEBUG    src.ocr_engine – OCR engine 'ppocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:17:40] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ch-ocr]
+[2026-05-23 16:17:40] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ch-ocr'
+[2026-05-23 16:17:40] DEBUG    src.ocr_engine – OCR engine 'ch-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:17:40] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr-vl-1.5]
+[2026-05-23 16:17:40] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 200 for OCR engine 'paddle-ocr-vl-1.5'
+[2026-05-23 16:17:40] DEBUG    src.ocr_engine – Koharu POST /pipelines response: {'operationId': 'e9eddfd0-cd06-4aae-b364-2baf32645038'}
+[2026-05-23 16:17:40] INFO     src.ocr_engine – Using Koharu OCR engine 'paddle-ocr-vl-1.5' with operation e9eddfd0-cd06-4aae-b364-2baf32645038.
+[2026-05-23 16:17:40] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 16:17:41] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': 'c56a0ab0-97e2-4b48-b93b-5d1af0a7645d', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e9eddfd0-cd06-4aae-b364-2baf32645038', 'kind': 'pipeline', 'status': 'completed'}, {'id': '9714e872-889c-479f-92dd-7db56d70a88e', 'kind': 'pipeline', 'status': 'completed'}, {'id': '265b1f8a-1616-4347-808c-ca9011c73536', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'ba1b34f6-47c7-4350-91b9-769cb6c6fd9c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6f2dd740-0ff1-4886-ad39-87acf4e30e43', 'kind': 'pipeline', 'status': 'completed'}, {'id': '47ac16c5-a5c3-4068-917d-54eece15b7a0', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5954f833-f4ec-480c-92dd-ae07ee1f5b9a', 'kind': 'pipeline', 'status': 'completed'}, {'id': '155a7c4f-83c0-47d2-8f1a-2cba09118e1c', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'df173c00-c74f-4775-802f-c8815d6f2b19', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1506ec75-7245-42f0-8a4d-09f79203d8c5', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7cf7ce97-c1e9-40a4-b7c6-9478caa84376', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-05-23 16:17:43] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 16:17:43] DEBUG    src.ocr_engine – Koharu scene node preview (first 3): [{'page_id': '019e5532-e910-7360-be5a-8e5a7265475e', 'node_id': '019e5532-e910-7360-be5a-8e6daaa15800', 'kind': {'image': {'role': 'source', 'blob': '4ccecaacd80bf5fd37bce77eb157c3a96c14ebb0c05714e9bf6da9076b648699', 'opacity': 1.0, 'naturalWidth': 800, 'naturalHeight': 1067, 'name': 'page.png'}}}, {'page_id': '019e5532-e910-7360-be5a-8e5a7265475e', 'node_id': '019e5532-eb50-7702-8a4a-607ff4626dd8', 'kind': {'mask': {'role': 'segment', 'blob': '6102c9fd2db2ddedaa29b1943b52a0b47360e6954dc09bc0e116bf20c5b12c80'}}}, {'page_id': '019e5532-e910-7360-be5a-8e5a7265475e', 'node_id': '019e5532-eb50-7702-8a4a-6088be17903a', 'kind': {'text': {'confidence': 0.921875, 'sourceLang': None, 'sourceDirection': None, 'renderedDirection': None, 'linePolygons': None, 'rotationDeg': None, 'detectedFontSizePx': None, 'detector': 'ctd', 'text': '不过只要你能健康长大，这一切都值得', 'translation': None, 'style': None, 'fontPrediction': None, 'sprite': None, 'spriteTransform': None, 'lockLayoutBox': False}}}]
+[2026-05-23 16:17:43] INFO     src.ocr_engine – Koharu API returned 1 text regions.
+[2026-05-23 16:17:43] INFO     src.pipeline – 1 / 1 box(es) passed confidence threshold (0.50).
+[2026-05-23 16:17:43] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-05-23 16:17:43] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 16:17:43] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+不过只要你能健康长大，这一切都值得
+---------------------
+[2026-05-23 16:17:45] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Mais tant que tu vivras une vie saine et longue, tout cela vaut la peine.
+----------------------
+[2026-05-23 16:17:45] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-05-23 16:17:45] INFO     src.bubble_segmentation – Segmentation complete: 1 textboxes classified (0 bubbles, 1 floating text)
+[2026-05-23 16:17:45] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-05-23 16:17:45] INFO     src.pipeline – Saved translated image to 'output\800.jpg'.
+[2026-05-23 16:17:45] INFO     src.pipeline – Processing '801.jpg' …
+[2026-05-23 16:17:45] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 16:17:45] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 16:17:45] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 16:17:45] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr]
+[2026-05-23 16:17:45] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'paddle-ocr'
+[2026-05-23 16:17:45] DEBUG    src.ocr_engine – OCR engine 'paddle-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:17:45] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ppocr]
+[2026-05-23 16:17:45] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ppocr'
+[2026-05-23 16:17:45] DEBUG    src.ocr_engine – OCR engine 'ppocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:17:45] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ch-ocr]
+[2026-05-23 16:17:45] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ch-ocr'
+[2026-05-23 16:17:45] DEBUG    src.ocr_engine – OCR engine 'ch-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:17:45] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr-vl-1.5]
+[2026-05-23 16:17:45] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 200 for OCR engine 'paddle-ocr-vl-1.5'
+[2026-05-23 16:17:45] DEBUG    src.ocr_engine – Koharu POST /pipelines response: {'operationId': 'e1625838-ae74-4c79-ac05-54694406ca4d'}
+[2026-05-23 16:17:45] INFO     src.ocr_engine – Using Koharu OCR engine 'paddle-ocr-vl-1.5' with operation e1625838-ae74-4c79-ac05-54694406ca4d.
+[2026-05-23 16:17:45] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 16:17:46] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': 'c56a0ab0-97e2-4b48-b93b-5d1af0a7645d', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e9eddfd0-cd06-4aae-b364-2baf32645038', 'kind': 'pipeline', 'status': 'completed'}, {'id': '9714e872-889c-479f-92dd-7db56d70a88e', 'kind': 'pipeline', 'status': 'completed'}, {'id': '265b1f8a-1616-4347-808c-ca9011c73536', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'ba1b34f6-47c7-4350-91b9-769cb6c6fd9c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6f2dd740-0ff1-4886-ad39-87acf4e30e43', 'kind': 'pipeline', 'status': 'completed'}, {'id': '47ac16c5-a5c3-4068-917d-54eece15b7a0', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e1625838-ae74-4c79-ac05-54694406ca4d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5954f833-f4ec-480c-92dd-ae07ee1f5b9a', 'kind': 'pipeline', 'status': 'completed'}, {'id': '155a7c4f-83c0-47d2-8f1a-2cba09118e1c', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'df173c00-c74f-4775-802f-c8815d6f2b19', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1506ec75-7245-42f0-8a4d-09f79203d8c5', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7cf7ce97-c1e9-40a4-b7c6-9478caa84376', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-05-23 16:17:48] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 16:17:48] DEBUG    src.ocr_engine – Koharu scene node preview (first 3): [{'page_id': '019e5532-fd3e-7890-9511-58fd62963834', 'node_id': '019e5532-fd3e-7890-9511-590c0c60995d', 'kind': {'image': {'role': 'source', 'blob': '944535c072a8fc179d64eebaa688b74ee0d1864c30f9acb4558cf5e5e0b19766', 'opacity': 1.0, 'naturalWidth': 800, 'naturalHeight': 1067, 'name': 'page.png'}}}, {'page_id': '019e5532-fd3e-7890-9511-58fd62963834', 'node_id': '019e5532-ff2c-7161-b194-25c6a29b75c9', 'kind': {'mask': {'role': 'segment', 'blob': '468c6e39a27ed9a2484d3dbb68d6500e73d1d84e3ddd5ebc2c72c3b783405e2a'}}}, {'page_id': '019e5532-fd3e-7890-9511-58fd62963834', 'node_id': '019e5532-ff2c-7161-b194-25dc48d44059', 'kind': {'text': {'confidence': 0.51934814, 'sourceLang': None, 'sourceDirection': None, 'renderedDirection': None, 'linePolygons': None, 'rotationDeg': None, 'detectedFontSizePx': None, 'detector': 'ctd', 'text': '能量+1', 'translation': None, 'style': None, 'fontPrediction': None, 'sprite': None, 'spriteTransform': None, 'lockLayoutBox': False}}}]
+[2026-05-23 16:17:48] INFO     src.ocr_engine – Koharu API returned 3 text regions.
+[2026-05-23 16:17:48] INFO     src.pipeline – 3 / 3 box(es) passed confidence threshold (0.50).
+[2026-05-23 16:17:48] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-05-23 16:17:48] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 16:17:48] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+能量+1 能量+1 口猫
+---------------------
+[2026-05-23 16:17:49] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Énergie + 1 Énergie + 1 Chat de bouche
+----------------------
+[2026-05-23 16:17:49] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-05-23 16:17:49] INFO     src.bubble_segmentation – Segmentation complete: 1 textboxes classified (0 bubbles, 1 floating text)
+[2026-05-23 16:17:49] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-05-23 16:17:49] INFO     src.pipeline – Saved translated image to 'output\801.jpg'.
+[2026-05-23 16:17:49] INFO     src.pipeline – Processing '802.jpg' …
+[2026-05-23 16:17:49] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 16:17:49] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 16:17:49] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 16:17:49] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr]
+[2026-05-23 16:17:49] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'paddle-ocr'
+[2026-05-23 16:17:49] DEBUG    src.ocr_engine – OCR engine 'paddle-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:17:49] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ppocr]
+[2026-05-23 16:17:49] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ppocr'
+[2026-05-23 16:17:49] DEBUG    src.ocr_engine – OCR engine 'ppocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:17:49] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ch-ocr]
+[2026-05-23 16:17:49] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ch-ocr'
+[2026-05-23 16:17:49] DEBUG    src.ocr_engine – OCR engine 'ch-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:17:49] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr-vl-1.5]
+[2026-05-23 16:17:49] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 200 for OCR engine 'paddle-ocr-vl-1.5'
+[2026-05-23 16:17:49] DEBUG    src.ocr_engine – Koharu POST /pipelines response: {'operationId': '7d8714a8-a95a-4e7a-a531-33919f1d2275'}
+[2026-05-23 16:17:49] INFO     src.ocr_engine – Using Koharu OCR engine 'paddle-ocr-vl-1.5' with operation 7d8714a8-a95a-4e7a-a531-33919f1d2275.
+[2026-05-23 16:17:49] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 16:17:51] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': 'c56a0ab0-97e2-4b48-b93b-5d1af0a7645d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7d8714a8-a95a-4e7a-a531-33919f1d2275', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e9eddfd0-cd06-4aae-b364-2baf32645038', 'kind': 'pipeline', 'status': 'completed'}, {'id': '9714e872-889c-479f-92dd-7db56d70a88e', 'kind': 'pipeline', 'status': 'completed'}, {'id': '265b1f8a-1616-4347-808c-ca9011c73536', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'ba1b34f6-47c7-4350-91b9-769cb6c6fd9c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6f2dd740-0ff1-4886-ad39-87acf4e30e43', 'kind': 'pipeline', 'status': 'completed'}, {'id': '47ac16c5-a5c3-4068-917d-54eece15b7a0', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e1625838-ae74-4c79-ac05-54694406ca4d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5954f833-f4ec-480c-92dd-ae07ee1f5b9a', 'kind': 'pipeline', 'status': 'completed'}, {'id': '155a7c4f-83c0-47d2-8f1a-2cba09118e1c', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'df173c00-c74f-4775-802f-c8815d6f2b19', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1506ec75-7245-42f0-8a4d-09f79203d8c5', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7cf7ce97-c1e9-40a4-b7c6-9478caa84376', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-05-23 16:17:53] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 16:17:53] DEBUG    src.ocr_engine – Koharu scene node preview (first 3): [{'page_id': '019e5533-0e6c-7a53-979b-950c29b49302', 'node_id': '019e5533-0e6c-7a53-979b-951964edd637', 'kind': {'image': {'role': 'source', 'blob': 'cc28b1b97d88e73530cb3c064db8478b247ab8daa7cbff36d4e22cbc0715b668', 'opacity': 1.0, 'naturalWidth': 800, 'naturalHeight': 1067, 'name': 'page.png'}}}, {'page_id': '019e5533-0e6c-7a53-979b-950c29b49302', 'node_id': '019e5533-104a-72a1-ad88-e29e44f967d7', 'kind': {'mask': {'role': 'segment', 'blob': '048f21bea483d9f55f96f3735345a4584a73ae3041f222dd0d26e80962fc8edf'}}}, {'page_id': '019e5533-0e6c-7a53-979b-950c29b49302', 'node_id': '019e5533-104a-72a1-ad88-e2af7152c23a', 'kind': {'text': {'confidence': 0.921875, 'sourceLang': None, 'sourceDirection': None, 'renderedDirection': None, 'linePolygons': None, 'rotationDeg': None, 'detectedFontSizePx': None, 'detector': 'ctd', 'text': '我穿越了，穿越成了一个大脑还没有发育完整的新生儿', 'translation': None, 'style': None, 'fontPrediction': None, 'sprite': None, 'spriteTransform': None, 'lockLayoutBox': False}}}]
+[2026-05-23 16:17:53] INFO     src.ocr_engine – Koharu API returned 1 text regions.
+[2026-05-23 16:17:53] INFO     src.pipeline – 1 / 1 box(es) passed confidence threshold (0.50).
+[2026-05-23 16:17:53] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-05-23 16:17:53] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 16:17:53] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+我穿越了，穿越成了一个大脑还没有发育完整的新生儿
+---------------------
+[2026-05-23 16:17:55] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+J'ai traversé, et je suis devenu un nouveau-né dont le cerveau n'est pas encore complètement développé.
+----------------------
+[2026-05-23 16:17:55] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-05-23 16:17:55] INFO     src.bubble_segmentation – Segmentation complete: 1 textboxes classified (0 bubbles, 1 floating text)
+[2026-05-23 16:17:55] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-05-23 16:17:55] INFO     src.pipeline – Saved translated image to 'output\802.jpg'.
+[2026-05-23 16:17:55] INFO     src.pipeline – Processing '803.jpg' …
+[2026-05-23 16:17:55] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 16:17:55] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 16:17:55] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 16:17:55] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr]
+[2026-05-23 16:17:55] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'paddle-ocr'
+[2026-05-23 16:17:55] DEBUG    src.ocr_engine – OCR engine 'paddle-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:17:55] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ppocr]
+[2026-05-23 16:17:55] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ppocr'
+[2026-05-23 16:17:55] DEBUG    src.ocr_engine – OCR engine 'ppocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:17:55] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ch-ocr]
+[2026-05-23 16:17:55] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ch-ocr'
+[2026-05-23 16:17:55] DEBUG    src.ocr_engine – OCR engine 'ch-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:17:55] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr-vl-1.5]
+[2026-05-23 16:17:55] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 200 for OCR engine 'paddle-ocr-vl-1.5'
+[2026-05-23 16:17:55] DEBUG    src.ocr_engine – Koharu POST /pipelines response: {'operationId': '33ed7c7d-f6dd-4c7b-8cdb-292168aba322'}
+[2026-05-23 16:17:55] INFO     src.ocr_engine – Using Koharu OCR engine 'paddle-ocr-vl-1.5' with operation 33ed7c7d-f6dd-4c7b-8cdb-292168aba322.
+[2026-05-23 16:17:55] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 16:17:56] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': 'c56a0ab0-97e2-4b48-b93b-5d1af0a7645d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7d8714a8-a95a-4e7a-a531-33919f1d2275', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e9eddfd0-cd06-4aae-b364-2baf32645038', 'kind': 'pipeline', 'status': 'completed'}, {'id': '9714e872-889c-479f-92dd-7db56d70a88e', 'kind': 'pipeline', 'status': 'completed'}, {'id': '265b1f8a-1616-4347-808c-ca9011c73536', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'ba1b34f6-47c7-4350-91b9-769cb6c6fd9c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6f2dd740-0ff1-4886-ad39-87acf4e30e43', 'kind': 'pipeline', 'status': 'completed'}, {'id': '47ac16c5-a5c3-4068-917d-54eece15b7a0', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e1625838-ae74-4c79-ac05-54694406ca4d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5954f833-f4ec-480c-92dd-ae07ee1f5b9a', 'kind': 'pipeline', 'status': 'completed'}, {'id': '33ed7c7d-f6dd-4c7b-8cdb-292168aba322', 'kind': 'pipeline', 'status': 'completed'}, {'id': '155a7c4f-83c0-47d2-8f1a-2cba09118e1c', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'df173c00-c74f-4775-802f-c8815d6f2b19', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1506ec75-7245-42f0-8a4d-09f79203d8c5', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7cf7ce97-c1e9-40a4-b7c6-9478caa84376', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-05-23 16:17:58] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 16:17:58] DEBUG    src.ocr_engine – Koharu scene node preview (first 3): [{'page_id': '019e5533-2343-7761-a862-444eadfaa34d', 'node_id': '019e5533-2343-7761-a862-445b2dcbb4a2', 'kind': {'image': {'role': 'source', 'blob': 'bc1a63f290903ed6c19fef5caceae866dbec5e9017d60b3fdeeb3e1e32149350', 'opacity': 1.0, 'naturalWidth': 800, 'naturalHeight': 1131, 'name': 'page.png'}}}, {'page_id': '019e5533-2343-7761-a862-444eadfaa34d', 'node_id': '019e5533-252e-73c3-833e-aa001565e9f7', 'kind': {'mask': {'role': 'segment', 'blob': '09fdfa419068f0c7b2ffdb787db9a425f61faef434e4f8bc5b7e7a6bcc0b5100'}}}, {'page_id': '019e5533-2343-7761-a862-444eadfaa34d', 'node_id': '019e5533-252e-73c3-833e-aa149664fa3e', 'kind': {'text': {'confidence': 0.4869995, 'sourceLang': None, 'sourceDirection': None, 'renderedDirection': None, 'linePolygons': None, 'rotationDeg': None, 'detectedFontSizePx': None, 'detector': 'ctd', 'text': '圣祖山脉之外的世界，已经被妖兽所占领，这里的人们已经有数百年不曾与外界有过联系了。', 'translation': None, 'style': None, 'fontPrediction': None, 'sprite': None, 'spriteTransform': None, 'lockLayoutBox': False}}}]
+[2026-05-23 16:17:58] INFO     src.ocr_engine – Koharu API returned 5 text regions.
+[2026-05-23 16:17:58] INFO     src.pipeline – 3 / 5 box(es) passed confidence threshold (0.50).
+[2026-05-23 16:17:58] INFO     src.pipeline – Grouped into 3 contiguous text block(s) for translation.
+[2026-05-23 16:17:58] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 16:17:58] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+虽然经常会受到山脉中风雪妖兽的袭击，但这座城池还是在次次毁灭性的战争中不断重建了起来。
+---------------------
+[2026-05-23 16:18:01] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Malgré les fréquentes attaques de créatures surnaturelles qui hantent les montagnes, la ville se relève chaque fois de guerres dévastatrices.
+----------------------
+[2026-05-23 16:18:01] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+谁也不清楚外面的世界是怎样的。传说人类在鼎盛时期有着庞大的帝国，但如今都已灰飞烟灭，不复存在。这座城市由于位置隐秘，才得以从黑暗时代完整保留下来。
+---------------------
+[2026-05-23 16:18:05] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Personne ne sait ce que le monde extérieur ressemble. Selon la légende, les humains avaient un immense empire au sommet de leur puissance, mais il n'en reste plus rien aujourd'hui. Cette ville a pu se préserver en entier grâce à son emplacement caché, pendant l'ère des ténèbres.
+----------------------
+[2026-05-23 16:18:05] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+光辉之城
+---------------------
+[2026-05-23 16:18:06] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+La ville lumineuse
+----------------------
+[2026-05-23 16:18:06] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-05-23 16:18:06] INFO     src.bubble_segmentation – Segmentation complete: 3 textboxes classified (0 bubbles, 3 floating text)
+[2026-05-23 16:18:06] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-05-23 16:18:06] INFO     src.pipeline – Saved translated image to 'output\803.jpg'.
+[2026-05-23 16:18:06] INFO     __main__ – Done.
+[2026-05-23 16:24:13] INFO     __main__ – Initialising OCR engine …
+[2026-05-23 16:24:13] INFO     __main__ – Initialising translation engine …
+[2026-05-23 16:24:14] INFO     __main__ – Initialising inpainter …
+[2026-05-23 16:24:14] WARNING  src.inpainter – LaMa model loading is not yet implemented.  Falling back to OpenCV inpainting.
+[2026-05-23 16:24:14] INFO     __main__ – Initialising typesetter …
+[2026-05-23 16:24:14] INFO     src.pipeline – Found 4 image(s) in 'input'.
+[2026-05-23 16:24:14] INFO     src.pipeline – Processing '800.jpg' …
+[2026-05-23 16:24:14] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 16:24:14] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 16:24:14] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 16:24:14] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr]
+[2026-05-23 16:24:14] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'paddle-ocr'
+[2026-05-23 16:24:14] DEBUG    src.ocr_engine – OCR engine 'paddle-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:24:14] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ppocr]
+[2026-05-23 16:24:14] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ppocr'
+[2026-05-23 16:24:14] DEBUG    src.ocr_engine – OCR engine 'ppocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:24:14] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ch-ocr]
+[2026-05-23 16:24:14] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ch-ocr'
+[2026-05-23 16:24:14] DEBUG    src.ocr_engine – OCR engine 'ch-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:24:14] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr-vl-1.5]
+[2026-05-23 16:24:14] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 200 for OCR engine 'paddle-ocr-vl-1.5'
+[2026-05-23 16:24:14] DEBUG    src.ocr_engine – Koharu POST /pipelines response: {'operationId': '5d251082-4679-48cf-9f1a-97e4aeae2174'}
+[2026-05-23 16:24:14] INFO     src.ocr_engine – Using Koharu OCR engine 'paddle-ocr-vl-1.5' with operation 5d251082-4679-48cf-9f1a-97e4aeae2174.
+[2026-05-23 16:24:14] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 16:24:15] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': 'c56a0ab0-97e2-4b48-b93b-5d1af0a7645d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7d8714a8-a95a-4e7a-a531-33919f1d2275', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e9eddfd0-cd06-4aae-b364-2baf32645038', 'kind': 'pipeline', 'status': 'completed'}, {'id': '9714e872-889c-479f-92dd-7db56d70a88e', 'kind': 'pipeline', 'status': 'completed'}, {'id': '265b1f8a-1616-4347-808c-ca9011c73536', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'ba1b34f6-47c7-4350-91b9-769cb6c6fd9c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6f2dd740-0ff1-4886-ad39-87acf4e30e43', 'kind': 'pipeline', 'status': 'completed'}, {'id': '47ac16c5-a5c3-4068-917d-54eece15b7a0', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5d251082-4679-48cf-9f1a-97e4aeae2174', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e1625838-ae74-4c79-ac05-54694406ca4d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5954f833-f4ec-480c-92dd-ae07ee1f5b9a', 'kind': 'pipeline', 'status': 'completed'}, {'id': '33ed7c7d-f6dd-4c7b-8cdb-292168aba322', 'kind': 'pipeline', 'status': 'completed'}, {'id': '155a7c4f-83c0-47d2-8f1a-2cba09118e1c', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'df173c00-c74f-4775-802f-c8815d6f2b19', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1506ec75-7245-42f0-8a4d-09f79203d8c5', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7cf7ce97-c1e9-40a4-b7c6-9478caa84376', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-05-23 16:24:17] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 16:24:17] DEBUG    src.ocr_engine – Koharu scene node preview (first 3): [{'page_id': '019e5538-ec77-7330-9514-466250daf9fb', 'node_id': '019e5538-ec77-7330-9514-467e5533cb96', 'kind': {'image': {'role': 'source', 'blob': '4ccecaacd80bf5fd37bce77eb157c3a96c14ebb0c05714e9bf6da9076b648699', 'opacity': 1.0, 'naturalWidth': 800, 'naturalHeight': 1067, 'name': 'page.png'}}}, {'page_id': '019e5538-ec77-7330-9514-466250daf9fb', 'node_id': '019e5538-ee66-7032-9371-973b031cc2ef', 'kind': {'mask': {'role': 'segment', 'blob': '6102c9fd2db2ddedaa29b1943b52a0b47360e6954dc09bc0e116bf20c5b12c80'}}}, {'page_id': '019e5538-ec77-7330-9514-466250daf9fb', 'node_id': '019e5538-ee66-7032-9371-974b5667325a', 'kind': {'text': {'confidence': 0.921875, 'sourceLang': None, 'sourceDirection': None, 'renderedDirection': None, 'linePolygons': None, 'rotationDeg': None, 'detectedFontSizePx': None, 'detector': 'ctd', 'text': '不过只要你能健康长大，这一切都值得', 'translation': None, 'style': None, 'fontPrediction': None, 'sprite': None, 'spriteTransform': None, 'lockLayoutBox': False}}}]
+[2026-05-23 16:24:17] INFO     src.ocr_engine – Koharu API returned 1 text regions.
+[2026-05-23 16:24:17] INFO     src.pipeline – 1 / 1 box(es) passed confidence threshold (0.40).
+[2026-05-23 16:24:17] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-05-23 16:24:17] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 16:24:17] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+不过只要你能健康长大，这一切都值得
+---------------------
+[2026-05-23 16:24:23] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Mais tant que tu restes en bonne santé et grandisses bien, tout cela vaut la peine.
+----------------------
+[2026-05-23 16:24:23] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-05-23 16:24:23] INFO     src.bubble_segmentation – Segmentation complete: 1 textboxes classified (0 bubbles, 1 floating text)
+[2026-05-23 16:24:23] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-05-23 16:24:23] INFO     src.pipeline – Saved translated image to 'output\800.jpg'.
+[2026-05-23 16:24:23] INFO     src.pipeline – Processing '801.jpg' …
+[2026-05-23 16:24:23] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 16:24:23] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 16:24:23] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 16:24:24] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr]
+[2026-05-23 16:24:24] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'paddle-ocr'
+[2026-05-23 16:24:24] DEBUG    src.ocr_engine – OCR engine 'paddle-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:24:24] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ppocr]
+[2026-05-23 16:24:24] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ppocr'
+[2026-05-23 16:24:24] DEBUG    src.ocr_engine – OCR engine 'ppocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:24:24] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ch-ocr]
+[2026-05-23 16:24:24] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ch-ocr'
+[2026-05-23 16:24:24] DEBUG    src.ocr_engine – OCR engine 'ch-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:24:24] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr-vl-1.5]
+[2026-05-23 16:24:24] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 200 for OCR engine 'paddle-ocr-vl-1.5'
+[2026-05-23 16:24:24] DEBUG    src.ocr_engine – Koharu POST /pipelines response: {'operationId': '3dec6ce3-5e55-4804-b243-a6c382ad1fa9'}
+[2026-05-23 16:24:24] INFO     src.ocr_engine – Using Koharu OCR engine 'paddle-ocr-vl-1.5' with operation 3dec6ce3-5e55-4804-b243-a6c382ad1fa9.
+[2026-05-23 16:24:24] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 16:24:25] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': 'c56a0ab0-97e2-4b48-b93b-5d1af0a7645d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7d8714a8-a95a-4e7a-a531-33919f1d2275', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e9eddfd0-cd06-4aae-b364-2baf32645038', 'kind': 'pipeline', 'status': 'completed'}, {'id': '9714e872-889c-479f-92dd-7db56d70a88e', 'kind': 'pipeline', 'status': 'completed'}, {'id': '265b1f8a-1616-4347-808c-ca9011c73536', 'kind': 'pipeline', 'status': 'completed'}, {'id': '3dec6ce3-5e55-4804-b243-a6c382ad1fa9', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'ba1b34f6-47c7-4350-91b9-769cb6c6fd9c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6f2dd740-0ff1-4886-ad39-87acf4e30e43', 'kind': 'pipeline', 'status': 'completed'}, {'id': '47ac16c5-a5c3-4068-917d-54eece15b7a0', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5d251082-4679-48cf-9f1a-97e4aeae2174', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e1625838-ae74-4c79-ac05-54694406ca4d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5954f833-f4ec-480c-92dd-ae07ee1f5b9a', 'kind': 'pipeline', 'status': 'completed'}, {'id': '33ed7c7d-f6dd-4c7b-8cdb-292168aba322', 'kind': 'pipeline', 'status': 'completed'}, {'id': '155a7c4f-83c0-47d2-8f1a-2cba09118e1c', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'df173c00-c74f-4775-802f-c8815d6f2b19', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1506ec75-7245-42f0-8a4d-09f79203d8c5', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7cf7ce97-c1e9-40a4-b7c6-9478caa84376', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-05-23 16:24:27] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 16:24:27] DEBUG    src.ocr_engine – Koharu scene node preview (first 3): [{'page_id': '019e5539-11df-7122-8eb8-e62d33fee121', 'node_id': '019e5539-11df-7122-8eb8-e63ab82503dc', 'kind': {'image': {'role': 'source', 'blob': '944535c072a8fc179d64eebaa688b74ee0d1864c30f9acb4558cf5e5e0b19766', 'opacity': 1.0, 'naturalWidth': 800, 'naturalHeight': 1067, 'name': 'page.png'}}}, {'page_id': '019e5539-11df-7122-8eb8-e62d33fee121', 'node_id': '019e5539-13ba-75b3-99f3-014a1af50ae4', 'kind': {'mask': {'role': 'segment', 'blob': '468c6e39a27ed9a2484d3dbb68d6500e73d1d84e3ddd5ebc2c72c3b783405e2a'}}}, {'page_id': '019e5539-11df-7122-8eb8-e62d33fee121', 'node_id': '019e5539-13ba-75b3-99f3-015609154d6c', 'kind': {'text': {'confidence': 0.51934814, 'sourceLang': None, 'sourceDirection': None, 'renderedDirection': None, 'linePolygons': None, 'rotationDeg': None, 'detectedFontSizePx': None, 'detector': 'ctd', 'text': '能量+1', 'translation': None, 'style': None, 'fontPrediction': None, 'sprite': None, 'spriteTransform': None, 'lockLayoutBox': False}}}]
+[2026-05-23 16:24:27] INFO     src.ocr_engine – Koharu API returned 3 text regions.
+[2026-05-23 16:24:27] INFO     src.pipeline – 3 / 3 box(es) passed confidence threshold (0.40).
+[2026-05-23 16:24:27] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-05-23 16:24:27] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 16:24:27] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+能量+1 能量+1 口猫
+---------------------
+[2026-05-23 16:24:28] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Énergie + 1 Énergie + 1 Chat de bouche
+----------------------
+[2026-05-23 16:24:28] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-05-23 16:24:28] INFO     src.bubble_segmentation – Segmentation complete: 1 textboxes classified (0 bubbles, 1 floating text)
+[2026-05-23 16:24:28] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-05-23 16:24:28] INFO     src.pipeline – Saved translated image to 'output\801.jpg'.
+[2026-05-23 16:24:28] INFO     src.pipeline – Processing '802.jpg' …
+[2026-05-23 16:24:28] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 16:24:28] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 16:24:28] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 16:24:28] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr]
+[2026-05-23 16:24:28] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'paddle-ocr'
+[2026-05-23 16:24:28] DEBUG    src.ocr_engine – OCR engine 'paddle-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:24:28] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ppocr]
+[2026-05-23 16:24:28] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ppocr'
+[2026-05-23 16:24:28] DEBUG    src.ocr_engine – OCR engine 'ppocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:24:28] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ch-ocr]
+[2026-05-23 16:24:28] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ch-ocr'
+[2026-05-23 16:24:28] DEBUG    src.ocr_engine – OCR engine 'ch-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:24:28] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr-vl-1.5]
+[2026-05-23 16:24:28] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 200 for OCR engine 'paddle-ocr-vl-1.5'
+[2026-05-23 16:24:28] DEBUG    src.ocr_engine – Koharu POST /pipelines response: {'operationId': '1df37e3c-b00a-455e-a455-a0cce3f706b7'}
+[2026-05-23 16:24:28] INFO     src.ocr_engine – Using Koharu OCR engine 'paddle-ocr-vl-1.5' with operation 1df37e3c-b00a-455e-a455-a0cce3f706b7.
+[2026-05-23 16:24:28] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 16:24:29] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': 'c56a0ab0-97e2-4b48-b93b-5d1af0a7645d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7d8714a8-a95a-4e7a-a531-33919f1d2275', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e9eddfd0-cd06-4aae-b364-2baf32645038', 'kind': 'pipeline', 'status': 'completed'}, {'id': '9714e872-889c-479f-92dd-7db56d70a88e', 'kind': 'pipeline', 'status': 'completed'}, {'id': '265b1f8a-1616-4347-808c-ca9011c73536', 'kind': 'pipeline', 'status': 'completed'}, {'id': '3dec6ce3-5e55-4804-b243-a6c382ad1fa9', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'ba1b34f6-47c7-4350-91b9-769cb6c6fd9c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6f2dd740-0ff1-4886-ad39-87acf4e30e43', 'kind': 'pipeline', 'status': 'completed'}, {'id': '47ac16c5-a5c3-4068-917d-54eece15b7a0', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5d251082-4679-48cf-9f1a-97e4aeae2174', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e1625838-ae74-4c79-ac05-54694406ca4d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5954f833-f4ec-480c-92dd-ae07ee1f5b9a', 'kind': 'pipeline', 'status': 'completed'}, {'id': '33ed7c7d-f6dd-4c7b-8cdb-292168aba322', 'kind': 'pipeline', 'status': 'completed'}, {'id': '155a7c4f-83c0-47d2-8f1a-2cba09118e1c', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'df173c00-c74f-4775-802f-c8815d6f2b19', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1506ec75-7245-42f0-8a4d-09f79203d8c5', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7cf7ce97-c1e9-40a4-b7c6-9478caa84376', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1df37e3c-b00a-455e-a455-a0cce3f706b7', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-05-23 16:24:31] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 16:24:31] DEBUG    src.ocr_engine – Koharu scene node preview (first 3): [{'page_id': '019e5539-2323-7a10-a33d-0189f9a76cc9', 'node_id': '019e5539-2323-7a10-a33d-019d4786bd4d', 'kind': {'image': {'role': 'source', 'blob': 'cc28b1b97d88e73530cb3c064db8478b247ab8daa7cbff36d4e22cbc0715b668', 'opacity': 1.0, 'naturalWidth': 800, 'naturalHeight': 1067, 'name': 'page.png'}}}, {'page_id': '019e5539-2323-7a10-a33d-0189f9a76cc9', 'node_id': '019e5539-2524-7401-82af-c47f67dff22a', 'kind': {'mask': {'role': 'segment', 'blob': '048f21bea483d9f55f96f3735345a4584a73ae3041f222dd0d26e80962fc8edf'}}}, {'page_id': '019e5539-2323-7a10-a33d-0189f9a76cc9', 'node_id': '019e5539-2524-7401-82af-c48d9d616c62', 'kind': {'text': {'confidence': 0.921875, 'sourceLang': None, 'sourceDirection': None, 'renderedDirection': None, 'linePolygons': None, 'rotationDeg': None, 'detectedFontSizePx': None, 'detector': 'ctd', 'text': '我穿越了，穿越成了一个大脑还没有发育完整的新生儿', 'translation': None, 'style': None, 'fontPrediction': None, 'sprite': None, 'spriteTransform': None, 'lockLayoutBox': False}}}]
+[2026-05-23 16:24:31] INFO     src.ocr_engine – Koharu API returned 1 text regions.
+[2026-05-23 16:24:31] INFO     src.pipeline – 1 / 1 box(es) passed confidence threshold (0.40).
+[2026-05-23 16:24:31] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-05-23 16:24:31] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 16:24:31] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+我穿越了，穿越成了一个大脑还没有发育完整的新生儿
+---------------------
+[2026-05-23 16:24:33] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+J'ai traversé et je suis devenu un nouveau-né dont le cerveau n'est pas encore complètement développé.
+----------------------
+[2026-05-23 16:24:33] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-05-23 16:24:33] INFO     src.bubble_segmentation – Segmentation complete: 1 textboxes classified (0 bubbles, 1 floating text)
+[2026-05-23 16:24:33] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-05-23 16:24:33] INFO     src.pipeline – Saved translated image to 'output\802.jpg'.
+[2026-05-23 16:24:33] INFO     src.pipeline – Processing '803.jpg' …
+[2026-05-23 16:24:33] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 16:24:33] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 16:24:33] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 16:24:33] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr]
+[2026-05-23 16:24:33] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'paddle-ocr'
+[2026-05-23 16:24:33] DEBUG    src.ocr_engine – OCR engine 'paddle-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:24:33] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ppocr]
+[2026-05-23 16:24:33] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ppocr'
+[2026-05-23 16:24:33] DEBUG    src.ocr_engine – OCR engine 'ppocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:24:33] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ch-ocr]
+[2026-05-23 16:24:33] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ch-ocr'
+[2026-05-23 16:24:33] DEBUG    src.ocr_engine – OCR engine 'ch-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:24:33] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr-vl-1.5]
+[2026-05-23 16:24:33] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 200 for OCR engine 'paddle-ocr-vl-1.5'
+[2026-05-23 16:24:33] DEBUG    src.ocr_engine – Koharu POST /pipelines response: {'operationId': 'dda79c96-2517-48fe-b812-89a2fbcfab50'}
+[2026-05-23 16:24:33] INFO     src.ocr_engine – Using Koharu OCR engine 'paddle-ocr-vl-1.5' with operation dda79c96-2517-48fe-b812-89a2fbcfab50.
+[2026-05-23 16:24:33] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 16:24:34] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': 'c56a0ab0-97e2-4b48-b93b-5d1af0a7645d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7d8714a8-a95a-4e7a-a531-33919f1d2275', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e9eddfd0-cd06-4aae-b364-2baf32645038', 'kind': 'pipeline', 'status': 'completed'}, {'id': '9714e872-889c-479f-92dd-7db56d70a88e', 'kind': 'pipeline', 'status': 'completed'}, {'id': '265b1f8a-1616-4347-808c-ca9011c73536', 'kind': 'pipeline', 'status': 'completed'}, {'id': '3dec6ce3-5e55-4804-b243-a6c382ad1fa9', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'ba1b34f6-47c7-4350-91b9-769cb6c6fd9c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6f2dd740-0ff1-4886-ad39-87acf4e30e43', 'kind': 'pipeline', 'status': 'completed'}, {'id': '47ac16c5-a5c3-4068-917d-54eece15b7a0', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5d251082-4679-48cf-9f1a-97e4aeae2174', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e1625838-ae74-4c79-ac05-54694406ca4d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5954f833-f4ec-480c-92dd-ae07ee1f5b9a', 'kind': 'pipeline', 'status': 'completed'}, {'id': '33ed7c7d-f6dd-4c7b-8cdb-292168aba322', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'dda79c96-2517-48fe-b812-89a2fbcfab50', 'kind': 'pipeline', 'status': 'completed'}, {'id': '155a7c4f-83c0-47d2-8f1a-2cba09118e1c', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'df173c00-c74f-4775-802f-c8815d6f2b19', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1506ec75-7245-42f0-8a4d-09f79203d8c5', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7cf7ce97-c1e9-40a4-b7c6-9478caa84376', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1df37e3c-b00a-455e-a455-a0cce3f706b7', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-05-23 16:24:36] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 16:24:36] DEBUG    src.ocr_engine – Koharu scene node preview (first 3): [{'page_id': '019e5539-37ba-72c1-8314-e8babc0c1c57', 'node_id': '019e5539-37ba-72c1-8314-e8c664971a58', 'kind': {'image': {'role': 'source', 'blob': 'bc1a63f290903ed6c19fef5caceae866dbec5e9017d60b3fdeeb3e1e32149350', 'opacity': 1.0, 'naturalWidth': 800, 'naturalHeight': 1131, 'name': 'page.png'}}}, {'page_id': '019e5539-37ba-72c1-8314-e8babc0c1c57', 'node_id': '019e5539-3995-7920-8d9e-78aee7d9931c', 'kind': {'mask': {'role': 'segment', 'blob': '09fdfa419068f0c7b2ffdb787db9a425f61faef434e4f8bc5b7e7a6bcc0b5100'}}}, {'page_id': '019e5539-37ba-72c1-8314-e8babc0c1c57', 'node_id': '019e5539-3995-7920-8d9e-78b3b92d7e04', 'kind': {'text': {'confidence': 0.4869995, 'sourceLang': None, 'sourceDirection': None, 'renderedDirection': None, 'linePolygons': None, 'rotationDeg': None, 'detectedFontSizePx': None, 'detector': 'ctd', 'text': '圣祖山脉之外的世界，已经被妖兽所占领，这里的人们已经有数百年不曾与外界有过联系了。', 'translation': None, 'style': None, 'fontPrediction': None, 'sprite': None, 'spriteTransform': None, 'lockLayoutBox': False}}}]
+[2026-05-23 16:24:36] INFO     src.ocr_engine – Koharu API returned 5 text regions.
+[2026-05-23 16:24:36] INFO     src.pipeline – 5 / 5 box(es) passed confidence threshold (0.40).
+[2026-05-23 16:24:36] INFO     src.pipeline – Grouped into 4 contiguous text block(s) for translation.
+[2026-05-23 16:24:36] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 16:24:36] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+圣祖山脉之外的世界，已经被妖兽所占领，这里的人们已经有数百年不曾与外界有过联系了。 圣祖山脉之外的世界，已经被妖兽所占领，这里的人们已经有数百年不曾与外界有过联系了。
+---------------------
+[2026-05-23 16:24:40] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Le monde au-delà de la chaîne Sainte-Ascension est sous le contrôle des créatures surnaturelles. Les habitants de ce lieu n'ont pas eu de contact avec l'extérieur depuis plusieurs siècles.
+
+(Repeated text is likely an error in the original manga)
+----------------------
+[2026-05-23 16:24:40] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+虽然经常会受到山脉中风雪妖兽的袭击，但这座城池还是在次次毁灭性的战争中不断重建了起来。
+---------------------
+[2026-05-23 16:24:44] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Bien que la ville soit fréquemment attaquée par des créatures surnaturelles qui vivent dans les montagnes et qui sont soumises aux tempêtes de neige, elle se relève toujours après chaque guerre dévastatrice.
+----------------------
+[2026-05-23 16:24:44] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+谁也不清楚外面的世界是怎样的。传说人类在鼎盛时期有着庞大的帝国，但如今都已灰飞烟灭，不复存在。这座城市由于位置隐秘，才得以从黑暗时代完整保留下来。
+---------------------
+[2026-05-23 16:24:47] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Personne ne sait ce que le monde extérieur ressemble. Il est dit que les humains avaient une grande empire à leur apogée, mais maintenant tout cela n'existe plus. Cette ville a pu se préserver de l'ère sombre grâce à son emplacement caché.
+----------------------
+[2026-05-23 16:24:47] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+光辉之城
+---------------------
+[2026-05-23 16:24:48] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+La ville de lumière
+----------------------
+[2026-05-23 16:24:48] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-05-23 16:24:48] INFO     src.bubble_segmentation – Segmentation complete: 4 textboxes classified (0 bubbles, 4 floating text)
+[2026-05-23 16:24:48] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-05-23 16:24:48] INFO     src.pipeline – Saved translated image to 'output\803.jpg'.
+[2026-05-23 16:24:48] INFO     __main__ – Done.
+[2026-05-23 16:34:36] INFO     __main__ – Initialising OCR engine …
+[2026-05-23 16:34:36] INFO     __main__ – Initialising translation engine …
+[2026-05-23 16:34:36] INFO     __main__ – Initialising inpainter …
+[2026-05-23 16:34:36] WARNING  src.inpainter – LaMa model loading is not yet implemented.  Falling back to OpenCV inpainting.
+[2026-05-23 16:34:36] INFO     __main__ – Initialising typesetter …
+[2026-05-23 16:34:36] INFO     src.pipeline – Found 4 image(s) in 'input'.
+[2026-05-23 16:34:36] INFO     src.pipeline – Processing '800.jpg' …
+[2026-05-23 16:34:36] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 16:34:37] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 16:34:37] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 16:34:37] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr]
+[2026-05-23 16:34:37] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'paddle-ocr'
+[2026-05-23 16:34:37] DEBUG    src.ocr_engine – OCR engine 'paddle-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:34:37] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ppocr]
+[2026-05-23 16:34:37] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ppocr'
+[2026-05-23 16:34:37] DEBUG    src.ocr_engine – OCR engine 'ppocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:34:37] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ch-ocr]
+[2026-05-23 16:34:37] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ch-ocr'
+[2026-05-23 16:34:37] DEBUG    src.ocr_engine – OCR engine 'ch-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:34:37] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr-vl-1.5]
+[2026-05-23 16:34:37] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 200 for OCR engine 'paddle-ocr-vl-1.5'
+[2026-05-23 16:34:37] DEBUG    src.ocr_engine – Koharu POST /pipelines response: {'operationId': '6e13de16-d8fd-47fe-9839-2238dabbd8b3'}
+[2026-05-23 16:34:37] INFO     src.ocr_engine – Using Koharu OCR engine 'paddle-ocr-vl-1.5' with operation 6e13de16-d8fd-47fe-9839-2238dabbd8b3.
+[2026-05-23 16:34:37] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 16:34:38] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': 'c56a0ab0-97e2-4b48-b93b-5d1af0a7645d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7d8714a8-a95a-4e7a-a531-33919f1d2275', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e9eddfd0-cd06-4aae-b364-2baf32645038', 'kind': 'pipeline', 'status': 'completed'}, {'id': '9714e872-889c-479f-92dd-7db56d70a88e', 'kind': 'pipeline', 'status': 'completed'}, {'id': '265b1f8a-1616-4347-808c-ca9011c73536', 'kind': 'pipeline', 'status': 'completed'}, {'id': '3dec6ce3-5e55-4804-b243-a6c382ad1fa9', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'ba1b34f6-47c7-4350-91b9-769cb6c6fd9c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6f2dd740-0ff1-4886-ad39-87acf4e30e43', 'kind': 'pipeline', 'status': 'completed'}, {'id': '47ac16c5-a5c3-4068-917d-54eece15b7a0', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5d251082-4679-48cf-9f1a-97e4aeae2174', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e1625838-ae74-4c79-ac05-54694406ca4d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5954f833-f4ec-480c-92dd-ae07ee1f5b9a', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6e13de16-d8fd-47fe-9839-2238dabbd8b3', 'kind': 'pipeline', 'status': 'completed'}, {'id': '33ed7c7d-f6dd-4c7b-8cdb-292168aba322', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'dda79c96-2517-48fe-b812-89a2fbcfab50', 'kind': 'pipeline', 'status': 'completed'}, {'id': '155a7c4f-83c0-47d2-8f1a-2cba09118e1c', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'df173c00-c74f-4775-802f-c8815d6f2b19', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1506ec75-7245-42f0-8a4d-09f79203d8c5', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7cf7ce97-c1e9-40a4-b7c6-9478caa84376', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1df37e3c-b00a-455e-a455-a0cce3f706b7', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-05-23 16:34:40] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 16:34:40] DEBUG    src.ocr_engine – Koharu scene node preview (first 3): [{'page_id': '019e5542-6cee-7ba1-8695-544f586bdb1a', 'node_id': '019e5542-6cee-7ba1-8695-54542e6fbb15', 'kind': {'image': {'role': 'source', 'blob': '4ccecaacd80bf5fd37bce77eb157c3a96c14ebb0c05714e9bf6da9076b648699', 'opacity': 1.0, 'naturalWidth': 800, 'naturalHeight': 1067, 'name': 'page.png'}}}, {'page_id': '019e5542-6cee-7ba1-8695-544f586bdb1a', 'node_id': '019e5542-6ec4-7f53-9f71-e0353c044e1c', 'kind': {'mask': {'role': 'segment', 'blob': '6102c9fd2db2ddedaa29b1943b52a0b47360e6954dc09bc0e116bf20c5b12c80'}}}, {'page_id': '019e5542-6cee-7ba1-8695-544f586bdb1a', 'node_id': '019e5542-6ec4-7f53-9f71-e0420db272d8', 'kind': {'text': {'confidence': 0.921875, 'sourceLang': None, 'sourceDirection': None, 'renderedDirection': None, 'linePolygons': None, 'rotationDeg': None, 'detectedFontSizePx': None, 'detector': 'ctd', 'text': '不过只要你能健康长大，这一切都值得', 'translation': None, 'style': None, 'fontPrediction': None, 'sprite': None, 'spriteTransform': None, 'lockLayoutBox': False}}}]
+[2026-05-23 16:34:40] INFO     src.ocr_engine – Koharu API returned 1 text regions.
+[2026-05-23 16:34:40] INFO     src.pipeline – 1 / 1 box(es) passed confidence threshold (0.40).
+[2026-05-23 16:34:40] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-05-23 16:34:40] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 16:34:40] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+不过只要你能健康长大，这一切都值得
+---------------------
+[2026-05-23 16:34:46] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Mais tant que tu es en bonne santé et grandis bien, tout cela vaut la peine.
+----------------------
+[2026-05-23 16:34:46] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-05-23 16:34:46] INFO     src.bubble_segmentation – Segmentation complete: 1 textboxes classified (0 bubbles, 1 floating text)
+[2026-05-23 16:34:46] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-05-23 16:34:46] INFO     src.pipeline – Saved translated image to 'output\800.jpg'.
+[2026-05-23 16:34:46] INFO     src.pipeline – Processing '801.jpg' …
+[2026-05-23 16:34:46] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 16:34:46] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 16:34:46] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 16:34:46] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr]
+[2026-05-23 16:34:46] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'paddle-ocr'
+[2026-05-23 16:34:46] DEBUG    src.ocr_engine – OCR engine 'paddle-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:34:46] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ppocr]
+[2026-05-23 16:34:46] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ppocr'
+[2026-05-23 16:34:46] DEBUG    src.ocr_engine – OCR engine 'ppocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:34:46] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ch-ocr]
+[2026-05-23 16:34:46] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ch-ocr'
+[2026-05-23 16:34:46] DEBUG    src.ocr_engine – OCR engine 'ch-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:34:46] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr-vl-1.5]
+[2026-05-23 16:34:46] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 200 for OCR engine 'paddle-ocr-vl-1.5'
+[2026-05-23 16:34:46] DEBUG    src.ocr_engine – Koharu POST /pipelines response: {'operationId': '6321b09e-c7b5-4c4c-aa2b-5292572484ba'}
+[2026-05-23 16:34:46] INFO     src.ocr_engine – Using Koharu OCR engine 'paddle-ocr-vl-1.5' with operation 6321b09e-c7b5-4c4c-aa2b-5292572484ba.
+[2026-05-23 16:34:46] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 16:34:47] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': 'c56a0ab0-97e2-4b48-b93b-5d1af0a7645d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7d8714a8-a95a-4e7a-a531-33919f1d2275', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e9eddfd0-cd06-4aae-b364-2baf32645038', 'kind': 'pipeline', 'status': 'completed'}, {'id': '9714e872-889c-479f-92dd-7db56d70a88e', 'kind': 'pipeline', 'status': 'completed'}, {'id': '265b1f8a-1616-4347-808c-ca9011c73536', 'kind': 'pipeline', 'status': 'completed'}, {'id': '3dec6ce3-5e55-4804-b243-a6c382ad1fa9', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'ba1b34f6-47c7-4350-91b9-769cb6c6fd9c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6f2dd740-0ff1-4886-ad39-87acf4e30e43', 'kind': 'pipeline', 'status': 'completed'}, {'id': '47ac16c5-a5c3-4068-917d-54eece15b7a0', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5d251082-4679-48cf-9f1a-97e4aeae2174', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e1625838-ae74-4c79-ac05-54694406ca4d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5954f833-f4ec-480c-92dd-ae07ee1f5b9a', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6e13de16-d8fd-47fe-9839-2238dabbd8b3', 'kind': 'pipeline', 'status': 'completed'}, {'id': '33ed7c7d-f6dd-4c7b-8cdb-292168aba322', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'dda79c96-2517-48fe-b812-89a2fbcfab50', 'kind': 'pipeline', 'status': 'completed'}, {'id': '155a7c4f-83c0-47d2-8f1a-2cba09118e1c', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'df173c00-c74f-4775-802f-c8815d6f2b19', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1506ec75-7245-42f0-8a4d-09f79203d8c5', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6321b09e-c7b5-4c4c-aa2b-5292572484ba', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7cf7ce97-c1e9-40a4-b7c6-9478caa84376', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1df37e3c-b00a-455e-a455-a0cce3f706b7', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-05-23 16:34:49] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 16:34:49] DEBUG    src.ocr_engine – Koharu scene node preview (first 3): [{'page_id': '019e5542-900f-7393-b872-8b3032f48889', 'node_id': '019e5542-900f-7393-b872-8b4f43e43f6d', 'kind': {'image': {'role': 'source', 'blob': '944535c072a8fc179d64eebaa688b74ee0d1864c30f9acb4558cf5e5e0b19766', 'opacity': 1.0, 'naturalWidth': 800, 'naturalHeight': 1067, 'name': 'page.png'}}}, {'page_id': '019e5542-900f-7393-b872-8b3032f48889', 'node_id': '019e5542-91f8-7f21-8b8d-60a60d39e011', 'kind': {'mask': {'role': 'segment', 'blob': '468c6e39a27ed9a2484d3dbb68d6500e73d1d84e3ddd5ebc2c72c3b783405e2a'}}}, {'page_id': '019e5542-900f-7393-b872-8b3032f48889', 'node_id': '019e5542-91f8-7f21-8b8d-60b07e47e086', 'kind': {'text': {'confidence': 0.51934814, 'sourceLang': None, 'sourceDirection': None, 'renderedDirection': None, 'linePolygons': None, 'rotationDeg': None, 'detectedFontSizePx': None, 'detector': 'ctd', 'text': '能量+1', 'translation': None, 'style': None, 'fontPrediction': None, 'sprite': None, 'spriteTransform': None, 'lockLayoutBox': False}}}]
+[2026-05-23 16:34:49] INFO     src.ocr_engine – Koharu API returned 3 text regions.
+[2026-05-23 16:34:49] INFO     src.pipeline – 3 / 3 box(es) passed confidence threshold (0.40).
+[2026-05-23 16:34:49] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-05-23 16:34:49] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 16:34:49] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+能量+1 能量+1 口猫
+---------------------
+[2026-05-23 16:34:50] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Énergie + 1 Énergie + 1 Chat de bouche
+----------------------
+[2026-05-23 16:34:50] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-05-23 16:34:50] INFO     src.bubble_segmentation – Segmentation complete: 1 textboxes classified (0 bubbles, 1 floating text)
+[2026-05-23 16:34:50] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-05-23 16:34:50] INFO     src.pipeline – Saved translated image to 'output\801.jpg'.
+[2026-05-23 16:34:50] INFO     src.pipeline – Processing '802.jpg' …
+[2026-05-23 16:34:50] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 16:34:50] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 16:34:50] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 16:34:50] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr]
+[2026-05-23 16:34:50] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'paddle-ocr'
+[2026-05-23 16:34:50] DEBUG    src.ocr_engine – OCR engine 'paddle-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:34:50] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ppocr]
+[2026-05-23 16:34:50] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ppocr'
+[2026-05-23 16:34:50] DEBUG    src.ocr_engine – OCR engine 'ppocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:34:50] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ch-ocr]
+[2026-05-23 16:34:50] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ch-ocr'
+[2026-05-23 16:34:50] DEBUG    src.ocr_engine – OCR engine 'ch-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:34:50] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr-vl-1.5]
+[2026-05-23 16:34:50] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 200 for OCR engine 'paddle-ocr-vl-1.5'
+[2026-05-23 16:34:50] DEBUG    src.ocr_engine – Koharu POST /pipelines response: {'operationId': 'd1d5e47d-90e1-4182-ab46-e3eb7a388c82'}
+[2026-05-23 16:34:50] INFO     src.ocr_engine – Using Koharu OCR engine 'paddle-ocr-vl-1.5' with operation d1d5e47d-90e1-4182-ab46-e3eb7a388c82.
+[2026-05-23 16:34:50] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 16:34:51] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': 'c56a0ab0-97e2-4b48-b93b-5d1af0a7645d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7d8714a8-a95a-4e7a-a531-33919f1d2275', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e9eddfd0-cd06-4aae-b364-2baf32645038', 'kind': 'pipeline', 'status': 'completed'}, {'id': '9714e872-889c-479f-92dd-7db56d70a88e', 'kind': 'pipeline', 'status': 'completed'}, {'id': '265b1f8a-1616-4347-808c-ca9011c73536', 'kind': 'pipeline', 'status': 'completed'}, {'id': '3dec6ce3-5e55-4804-b243-a6c382ad1fa9', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'ba1b34f6-47c7-4350-91b9-769cb6c6fd9c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6f2dd740-0ff1-4886-ad39-87acf4e30e43', 'kind': 'pipeline', 'status': 'completed'}, {'id': '47ac16c5-a5c3-4068-917d-54eece15b7a0', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5d251082-4679-48cf-9f1a-97e4aeae2174', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e1625838-ae74-4c79-ac05-54694406ca4d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5954f833-f4ec-480c-92dd-ae07ee1f5b9a', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6e13de16-d8fd-47fe-9839-2238dabbd8b3', 'kind': 'pipeline', 'status': 'completed'}, {'id': '33ed7c7d-f6dd-4c7b-8cdb-292168aba322', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'dda79c96-2517-48fe-b812-89a2fbcfab50', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'd1d5e47d-90e1-4182-ab46-e3eb7a388c82', 'kind': 'pipeline', 'status': 'completed'}, {'id': '155a7c4f-83c0-47d2-8f1a-2cba09118e1c', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'df173c00-c74f-4775-802f-c8815d6f2b19', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1506ec75-7245-42f0-8a4d-09f79203d8c5', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6321b09e-c7b5-4c4c-aa2b-5292572484ba', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7cf7ce97-c1e9-40a4-b7c6-9478caa84376', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1df37e3c-b00a-455e-a455-a0cce3f706b7', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-05-23 16:34:53] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 16:34:53] DEBUG    src.ocr_engine – Koharu scene node preview (first 3): [{'page_id': '019e5542-a179-7891-aad9-afabc46ab2b2', 'node_id': '019e5542-a179-7891-aad9-afb7588cd4d8', 'kind': {'image': {'role': 'source', 'blob': 'cc28b1b97d88e73530cb3c064db8478b247ab8daa7cbff36d4e22cbc0715b668', 'opacity': 1.0, 'naturalWidth': 800, 'naturalHeight': 1067, 'name': 'page.png'}}}, {'page_id': '019e5542-a179-7891-aad9-afabc46ab2b2', 'node_id': '019e5542-a35f-77f1-8f99-1ac8ce73d743', 'kind': {'mask': {'role': 'segment', 'blob': '048f21bea483d9f55f96f3735345a4584a73ae3041f222dd0d26e80962fc8edf'}}}, {'page_id': '019e5542-a179-7891-aad9-afabc46ab2b2', 'node_id': '019e5542-a35f-77f1-8f99-1ad8836001bd', 'kind': {'text': {'confidence': 0.921875, 'sourceLang': None, 'sourceDirection': None, 'renderedDirection': None, 'linePolygons': None, 'rotationDeg': None, 'detectedFontSizePx': None, 'detector': 'ctd', 'text': '我穿越了，穿越成了一个大脑还没有发育完整的新生儿', 'translation': None, 'style': None, 'fontPrediction': None, 'sprite': None, 'spriteTransform': None, 'lockLayoutBox': False}}}]
+[2026-05-23 16:34:53] INFO     src.ocr_engine – Koharu API returned 1 text regions.
+[2026-05-23 16:34:53] INFO     src.pipeline – 1 / 1 box(es) passed confidence threshold (0.40).
+[2026-05-23 16:34:53] INFO     src.pipeline – Grouped into 1 contiguous text block(s) for translation.
+[2026-05-23 16:34:53] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 16:34:53] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+我穿越了，穿越成了一个大脑还没有发育完整的新生儿
+---------------------
+[2026-05-23 16:34:55] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+J'ai traversé, et je suis devenu un nouveau-né dont le cerveau n'est pas encore développé.
+----------------------
+[2026-05-23 16:34:55] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-05-23 16:34:55] INFO     src.bubble_segmentation – Segmentation complete: 1 textboxes classified (0 bubbles, 1 floating text)
+[2026-05-23 16:34:55] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-05-23 16:34:55] INFO     src.pipeline – Saved translated image to 'output\802.jpg'.
+[2026-05-23 16:34:55] INFO     src.pipeline – Processing '803.jpg' …
+[2026-05-23 16:34:55] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-05-23 16:34:55] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-05-23 16:34:55] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-05-23 16:34:55] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr]
+[2026-05-23 16:34:55] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'paddle-ocr'
+[2026-05-23 16:34:55] DEBUG    src.ocr_engine – OCR engine 'paddle-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:34:55] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ppocr]
+[2026-05-23 16:34:55] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ppocr'
+[2026-05-23 16:34:55] DEBUG    src.ocr_engine – OCR engine 'ppocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:34:55] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ch-ocr]
+[2026-05-23 16:34:55] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ch-ocr'
+[2026-05-23 16:34:55] DEBUG    src.ocr_engine – OCR engine 'ch-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-05-23 16:34:55] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr-vl-1.5]
+[2026-05-23 16:34:55] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 200 for OCR engine 'paddle-ocr-vl-1.5'
+[2026-05-23 16:34:55] DEBUG    src.ocr_engine – Koharu POST /pipelines response: {'operationId': 'f2f396f3-d77d-473b-96a6-0b89fa468b80'}
+[2026-05-23 16:34:55] INFO     src.ocr_engine – Using Koharu OCR engine 'paddle-ocr-vl-1.5' with operation f2f396f3-d77d-473b-96a6-0b89fa468b80.
+[2026-05-23 16:34:55] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-05-23 16:34:56] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': 'c56a0ab0-97e2-4b48-b93b-5d1af0a7645d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7d8714a8-a95a-4e7a-a531-33919f1d2275', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e9eddfd0-cd06-4aae-b364-2baf32645038', 'kind': 'pipeline', 'status': 'completed'}, {'id': '9714e872-889c-479f-92dd-7db56d70a88e', 'kind': 'pipeline', 'status': 'completed'}, {'id': '265b1f8a-1616-4347-808c-ca9011c73536', 'kind': 'pipeline', 'status': 'completed'}, {'id': '3dec6ce3-5e55-4804-b243-a6c382ad1fa9', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'ba1b34f6-47c7-4350-91b9-769cb6c6fd9c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6f2dd740-0ff1-4886-ad39-87acf4e30e43', 'kind': 'pipeline', 'status': 'completed'}, {'id': '47ac16c5-a5c3-4068-917d-54eece15b7a0', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5d251082-4679-48cf-9f1a-97e4aeae2174', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e1625838-ae74-4c79-ac05-54694406ca4d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5954f833-f4ec-480c-92dd-ae07ee1f5b9a', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6e13de16-d8fd-47fe-9839-2238dabbd8b3', 'kind': 'pipeline', 'status': 'completed'}, {'id': '33ed7c7d-f6dd-4c7b-8cdb-292168aba322', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'dda79c96-2517-48fe-b812-89a2fbcfab50', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'd1d5e47d-90e1-4182-ab46-e3eb7a388c82', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'f2f396f3-d77d-473b-96a6-0b89fa468b80', 'kind': 'pipeline', 'status': 'running'}, {'id': '155a7c4f-83c0-47d2-8f1a-2cba09118e1c', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'df173c00-c74f-4775-802f-c8815d6f2b19', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1506ec75-7245-42f0-8a4d-09f79203d8c5', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6321b09e-c7b5-4c4c-aa2b-5292572484ba', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7cf7ce97-c1e9-40a4-b7c6-9478caa84376', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1df37e3c-b00a-455e-a455-a0cce3f706b7', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-05-23 16:34:58] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': 'c56a0ab0-97e2-4b48-b93b-5d1af0a7645d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7d8714a8-a95a-4e7a-a531-33919f1d2275', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e9eddfd0-cd06-4aae-b364-2baf32645038', 'kind': 'pipeline', 'status': 'completed'}, {'id': '9714e872-889c-479f-92dd-7db56d70a88e', 'kind': 'pipeline', 'status': 'completed'}, {'id': '265b1f8a-1616-4347-808c-ca9011c73536', 'kind': 'pipeline', 'status': 'completed'}, {'id': '3dec6ce3-5e55-4804-b243-a6c382ad1fa9', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'ba1b34f6-47c7-4350-91b9-769cb6c6fd9c', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6f2dd740-0ff1-4886-ad39-87acf4e30e43', 'kind': 'pipeline', 'status': 'completed'}, {'id': '47ac16c5-a5c3-4068-917d-54eece15b7a0', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5d251082-4679-48cf-9f1a-97e4aeae2174', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'e1625838-ae74-4c79-ac05-54694406ca4d', 'kind': 'pipeline', 'status': 'completed'}, {'id': '5954f833-f4ec-480c-92dd-ae07ee1f5b9a', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6e13de16-d8fd-47fe-9839-2238dabbd8b3', 'kind': 'pipeline', 'status': 'completed'}, {'id': '33ed7c7d-f6dd-4c7b-8cdb-292168aba322', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'dda79c96-2517-48fe-b812-89a2fbcfab50', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'd1d5e47d-90e1-4182-ab46-e3eb7a388c82', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'f2f396f3-d77d-473b-96a6-0b89fa468b80', 'kind': 'pipeline', 'status': 'completed'}, {'id': '155a7c4f-83c0-47d2-8f1a-2cba09118e1c', 'kind': 'pipeline', 'status': 'completed'}, {'id': 'df173c00-c74f-4775-802f-c8815d6f2b19', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1506ec75-7245-42f0-8a4d-09f79203d8c5', 'kind': 'pipeline', 'status': 'completed'}, {'id': '6321b09e-c7b5-4c4c-aa2b-5292572484ba', 'kind': 'pipeline', 'status': 'completed'}, {'id': '7cf7ce97-c1e9-40a4-b7c6-9478caa84376', 'kind': 'pipeline', 'status': 'completed'}, {'id': '1df37e3c-b00a-455e-a455-a0cce3f706b7', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-05-23 16:35:00] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-05-23 16:35:00] DEBUG    src.ocr_engine – Koharu scene node preview (first 3): [{'page_id': '019e5542-b5b7-7352-8966-ae299458a38e', 'node_id': '019e5542-b5b7-7352-8966-ae37bc5704b3', 'kind': {'image': {'role': 'source', 'blob': 'bc1a63f290903ed6c19fef5caceae866dbec5e9017d60b3fdeeb3e1e32149350', 'opacity': 1.0, 'naturalWidth': 800, 'naturalHeight': 1131, 'name': 'page.png'}}}, {'page_id': '019e5542-b5b7-7352-8966-ae299458a38e', 'node_id': '019e5542-b815-74c2-80ec-1d736ba0d168', 'kind': {'mask': {'role': 'segment', 'blob': '09fdfa419068f0c7b2ffdb787db9a425f61faef434e4f8bc5b7e7a6bcc0b5100'}}}, {'page_id': '019e5542-b5b7-7352-8966-ae299458a38e', 'node_id': '019e5542-b815-74c2-80ec-1d8ffce230ed', 'kind': {'text': {'confidence': 0.4869995, 'sourceLang': None, 'sourceDirection': None, 'renderedDirection': None, 'linePolygons': None, 'rotationDeg': None, 'detectedFontSizePx': None, 'detector': 'ctd', 'text': '圣祖山脉之外的世界，已经被妖兽所占领，这里的人们已经有数百年不曾与外界有过联系了。', 'translation': None, 'style': None, 'fontPrediction': None, 'sprite': None, 'spriteTransform': None, 'lockLayoutBox': False}}}]
+[2026-05-23 16:35:00] INFO     src.ocr_engine – Koharu API returned 5 text regions.
+[2026-05-23 16:35:00] INFO     src.pipeline – 5 / 5 box(es) passed confidence threshold (0.40).
+[2026-05-23 16:35:00] INFO     src.pipeline – Grouped into 4 contiguous text block(s) for translation.
+[2026-05-23 16:35:00] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-05-23 16:35:00] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+圣祖山脉之外的世界，已经被妖兽所占领，这里的人们已经有数百年不曾与外界有过联系了。 圣祖山脉之外的世界，已经被妖兽所占领，这里的人们已经有数百年不曾与外界有过联系了。
+---------------------
+[2026-05-23 16:35:04] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Le monde au-delà de la Chaîne Sainte, est déjà occupé par les créatures surnaturelles. Les gens qui vivent ici n'ont pas eu de contact avec l'extérieur depuis des siècles.
+
+(Note : The original text is a repetition of the same sentence, I translated it accordingly)
+----------------------
+[2026-05-23 16:35:04] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+虽然经常会受到山脉中风雪妖兽的袭击，但这座城池还是在次次毁灭性的战争中不断重建了起来。
+---------------------
+[2026-05-23 16:35:07] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Bien que la ville soit régulièrement attaquée par les créatures de neige et de vent qui hantent les montagnes, elle se relève toujours après chaque guerre dévastatrice.
+----------------------
+[2026-05-23 16:35:07] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+谁也不清楚外面的世界是怎样的。传说人类在鼎盛时期有着庞大的帝国，但如今都已灰飞烟灭，不复存在。这座城市由于位置隐秘，才得以从黑暗时代完整保留下来。
+---------------------
+[2026-05-23 16:35:11] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Personne ne sait ce que le monde extérieur ressemble. On dit que les humains avaient un empire immense à son apogée, mais maintenant il n'en reste plus rien. C'est grâce à notre position cachée que cette ville a pu survivre aux temps sombres intacte.
+----------------------
+[2026-05-23 16:35:11] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+光辉之城
+---------------------
+[2026-05-23 16:35:11] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+CITÉ ÉCLATANTE
+----------------------
+[2026-05-23 16:35:11] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-05-23 16:35:11] INFO     src.bubble_segmentation – Segmentation complete: 4 textboxes classified (0 bubbles, 4 floating text)
+[2026-05-23 16:35:12] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-05-23 16:35:12] INFO     src.pipeline – Saved translated image to 'output\803.jpg'.
+[2026-05-23 16:35:12] INFO     __main__ – Done.

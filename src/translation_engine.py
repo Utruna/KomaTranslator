@@ -30,6 +30,15 @@ Rules:
 - If the input is already in the target language, return it unchanged.
 - Never add quotation marks around your answer."""
 
+_SYSTEM_PROMPT_SFX = """You are translating manga sound effects and game notifications.
+
+Rules:
+- Output 1 to 4 words maximum, in ALL CAPS.
+- Phonetic sounds (impacts, explosions…): use French onomatopoeia (BOUM, CRAC, WHOOSH…).
+- Game/cultivation UI text (e.g. "Energy +1"): translate literally and briefly.
+- Keep operators like + and - as-is.
+- Output ONLY the translated text."""
+
 
 class TranslationEngine:
     """LLM-backed translation engine.
@@ -169,6 +178,15 @@ class TranslationEngine:
         # TODO: route other providers here once implemented
         raise NotImplementedError(f"Provider '{self.provider}' has no call implementation yet.")
 
+    def translate_sfx(self, text: str) -> str:
+        """Translate a sound effect or game notification with the SFX prompt."""
+        if not text.strip():
+            return text
+        logger.debug("Translating SFX: '%s'", text)
+        if self.provider == "openai":
+            return self._call_openai(text, system_prompt=_SYSTEM_PROMPT_SFX)
+        raise NotImplementedError(f"Provider '{self.provider}' has no call implementation yet.")
+
     def translate_batch(self, texts: list[str]) -> list[str]:
         """Translate a list of strings sequentially.
 
@@ -187,19 +205,15 @@ class TranslationEngine:
     # Provider-specific call implementations
     # ------------------------------------------------------------------
 
-    def _call_openai(self, text: str) -> str:
-        """Send a translation request to the OpenAI Chat Completions API.
-
-        TODO: Adjust model parameters (``top_p``, ``presence_penalty``, …)
-              to fine-tune output quality for your use case.
-        """
+    def _call_openai(self, text: str, system_prompt: str = _SYSTEM_PROMPT) -> str:
+        """Send a translation request to the OpenAI Chat Completions API."""
         user_msg = self._build_user_message(text)
         logger.info("\n--- LLM API INPUT ---\nModel: %s\nPrompt:\n%s\n---------------------", self.model, user_msg)
-        
+
         response = self._client.chat.completions.create(
             model=self.model,
             messages=[
-                {"role": "system", "content": _SYSTEM_PROMPT},
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_msg},
             ],
             max_tokens=self.max_tokens,
