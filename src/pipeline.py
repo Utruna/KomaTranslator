@@ -72,6 +72,7 @@ class Pipeline:
         min_confidence: float = 0.4,
         cluster_threshold: float = 0.8,
         max_cluster_distance_px: int = 80,
+        bubble_grouping_threshold: float = 0.8,
     ) -> None:
         self.ocr = ocr
         self.translator = translator
@@ -80,6 +81,10 @@ class Pipeline:
         self.min_confidence = min_confidence
         self.cluster_threshold = cluster_threshold
         self.max_cluster_distance_px = max_cluster_distance_px
+        # Level-2 proximity multiplier: dist <= char_sz * threshold.  Lower
+        # values keep distinct bubbles separate; raise only if horizontal
+        # fragments are under-grouped.
+        self.bubble_grouping_threshold = bubble_grouping_threshold
 
     # ------------------------------------------------------------------
     # Public API
@@ -222,70 +227,88 @@ class Pipeline:
             return image.copy()
 
         # --- CLUSTERING ---
-        # Group text boxes that belong to the same speech bubble using proximity.
-        # This is more robust for both horizontal and vertical text direction.
-        def boxes_distance(b1: list[int], b2: list[int]) -> float:
+        def _gap_distance(b1: list[int], b2: list[int]) -> float:
+            """Euclidean distance between the nearest edges of two bboxes."""
             dx = max(0, max(b1[0], b2[0]) - min(b1[2], b2[2]))
             dy = max(0, max(b1[1], b2[1]) - min(b1[3], b2[3]))
-            return float((dx**2 + dy**2)**0.5)
+            return float((dx**2 + dy**2) ** 0.5)
 
-        def overlap_ratio(b1: list[int], b2: list[int], axis: str) -> float:
-            if axis == "x":
-                overlap = max(0, min(b1[2], b2[2]) - max(b1[0], b2[0]))
-                smaller = min(b1[2] - b1[0], b2[2] - b2[0])
-            else:
-                overlap = max(0, min(b1[3], b2[3]) - max(b1[1], b2[1]))
-                smaller = min(b1[3] - b1[1], b2[3] - b2[1])
-            if smaller <= 0:
-                return 0.0
-            return overlap / smaller
+        def _same_column(b1: list[int], b2: list[int]) -> bool:
+            """Level 1: strict vertical alignment — horizontal overlap + close rows."""
+            overlap_x = min(b1[2], b2[2]) - max(b1[0], b2[0])
+            if overlap_x <= 0:
+                return False
+            gap_y = max(0, max(b1[1], b2[1]) - min(b1[3], b2[3]))
+            char_height = max(b1[3] - b1[1], b2[3] - b2[1], 1)
+            return gap_y <= char_height * 2.0
+
+        def _close_proximity(b1: list[int], b2: list[int]) -> bool:
+            """Level 2: tight Euclidean fallback for fragmented horizontal text."""
+            char_sz = max(
+                min(b1[2] - b1[0], b1[3] - b1[1]),
+                min(b2[2] - b2[0], b2[3] - b2[1]),
+                1,
+            )
+            return _gap_distance(b1, b2) <= char_sz * self.bubble_grouping_threshold
 
         groups: list[list[TextBox]] = []
         for box in confident_boxes:
             matched_group_idx = -1
-            char_size_box = min(box.bbox[2] - box.bbox[0], box.bbox[3] - box.bbox[1])
-            
             for i, group in enumerate(groups):
                 for gbox in group:
-                    char_size_gbox = min(gbox.bbox[2] - gbox.bbox[0], gbox.bbox[3] - gbox.bbox[1])
-                    char_sz = max(char_size_box, char_size_gbox, 1)
-                    dist = boxes_distance(box.bbox, gbox.bbox)
-                    horizontal_overlap = overlap_ratio(box.bbox, gbox.bbox, "x")
-                    vertical_overlap = overlap_ratio(box.bbox, gbox.bbox, "y")
-                    
-                    # Threshold factor to consider boxes part of the same block.
-                    if (
-                        dist <= char_sz * self.cluster_threshold
-                        and dist <= self.max_cluster_distance_px
-                        and (horizontal_overlap > 0.2 or vertical_overlap > 0.2)
-                    ):
+                    if _same_column(box.bbox, gbox.bbox) or _close_proximity(box.bbox, gbox.bbox):
                         matched_group_idx = i
                         break
                 if matched_group_idx != -1:
                     break
-                    
             if matched_group_idx != -1:
                 groups[matched_group_idx].append(box)
             else:
                 groups.append([box])
-                
+
         grouped_boxes: list[TextBox] = []
         for group in groups:
-            # Sort top-to-bottom natively
             group.sort(key=lambda b: b.bbox[1])
-            
             merged_text = " ".join(b.text for b in group)
-            
             x_min = min(min(pt[0] for pt in b.polygon) for b in group)
             y_min = min(min(pt[1] for pt in b.polygon) for b in group)
             x_max = max(max(pt[0] for pt in b.polygon) for b in group)
             y_max = max(max(pt[1] for pt in b.polygon) for b in group)
-            
             merged_poly = [[x_min, y_min], [x_max, y_min], [x_max, y_max], [x_min, y_max]]
             avg_conf = sum(b.confidence for b in group) / len(group)
-            
             grouped_boxes.append(TextBox(polygon=merged_poly, text=merged_text, confidence=avg_conf))
-                
+
+        def _iou(a: list[int], b: list[int]) -> float:
+            ix1 = max(a[0], b[0])
+            iy1 = max(a[1], b[1])
+            ix2 = min(a[2], b[2])
+            iy2 = min(a[3], b[3])
+            inter = max(0, ix2 - ix1) * max(0, iy2 - iy1)
+            if inter == 0:
+                return 0.0
+            area_a = (a[2] - a[0]) * (a[3] - a[1])
+            area_b = (b[2] - b[0]) * (b[3] - b[1])
+            return inter / (area_a + area_b - inter)
+
+        # TODO: make IOU_DEDUP_THRESHOLD configurable via config.yaml (pipeline section)
+        IOU_DEDUP_THRESHOLD = 0.5
+        deduplicated: list[TextBox] = []
+        for candidate in grouped_boxes:
+            duplicate = False
+            for kept in deduplicated:
+                if _iou(candidate.bbox, kept.bbox) >= IOU_DEDUP_THRESHOLD:
+                    if len(candidate.text) > len(kept.text):
+                        deduplicated.remove(kept)
+                        deduplicated.append(candidate)
+                    duplicate = True
+                    break
+            if not duplicate:
+                deduplicated.append(candidate)
+        removed = len(grouped_boxes) - len(deduplicated)
+        if removed:
+            logger.info("Deduplicated %d overlapping box(es).", removed)
+        grouped_boxes = deduplicated
+
         logger.info("Grouped into %d contiguous text block(s) for translation.", len(grouped_boxes))
 
         # ------------------------------------------------------------------

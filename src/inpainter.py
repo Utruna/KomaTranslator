@@ -71,25 +71,38 @@ class Inpainter:
     # ------------------------------------------------------------------
 
     def _build_model(self) -> object:
-        """Load the LaMa inpainting model.
+        """Load the LaMa inpainting model via simple-lama-inpainting.
 
-        TODO: Integrate the official LaMa inference code here.
-              A typical integration looks like::
-
-                  import sys
-                  sys.path.insert(0, str(self.model_path))
-                  from saicinpainting.evaluation.utils import move_to_device
-                  # … load checkpoint, return model
-
-              See https://github.com/advimman/lama for the full setup guide.
+        model_path is kept for API compatibility but is unused here —
+        simple-lama-inpainting downloads the big-lama checkpoint automatically
+        via huggingface_hub on first use.
         """
-        logger.warning(
-            "LaMa model loading is not yet implemented.  "
-            "Falling back to OpenCV inpainting."
-        )
-        # TODO: load and return the LaMa model once the integration is ready
-        self._effective_method = "opencv"
-        return None
+        try:
+            from simple_lama_inpainting import SimpleLama  # late import
+        except ImportError:
+            logger.warning(
+                "simple-lama-inpainting is not installed. "
+                "Run: pip install simple-lama-inpainting  "
+                "Falling back to OpenCV inpainting."
+            )
+            self._effective_method = "opencv"
+            return None
+
+        try:
+            import torch
+            # simple-lama-inpainting may ignore the device kwarg and let PyTorch
+            # auto-select; force CPU explicitly before model construction.
+            device = torch.device(self.device)
+            model = SimpleLama(device=device)
+            logger.info("LaMa model loaded successfully on device '%s'.", self.device)
+            return model
+        except Exception as exc:
+            logger.warning(
+                "LaMa model failed to load (%s). Falling back to OpenCV inpainting.",
+                exc,
+            )
+            self._effective_method = "opencv"
+            return None
 
     def _build_mask(
         self,
@@ -250,22 +263,21 @@ class Inpainter:
         return cv2.cvtColor(result_bgr, cv2.COLOR_BGR2RGB)
 
     def _inpaint_lama(self, image: np.ndarray, mask: np.ndarray) -> np.ndarray:
-        """Deep-learning inpainting using LaMa.
-
-        TODO: Replace the OpenCV fallback below with real LaMa inference once
-              ``_build_model`` has been implemented::
-
-                  # Prepare tensors, run model, return result
-                  input_tensor  = prepare_lama_input(image, mask, self.device)
-                  output_tensor = self._model(input_tensor)
-                  return tensor_to_numpy(output_tensor)
+        """Deep-learning inpainting using LaMa (simple-lama-inpainting).
 
         Args:
-            image: RGB image.
-            mask:  Binary mask (``255`` = inpaint here).
+            image: RGB image as ``np.ndarray`` of shape ``(H, W, 3)``.
+            mask:  Binary mask (``255`` = inpaint here), shape ``(H, W)``.
 
         Returns:
-            Inpainted RGB image.
+            Inpainted RGB image as ``np.ndarray`` of shape ``(H, W, 3)``.
         """
-        logger.debug("LaMa inference not yet implemented; using OpenCV fallback.")
-        return self._inpaint_opencv(image, mask)
+        from PIL import Image  # late import — Pillow is always present
+
+        pil_image = Image.fromarray(image)  # RGB numpy → PIL RGB
+        pil_mask = Image.fromarray(mask)    # uint8 numpy → PIL L
+
+        result_pil = self._model(pil_image, pil_mask)
+
+        # SimpleLama returns a PIL Image in RGB mode.
+        return np.array(result_pil)

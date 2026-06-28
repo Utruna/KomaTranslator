@@ -97,6 +97,7 @@ def build_translator(cfg: dict) -> TranslationEngine:
     return TranslationEngine(
         api_key=t_cfg.get("api_key", ""),
         provider=t_cfg.get("provider", "openai"),
+        base_url=t_cfg.get("base_url", "http://localhost:11434/v1"),
         model=t_cfg.get("model", "gpt-4o"),
         source_language=t_cfg.get("source_language", "Chinese"),
         target_language=t_cfg.get("target_language", "French"),
@@ -193,11 +194,16 @@ def main() -> int:
             pipeline.process_directory(input_path, output_dir)
         else:
             # ── Single-file mode ─────────────────────────────────────
-            output_path = (
-                Path(args.output)
-                if args.output
-                else Path(paths_cfg.get("output_dir", "output")) / input_path.name
-            )
+            if args.output:
+                out = Path(args.output)
+                # Treat as a directory when it already is one or the path ends
+                # with a separator (e.g. `--output output/`).
+                if out.is_dir() or str(args.output).endswith(("/", "\\")):
+                    output_path = out / input_path.name
+                else:
+                    output_path = out
+            else:
+                output_path = Path(paths_cfg.get("output_dir", "output")) / input_path.name
             ensure_dir(output_path.parent)
             pipeline.process_file(input_path, output_path)
     else:

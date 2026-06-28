@@ -1,96 +1,158 @@
 # KomaTranslator
 
-KomaTranslator est un framework modulaire, extensible et automatisé dédié au scanlation (traduction de mangas, webtoons et comics). Il gère le processus de bout en bout : de la détection du texte original à l'insertion du texte traduit dans les bulles, en passant par le nettoyage (inpainting) et la traduction via LLM.
+*Automated pipeline that takes a raw manga page as input and outputs the same page with the original text erased and replaced by the translation — no manual editing required.*
 
-## ✨ Fonctionnalités
+![Python](https://img.shields.io/badge/python-3.10%2B-blue) ![License](https://img.shields.io/badge/license-MIT-green) ![LLM](https://img.shields.io/badge/LLM-OpenAI%20%7C%20Anthropic%20%7C%20DeepSeek%20%7C%20Ollama-purple) ![Inpainting](https://img.shields.io/badge/inpainting-LaMa%20%7C%20OpenCV-orange)
 
-Le pipeline s'articule autour de 4 moteurs configurables indépendamment :
+---
 
-- **🔍 OCR (`ocr_engine.py`)** : Extraction du texte et de ses boîtes englobantes (basé sur PaddleOCR). Calcule automatiquement les boîtes de délimitation.
-- **🧹 Inpainter (`inpainter.py`)** : Nettoyage des bulles et effacement du texte d'origine. Supporte `OpenCV` (méthodes Telea/NS) prêt à l'emploi. Prêt à intégrer un modèle avancé comme **LaMa** pour les décors complexes.
-- **🌐 Traduction (`translation_engine.py`)** : Moteur agnostique basé sur des LLMs. Fournit un prompt système optimisé pour les BDs. Facilement extensible avec des fournisseurs externes (OpenAI, Anthropic, DeepSeek, Ollama local).
-- **✍️ Typesetter (`typesetter.py`)** : Restitution du texte traduit dans les bulles nettoyées. Ajustement automatique de la taille de la police, gestion intelligente des retours à la ligne (Pillow) et support de contours (stroke/outline) pour la lisibilité.
+## Demo
 
-## 🏗️ Architecture du Pipeline
+| Before | After |
+|--------|-------|
+| ![Before](assets/demo_before.jpg) | ![After](assets/demo_after.jpg) |
 
-L'orchestrateur central (`pipeline.py`) enchaîne les opérations étape par étape :
-1. `OCR` identifie les blocs de texte sur l'image source.
-2. `Translation` reçoit le texte extrait et renvoie la version cible.
-3. `Inpainting` efface le texte d'origine pour préparer la zone `(bulle/background)`.
-4. `Typesetting` dessine la traduction sur l'image « nettoyée ».
+*→ Place your before/after images in `assets/` to populate this section.*
 
-## 📂 Structure du projet
+---
 
-```text
-KomaTranslator/
-├── config.yaml          # Configuration centralisée (chemins, clés API, paramètres OCR/Inpainting/Typesetting)
-├── main.py              # Point d'entrée CLI
-├── README.md            # Ce fichier
-├── requirements.txt     # Dépendances Python du projet
-├── src/
-│   ├── __init__.py
-│   ├── inpainter.py        
-│   ├── ocr_engine.py       
-│   ├── pipeline.py         
-│   ├── translation_engine.py 
-│   ├── typesetter.py       
-│   └── utils.py          # Outils utilitaires (logger, I/O images RGB NumPy, chargement de config)
-├── fonts/               # Dossier pour vos polices TTF/OTF
-├── input/               # Placez vos images source ici
-├── output/              # Les images finalisées seront générées ici
-└── models/              # Poids des modèles (PaddleOCR, points de contrôle LaMa, etc.)
+## How it works
+
+1. 🔍 **OCR** (`ocr_engine.py`) — Detects text regions on the page and extracts each string with its bounding polygon and confidence score, via the Koharu headless API (comic-text-detector + manga-ocr).
+2. 🌐 **Translation** (`translation_engine.py`) — Sends each bubble's text to an LLM (OpenAI, Anthropic, DeepSeek, or a local Ollama model) using prompts tuned for manga dialogue, SFX, and UI elements.
+3. 🧹 **Inpainting** (`inpainter.py`) — Erases the original text from each region using LaMa (deep-learning) or OpenCV Telea/NS as a CPU fallback.
+4. ✍️ **Typesetting** (`typesetter.py`) — Renders the translated text into the cleaned bubbles with automatic font-size fitting, smart line wrapping, and configurable outline (Pillow).
+
+---
+
+## Installation
+
+```bash
+git clone https://github.com/Utruna/KomaTranslator.git
+cd KomaTranslator
+python -m venv venv && source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
-## 🚀 Installation
+**Running locally without an API key?** Set `provider: openai` and point `base_url` to your Ollama instance (`http://localhost:11434/v1`). No key required — Ollama accepts any non-empty string as `api_key`.
 
-1. **Cloner le dépôt** (ou naviguer dans le dossier du projet)
-2. **Créer un environnement virtuel** (recommandé) :
-   ```bash
-   python -m venv venv
-   .\venv\Scripts\Activate.ps1   # (Windows)
-   # ou
-   source venv/bin/activate      # (Linux/macOS)
-   ```
-3. **Installer les dépendances** :
-   ```bash
-   pip install -U pip
-   pip install -r requirements.txt
-   ```
+---
 
-## ⚙️ Configuration
+## Quick Start
 
-Toutes les préférences de l'application sont centralisées dans `config.yaml`.  
-C'est ici que vous définissez :
-- Les répertoires de polices (`fonts/`), input/output.
-- Vos clés API (pour le moteur de traduction).
-- Les modèles à utiliser (ex: OpenCV ou LaMa pour l'inpainting).
+Edit `config.yaml` (minimum required fields):
 
-## 🎮 Utilisation
+```yaml
+translation:
+  api_key: "ollama"
+  provider: "openai"
+  base_url: "http://localhost:11434/v1"
+  model: "llama3.1"
+  source_language: "Chinese"
+  target_language: "French"
 
-L'utilisation se fait via le script principal `main.py`, qui embarque une interface CLI (Command Line Interface).
+inpainting:
+  method: "lama"
+  device: "cpu"
+  model_path: "models/lama"
+```
 
-Exemple de commande standard :
+Then run:
+
 ```bash
+# Translate a single image
+python main.py --input page.jpg --output translated.jpg
+
+# Translate a folder of images
 python main.py --config config.yaml --input input/ --output output/
 ```
 
-Il traitera toutes les images présentes dans le dossier d'entrée défini et recrachera les versions traduites dans le dossier de sortie.
+---
 
-## 🧾 Compte rendu des avancées
+## Supported LLM Providers
 
-Les points suivants ont déjà été stabilisés dans le projet :
+| Provider | Model example | Config value |
+|----------|--------------|--------------|
+| OpenAI | `gpt-4o` | `provider: openai` |
+| Anthropic (Claude) | `claude-sonnet-4-6` | `provider: anthropic` |
+| DeepSeek | `deepseek-chat` | `provider: deepseek` |
+| Ollama (local) | `llama3.1`, `qwen2.5` | `provider: openai` + `base_url: http://localhost:11434/v1` |
 
-- **Typesetter** : mesure correcte du texte multiligne, centrage vertical corrigé avec `anchor="mm"`, et cohérence entre `font_size` et `max_font_size`.
-- **OCR / Koharu** : polling plus robuste sur `GET /operations`, délai d'attente suffisant avant lecture de `scene.json`, logs DEBUG ajoutés, et fallback vers un engine OCR chinois valide.
-- **Configuration** : paramètres rendus configurables dans `config.yaml` pour l'engine OCR et le seuil de clustering du pipeline.
-- **Pipeline** : regroupement des blocs de texte resserré pour éviter les fusions excessives entre bulles distinctes.
+---
 
-État actuel : le pipeline OCR → Traduction → Inpainting → Typesetting fonctionne de bout en bout sur une image de test, avec sortie générée dans `output/`.
+## Project Structure
 
-## 🗺️ Roadmap & TODOs
+```text
+KomaTranslator/
+├── config.yaml               # Centralised configuration (paths, LLM, inpainting, typesetting)
+├── main.py                   # CLI entry point
+├── requirements.txt          # Python dependencies
+├── assets/                   # Demo images (before/after screenshots)
+├── fonts/                    # TTF/OTF font files for typesetting
+├── input/                    # Source images to translate
+├── output/                   # Translated images written here
+├── models/                   # Locally cached model weights (LaMa, etc.)
+└── src/
+    ├── ocr_engine.py         # Text detection and recognition (Koharu API)
+    ├── translation_engine.py # LLM-backed translation, multi-provider
+    ├── inpainter.py          # Text erasure — LaMa or OpenCV
+    ├── typesetter.py         # Renders translated text into cleaned bubbles
+    ├── pipeline.py           # Orchestrates OCR → translate → inpaint → typeset
+    └── utils.py              # Logger, image I/O helpers, config loader
+```
 
-Une fondation solide est en place, les prochaines étapes documentées dans le code (stubs `TODO`) sont :
-- [ ] Connecter véritablement les endpoints API dans `translation_engine.py` (Appels Batch API, Anthropic, DeepSeek).
-- [ ] Finaliser l'intégration du modèle **LaMa** dans `inpainter.py` (chargement du checkpoint et inférence).
-- [ ] Ajouter la détection et la gestion du **texte vertical** (spécifique aux mangas et certaines traductions asiatiques).
-- [ ] Implémenter une fallback de robustesse JSON pour le traducteur (si le LLM renvoie un JSON mal formatté).
+---
+
+## Configuration
+
+| Key | Default | Description |
+|-----|---------|-------------|
+| `paths.input_dir` | `input` | Folder containing source images |
+| `paths.output_dir` | `output` | Folder for translated output |
+| `paths.font_dir` | `fonts` | Folder for TTF/OTF fonts |
+| `paths.model_dir` | `models` | Folder for cached model weights |
+| `translation.provider` | `openai` | LLM provider (`openai`, `anthropic`, `deepseek`) |
+| `translation.model` | `llama3.1` | Model identifier passed to the provider |
+| `translation.base_url` | `http://localhost:11434/v1` | API base URL (override for Ollama/custom) |
+| `translation.source_language` | `Chinese` | Source language label sent to the LLM |
+| `translation.target_language` | `French` | Target language label sent to the LLM |
+| `translation.temperature` | `0.3` | Sampling temperature (lower = more stable) |
+| `translation.max_tokens` | `256` | Max tokens in LLM response |
+| `inpainting.method` | `lama` | `lama` (deep-learning) or `opencv` (CPU fallback) |
+| `inpainting.device` | `cpu` | `cpu` or `cuda` |
+| `inpainting.opencv_method` | `telea` | `telea` or `ns` when method is `opencv` |
+| `inpainting.dilation_kernel` | `5` | Pixels added around text mask before inpainting |
+| `typesetting.font_path` | *(see config)* | Path to the TTF/OTF font file |
+| `typesetting.font_size` | `40` | Base font size in points |
+| `typesetting.max_font_size` | `120` | Upper bound for auto-size fitting |
+| `typesetting.min_font_size` | `10` | Lower bound for auto-size fitting |
+| `typesetting.stroke_width` | `1` | Outline width in pixels (`0` = no outline) |
+| `typesetting.line_spacing` | `6` | Extra pixels between lines |
+| `pipeline.cluster_threshold` | `0.8` | Proximity factor for grouping text boxes into bubbles |
+| `pipeline.max_cluster_distance_px` | `80` | Hard pixel cap — boxes farther apart are never merged |
+| `pipeline.min_confidence` | `0.4` | Minimum OCR confidence to process a text box |
+
+---
+
+## Roadmap
+
+- [x] End-to-end pipeline (OCR → translate → inpaint → typeset)
+- [x] LaMa deep-learning inpainting
+- [x] Multi-provider LLM support (OpenAI, Anthropic, DeepSeek, Ollama)
+- [x] Per-bubble clustering and translation
+- [x] Context-aware translation (previous bubbles passed as context)
+- [ ] Vertical text support (Japanese manga)
+- [ ] Batch API support (Anthropic) for cost reduction
+- [ ] Web UI / drag-and-drop interface
+- [ ] Multi-language OCR (Japanese, Korean)
+
+---
+
+## Contributing
+
+PRs are welcome. For significant changes, please open an issue first to discuss the approach.
+→ [Open an issue](https://github.com/Utruna/KomaTranslator/issues)
+
+## License
+
+MIT
