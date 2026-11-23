@@ -1,107 +1,108 @@
-# KomaTranslator Live
+# KomaTranslator
 
-Traduction en direct des manhua / manhwa / manga dans le navigateur (Firefox, Chrome, Edge…).
-Source : chinois, japonais (y compris texte vertical), coréen, anglais. Cible : français, anglais, espagnol, allemand, italien, portugais.
+Extension de navigateur qui traduit **en direct** le texte des manhwa / manhua / manga affichés dans la page.
+Rien à installer à part l'extension : la lecture du texte (OCR) se fait **dans le navigateur**.
 
-```
-Page web ──img──▶ Extension ──octets──▶ Serveur local (127.0.0.1:8765)
-                                          ├─ OCR  : PP-OCRv5 via RapidOCR (ONNX)
-                                          ├─ Effacement du texte (inpainting OpenCV) + détection de la bulle
-                                          └─ Trad : Ollama (qwen3.5) / Claude / Google + glossaire de série
-Page web ◀── image traduite (texte dessiné par l'extension) ◀──┘
-```
-
-Ordre de grandeur : ~0,3–0,7 s d'OCR par page, ~1–2 s par bande de webtoon, ~1–5 s de traduction LLM.
-
-## Structure
+- Source : chinois, japonais (y compris texte vertical), coréen, anglais
+- Cible : français, anglais, espagnol, allemand, italien, portugais
+- Navigateurs : Firefox, Chrome, Brave, Opera, Edge
 
 ```
-server/          serveur local (OCR, traduction, mémoire de série, cache)
-extension/       extension Firefox / Chrome / Edge
-tools/           démarrage automatique, paquet .xpi
-samples/         pages de test (non versionnées)
-legacy/          ancien pipeline Koharu (abandonné, gardé pour référence)
-start_server.bat lance le serveur (avec fenêtre)
+Image de la page ─▶ OCR PP-OCRv5 (ONNX Runtime WebAssembly, dans le navigateur)
+                 ─▶ effacement du texte + détection de la bulle
+                 ─▶ traduction : Google (gratuit) / Ollama (local) / API (DeepSeek, OpenAI…) / Claude
+                 ─▶ image redessinée avec la traduction
 ```
 
-## Installation
+Ordre de grandeur : 0,5–2 s d'OCR par page (CPU), + 0,1 s (Google) à 1–2 s (LLM) de traduction.
 
-1. **Serveur** : double-clic sur `start_server.bat` (utilise le `venv` existant).
-   Attendre `KomaTranslator Live prêt sur http://127.0.0.1:8765`.
-   Dépendances : `pip install -r requirements.txt` (voir la note dans ce fichier pour OpenCV).
-2. **Extension**
-   - **Firefox** : `about:debugging#/runtime/this-firefox` → *Charger un module complémentaire temporaire* →
-     choisir `extension/manifest.json`. Puis clic sur l'icône → **Autoriser l'accès aux sites**, et recharger l'onglet.
-     ⚠ Un module temporaire disparaît à la fermeture de Firefox (voir *Installation permanente*).
-   - **Chrome / Edge** : `chrome://extensions` → *Mode développeur* → *Charger l'extension non empaquetée* → dossier `extension/`.
-3. Sur le site de lecture : icône de l'extension → **Traduire ce site**, choisir la langue source. Raccourci : `Alt+Shift+T`.
+---
 
-Après une modification du code : relancer le serveur, cliquer *Actualiser* sur l'extension, recharger la page.
+## Installer (pour tes amis)
 
-## Utilisation
+### Firefox
+1. Récupérer le fichier `komatranslator-x.y.z.xpi` (signé, voir *Partager* plus bas).
+2. Le glisser-déposer dans une fenêtre Firefox → **Ajouter**.
+3. La page d'options s'ouvre : laisser **Google** (gratuit) ou choisir un autre traducteur.
 
+### Chrome / Brave / Opera / Edge
+1. Dézipper `komatranslator-x.y.z.zip` dans un dossier qu'on garde (ne pas le supprimer ensuite).
+2. Aller sur `chrome://extensions` (Edge : `edge://extensions`) → activer **Mode développeur** (en haut à droite).
+3. **Charger l'extension non empaquetée** → choisir le dossier dézippé.
+   Chrome affiche parfois un avertissement « extensions en mode développeur » au démarrage : c'est normal hors store.
+
+### Utilisation
+- Sur le site de lecture : icône de l'extension → **Traduire ce site** (raccourci `Alt+Shift+T`).
 - Contour pointillé violet = image en cours ; le badge de l'icône = nombre d'images en cours.
-- Les images à l'écran passent en premier, puis celles en dessous ; celles déjà dépassées en dernier.
-- **Survol d'une bulle** : infobulle avec le texte original et la traduction.
-- **Alt + clic sur une bulle** : corriger la traduction. La correction est retenue pour la série
-  (appliquée à chaque fois que la même phrase réapparaît).
-- **↻ Retraduire la page** (popup) : vide le cache et retraduit — à faire après un import de glossaire.
-- Désactiver le site remet les images d'origine.
-- Les crédits / pubs de scantrad (URL, Discord, « read at… ») ne sont ni effacés ni traduits.
+- **Survol d'une bulle** : texte original. **Alt + clic** : corriger la traduction (retenue pour la série).
+- **↻ Retraduire la page** : vide le cache et retraduit (après un changement de traducteur ou de glossaire).
 
-## Traduction
+## Traducteurs (page d'options)
 
-Réglée dans `server/config.json` (modèle : `server/config.example.json`). Relancer le serveur après modification.
-
-| provider | qualité | config |
+| Traducteur | Qualité | Ce qu'il faut |
 |---|---|---|
-| `ollama` (conseillé) | bonne, locale, gratuite | `"provider": "ollama", "model": "qwen3.5:latest"` (l'appli Ollama doit tourner) |
-| `anthropic` | la meilleure | `"provider": "anthropic", "model": "claude-haiku-5-5", "api_key": "sk-ant-..."` |
-| `google` | littérale, sans contexte | `"provider": "google"` |
+| **Google** (défaut) | littérale, sans contexte | rien |
+| **Ollama** | bonne, gratuite, locale | [Ollama](https://ollama.com/download) + `ollama pull qwen3.5` + carte graphique 8 Go+ |
+| **API compatible OpenAI** | très bonne, quelques centimes / chapitre | clé DeepSeek, OpenAI, OpenRouter, Mistral… |
+| **Claude** | la meilleure | clé API Anthropic |
 
-- Toute la page part en une requête (contexte entre bulles). Si le LLM échoue → repli automatique sur Google.
-- `"review": true` : 2e passe de relecture (orthographe, conjugaison). Seules les petites corrections sont acceptées
-  (une réécriture complète est refusée). Coût : ~1 s par page. Mettre `false` pour aller plus vite.
-- Le texte anglais tout en MAJUSCULES (lettrage de scan) est remis en casse normale avant traduction : beaucoup moins de fautes.
-- Comparatif sur les pages de test : `qwen3.5` (9.7B) > `qwen2.5:14b` (plus lent, fautes de conjugaison).
+Avec un LLM : toute la page part en une requête (contexte entre bulles), avec le glossaire et les dernières répliques
+de la série. La **relecture** (activée par défaut) corrige l'orthographe ; seules les petites corrections sont acceptées.
+En cas d'échec du LLM : repli automatique sur Google (le popup affiche l'erreur).
 
-Les traductions sont mises en cache sur disque (`server/cache/`, 3000 pages max) : relire un chapitre est instantané.
+Ollama refuse par défaut les requêtes d'extensions ; l'extension retire l'en-tête concerné automatiquement.
+Si le test des options affiche quand même « 403 » : variable d'environnement
+`OLLAMA_ORIGINS=moz-extension://*,chrome-extension://*`, puis redémarrer Ollama.
 
-## Mémoire par série (glossaire, wiki)
+## Mémoire par série
 
-La série est déduite de l'URL (`site.com/manga/ma-serie/chapitre-12` → `site.com/manga/ma-serie`).
-Pour chaque série, `server/series/<série>.json` contient :
-- **glossary** : termes imposés (noms, sorts, lieux, rangs…) avec leur forme d'origine (萧炎, 斗气…) et leur traduction ;
-- **summary** : résumé + personnages avec leur genre (pour les pronoms) ;
-- **corrections** : traductions corrigées à la main (Alt+clic) ;
-- **history** : les 30 dernières répliques traduites (continuité entre les pages).
+La série est déduite de l'URL (`site.com/manga/ma-serie/chapitre-12` → `site.com/manga/ma-serie`). Pour chaque série
+(stockée dans le navigateur) : **glossaire** imposé (noms, sorts, lieux… avec leur forme d'origine 萧炎, 斗气),
+**résumé** (personnages, genre pour les pronoms), **corrections** manuelles, **30 dernières répliques**.
 
-**Import depuis un wiki** : popup → section *Série* → URL d'une page wiki (Fandom, Wikipédia, Baidu Baike…) →
-*Importer le glossaire*. Avec *Inclure les sous-pages*, le navigateur suit jusqu'à 20 liens internes du wiki
-(personnages, techniques…). Le LLM extrait le glossaire par lots (~20 s par lot). Les imports se cumulent.
+- **Import depuis un wiki** (popup → Série, LLM requis) : avec *Inclure les sous-pages*, jusqu'à 20 pages du wiki
+  (personnages, techniques…) sont lues ; les imports se cumulent.
+- **Voir / modifier le glossaire** : éditeur complet (termes, résumé, corrections, historique).
 
-**Voir / modifier le glossaire** (popup) : éditeur complet — termes, résumé, corrections, historique.
+## Partager (hors store)
 
-## Démarrage automatique (Windows)
+```
+tools\build.bat         → dist\komatranslator-<version>.zip   (Chrome & co : à dézipper)
+tools\sign_firefox.bat  → dist\komatranslator-<version>.xpi   (Firefox : signé, installable d'un clic)
+```
 
-- `tools\autostart_on.bat` : le serveur démarre sans fenêtre à l'ouverture de session (journal dans `server.log`).
-- `tools\autostart_off.bat` : désactive.
+**Firefox exige une signature Mozilla**, même pour un partage privé. `sign_firefox.bat` utilise la signature
+**« non listée »** : l'extension n'apparaît pas sur le store, la vérification est automatique (quelques minutes),
+c'est gratuit. Une seule fois : compte sur addons.mozilla.org + identifiants API
+(<https://addons.mozilla.org/developers/addon/api/key/>). Avant chaque nouvelle version, augmenter `version`
+dans `extension/manifest.json`.
 
-## Installation permanente sous Firefox
+La police perso `extension/fonts/font.*` (ex. Anime Ace, licence non redistribuable) n'est jamais incluse dans les
+paquets : les amis ont Comic Neue (licence OFL).
 
-Firefox (version normale) n'accepte que les extensions signées. Deux options :
-- **Firefox Nightly / Developer Edition** : `about:config` → `xpinstall.signatures.required` = `false`,
-  puis `tools\build_xpi.bat` → `dist\komatranslator.xpi` → `about:addons` → ⚙ → *Installer depuis un fichier*.
-- **Signature gratuite (non listée) sur addons.mozilla.org** : compte développeur, puis
-  `npx web-ext sign --channel=unlisted -s extension --api-key=... --api-secret=...` → `.xpi` signé installable partout.
+## Développement
 
-## Police
+```
+extension/
+  background.js        orchestration (images, OCR, traduction, cache, messages)
+  content.js           détection des images dans la page, rendu de la traduction
+  engine/ocr.js        OCR + bulles + effacement (portage JS du pipeline Python)
+  engine/models/       PP-OCRv5 mobile : détection, reconnaissance chinois/japonais/anglais, coréen
+  lib/translate.js     traducteurs, prompt, relecture
+  lib/store.js         mémoire par série (storage.local) + cache des pages (IndexedDB)
+  options.*, popup.*, editor.*
+tools/                 construction et signature des paquets
+legacy/                anciennes versions (pipeline Koharu, serveur Python « Live »)
+```
 
-L'extension utilise `extension/fonts/font.otf` si présent (non versionné, Anime Ace copiée depuis `legacy/src/police`), sinon Comic Sans.
+Firefox : le moteur OCR tourne dans la page d'arrière-plan. Chrome : dans un document « offscreen »
+(les service workers ne peuvent pas charger ONNX Runtime).
+Charger pour tester : Firefox `about:debugging` → *Charger un module temporaire* → `extension/manifest.json` ;
+Chrome `chrome://extensions` → *Charger l'extension non empaquetée* → `extension/`.
 
 ## Limites connues
 
-- Les lecteurs qui dessinent les pages dans un `<canvas>` (certains sites officiels) ne sont pas pris en charge, seulement les `<img>`.
+- Les lecteurs qui dessinent les pages dans un `<canvas>` ne sont pas pris en charge, seulement les `<img>`.
 - Texte sur fond très chargé : l'effacement peut laisser des traces.
 - Une bulle coupée entre deux images est traduite en deux morceaux.
 - Les termes « Original » d'un glossaire importé d'un wiki anglais sont devinés par le LLM : à vérifier dans l'éditeur.

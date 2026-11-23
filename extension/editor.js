@@ -1,7 +1,6 @@
 const $ = (id) => document.getElementById(id);
 const page = new URLSearchParams(location.search).get("page") || "";
 const FIELDS = ["src", "orig", "tgt", "type", "note"];
-let server = "http://127.0.0.1:8765";
 
 function cell(value, field) {
   const td = document.createElement("td");
@@ -75,12 +74,8 @@ $("save").onclick = async () => {
     clear_history: $("clearHist").checked,
   };
   try {
-    const r = await fetch(`${server}/series/save`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    if (!r.ok) throw new Error((await r.json()).error);
+    const r = await chrome.runtime.sendMessage({ type: "seriesSave", page, body });
+    if (!r?.ok) throw new Error(r?.error || "?");
     $("msg").textContent = "Enregistré ✔ (les prochaines pages utiliseront ce glossaire)";
     if ($("clearHist").checked) { $("history").innerHTML = ""; $("clearHist").checked = false; }
   } catch (e) {
@@ -89,10 +84,10 @@ $("save").onclick = async () => {
 };
 
 (async () => {
-  const s = await chrome.storage.sync.get("server");
-  if (s.server) server = s.server;
   try {
-    const d = await (await fetch(`${server}/series/full?page=${encodeURIComponent(page)}`)).json();
+    const r = await chrome.runtime.sendMessage({ type: "seriesFull", page });
+    if (!r?.ok) throw new Error(r?.error);
+    const d = r.data;
     $("key").textContent = d.key + (d.wiki ? ` · wiki : ${d.wiki}` : "");
     document.title = "Glossaire — " + d.key.split("/").pop();
     $("summary").value = d.summary || "";
@@ -104,7 +99,7 @@ $("save").onclick = async () => {
       $("history").appendChild(li);
     }
     count();
-  } catch {
-    $("key").textContent = "Serveur injoignable — lance start_server.bat";
+  } catch (e) {
+    $("key").textContent = "Impossible de charger la série : " + (e?.message || "?");
   }
 })();

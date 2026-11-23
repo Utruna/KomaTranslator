@@ -11,12 +11,15 @@
   let enabled = false;
   const state = new Map(); // img → {origSrc, origSrcset, url, translatedUrl, busy}
 
-  // ── Police BD (optionnelle: extension/fonts/font.otf) ──
+  // ── Police BD: fonts/font.otf si présente (police perso), sinon Comic Neue (OFL, embarquée) ──
   (async () => {
-    try {
-      const f = new FontFace("KomaFont", `url(${chrome.runtime.getURL("fonts/font.otf")})`);
-      document.fonts.add(await f.load());
-    } catch { /* pas de police fournie → Comic Sans */ }
+    for (const file of ["fonts/font.otf", "fonts/ComicNeue-Bold.ttf"]) {
+      try {
+        const f = new FontFace("KomaFont", `url(${chrome.runtime.getURL(file)})`);
+        document.fonts.add(await f.load());
+        return;
+      } catch { /* suivante */ }
+    }
   })();
 
   // ── Détection des images à traiter ──

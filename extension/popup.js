@@ -62,9 +62,16 @@ const $ = (id) => document.getElementById(id);
     window.close();
   };
 
+  $("options").onclick = () => { chrome.runtime.openOptionsPage(); window.close(); };
+
+  const NAMES = { google: "Google", ollama: "Ollama", openai: "API", anthropic: "Claude" };
   const h = await chrome.runtime.sendMessage({ type: "health" });
-  $("status").className = h?.ok ? "ok" : "ko";
-  $("status").textContent = h?.ok
-    ? `Serveur OK (traduction : ${h.provider}${h.model ? " · " + h.model : ""})`
-    : "Serveur éteint — lance start_server.bat";
+  if (h?.ok) {
+    $("status").className = h.lastError ? "ko" : "ok";
+    $("status").textContent = `Traduction : ${NAMES[h.provider] || h.provider}${h.model ? " · " + h.model : ""}`
+      + (h.lastError ? ` — échec, repli Google (${h.lastError})` : "");
+  } else {
+    $("status").className = "ko";
+    $("status").textContent = "Extension en cours de démarrage…";
+  }
 })();

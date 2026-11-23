@@ -1,0 +1,8 @@
+# Dictionnaires OCR : un caractère par ligne, toujours en LF (un \r corromprait le texte reconnu)
+extension/engine/models/*.txt text eol=lf
+# Fichiers binaires
+*.onnx binary
+*.wasm binary
+*.ttf binary
+*.png binary
+*.jpg binary

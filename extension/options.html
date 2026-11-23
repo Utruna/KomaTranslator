@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KomaTranslator — Options</title>
+<style>
+  :root { --bg: #fafafa; --fg: #1d1d1f; --muted: #6b6b70; --line: #e2e2e6; --accent: #6b46c1; --card: #fff; --ok: #146c2e; --ko: #9b1c1c; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #17171a; --fg: #ececf0; --muted: #9a9aa3; --line: #2e2e34; --accent: #9f7aea; --card: #1f1f23; --ok: #6fd98c; --ko: #ff8a8a; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.5 system-ui, sans-serif; }
+  main { max-width: 720px; margin: 0 auto; padding: 28px 16px 60px; }
+  header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+  header img { width: 40px; height: 40px; }
+  h1 { font-size: 22px; margin: 0; }
+  h2 { font-size: 15px; margin: 0 0 10px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin: 14px 0; }
+  .muted { color: var(--muted); font-size: 13px; }
+  .providers { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+  .providers label { border: 1px solid var(--line); border-radius: 8px; padding: 10px; cursor: pointer; display: block; }
+  .providers label:has(input:checked) { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .providers b { display: block; margin-bottom: 2px; }
+  .providers input { margin-right: 6px; }
+  .field { display: grid; grid-template-columns: 140px 1fr; gap: 8px; align-items: center; margin: 8px 0; }
+  .field input { width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); font: inherit; }
+  @media (max-width: 520px) { .field { grid-template-columns: 1fr; } }
+  .panel { display: none; }
+  .panel.show { display: block; }
+  code { background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; font-size: 12.5px; word-break: break-all; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+  button { background: var(--accent); color: #fff; border: 0; border-radius: 6px; padding: 8px 16px; font-weight: 600; cursor: pointer; font: inherit; }
+  button.sec { background: none; color: var(--fg); border: 1px solid var(--line); font-weight: 500; }
+  #result { font-size: 13px; }
+  #result.ok { color: var(--ok); }
+  #result.ko { color: var(--ko); }
+  details { margin-top: 8px; }
+  summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+  ol { padding-left: 20px; margin: 6px 0; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="icons/icon128.png" alt="">
+    <div>
+      <h1>KomaTranslator</h1>
+      <div class="muted">Le texte des images est lu dans ton navigateur. Choisis ici qui traduit.</div>
+    </div>
+  </header>
+
+  <section class="card">
+    <h2>Traducteur</h2>
+    <div class="providers">
+      <label><input type="radio" name="provider" value="google"><b>Google</b><span class="muted">Gratuit, aucune config. Traduction littérale.</span></label>
+      <label><input type="radio" name="provider" value="ollama"><b>Ollama (local)</b><span class="muted">Gratuit, très bon, nécessite une carte graphique.</span></label>
+      <label><input type="radio" name="provider" value="openai"><b>API (DeepSeek…)</b><span class="muted">Très bon, quelques centimes par chapitre.</span></label>
+      <label><input type="radio" name="provider" value="anthropic"><b>Claude</b><span class="muted">Le meilleur, clé API Anthropic.</span></label>
+    </div>
+
+    <div class="panel" data-for="ollama">
+      <div class="field"><label for="ollamaUrl">Adresse</label><input id="ollamaUrl" placeholder="http://localhost:11434"></div>
+      <div class="field"><label for="ollamaModel">Modèle</label><input id="ollamaModel" placeholder="qwen3.5:latest"></div>
+      <details>
+        <summary>Installer Ollama / erreur 403</summary>
+        <ol>
+          <li>Installer Ollama : <code>https://ollama.com/download</code></li>
+          <li>Télécharger le modèle : <code>ollama pull qwen3.5</code> (environ 7 Go, carte graphique 8 Go+ conseillée)</li>
+          <li>Si le test affiche « 403 » : ajouter la variable d'environnement Windows
+            <code>OLLAMA_ORIGINS</code> = <code>moz-extension://*,chrome-extension://*</code>, puis redémarrer Ollama.</li>
+        </ol>
+      </details>
+    </div>
+
+    <div class="panel" data-for="openai">
+      <div class="field"><label for="apiBase">URL de l'API</label><input id="apiBase" placeholder="https://api.deepseek.com/v1"></div>
+      <div class="field"><label for="apiKey">Clé API</label><input id="apiKey" type="password" placeholder="sk-..."></div>
+      <div class="field"><label for="apiModel">Modèle</label><input id="apiModel" placeholder="deepseek-chat"></div>
+      <div class="muted">Compatible OpenAI : DeepSeek, OpenAI, OpenRouter, Mistral, LM Studio… La clé reste dans ce navigateur.</div>
+    </div>
+
+    <div class="panel" data-for="anthropic">
+      <div class="field"><label for="anthropicKey">Clé API</label><input id="anthropicKey" type="password" placeholder="sk-ant-..."></div>
+      <div class="field"><label for="anthropicModel">Modèle</label><input id="anthropicModel" placeholder="claude-haiku-5-5"></div>
+      <div class="muted">La clé reste dans ce navigateur (jamais synchronisée).</div>
+    </div>
+
+    <div class="panel llm">
+      <div class="row"><label><input type="checkbox" id="review"> Relecture automatique (corrige l'orthographe, +1 s par page)</label></div>
+    </div>
+
+    <div class="row">
+      <button id="save">Enregistrer et tester</button>
+      <span id="result"></span>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Utilisation</h2>
+    <ol class="muted">
+      <li>Sur le site de lecture : icône de l'extension → <b>Traduire ce site</b> (raccourci <code>Alt+Shift+T</code>).</li>
+      <li>Survoler une bulle : texte original. <b>Alt + clic</b> : corriger la traduction (retenue pour la série).</li>
+      <li>Avec un LLM : importer un glossaire depuis un wiki de la série (popup → Série) pour garder les noms cohérents.</li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2>Données</h2>
+    <div class="muted">Glossaires, corrections et cache sont stockés dans ce navigateur uniquement.</div>
+    <div class="row"><button class="sec" id="clearCache">Vider le cache des pages traduites</button><span id="cacheMsg" class="muted"></span></div>
+  </section>
+</main>
+<script src="options.js"></script>
+</body>
+</html>

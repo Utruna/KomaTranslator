@@ -1,12 +1,14 @@
 {
   "manifest_version": 3,
-  "name": "KomaTranslator Live",
-  "version": "1.2.0",
-  "description": "Traduit en direct le texte des manhwa / manhua / manga affichés dans la page.",
+  "name": "KomaTranslator",
+  "version": "2.0.0",
+  "description": "Traduit en direct le texte des manhwa / manhua / manga (OCR dans le navigateur, sans serveur).",
   "permissions": [
     "storage",
+    "unlimitedStorage",
     "declarativeNetRequest",
-    "activeTab"
+    "activeTab",
+    "offscreen"
   ],
   "host_permissions": [
     "<all_urls>"
@@ -14,6 +16,10 @@
   "background": {
     "service_worker": "background.js",
     "scripts": [
+      "engine/ort.wasm.min.js",
+      "engine/ocr.js",
+      "lib/translate.js",
+      "lib/store.js",
       "background.js"
     ]
   },
@@ -76,5 +82,12 @@
     "48": "icons/icon48.png",
     "96": "icons/icon96.png",
     "128": "icons/icon128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
   }
 }

@@ -24,10 +24,11 @@
   #imsg { font-size: 11px; color: #555; margin-top: 4px; }
   label.sub { justify-content: flex-start; margin: 2px 0 6px; font-size: 12px; }
   .hint { color: #888; font-size: 11px; margin-top: 10px; }
+  .hint a { color: #6b46c1; }
 </style>
 </head>
 <body>
-  <h1>KomaTranslator Live</h1>
+  <h1>KomaTranslator</h1>
   <button id="grant" hidden>Autoriser l'accès aux sites</button>
   <label class="toggle">Traduire ce site <input type="checkbox" id="enabled"></label>
   <div id="host"></div>
@@ -60,8 +61,8 @@
     <div id="imsg"></div>
   </fieldset>
   <button id="retranslate" title="Vide le cache et retraduit la page (utile après un import de glossaire)">↻ Retraduire la page</button>
-  <div id="status">Serveur: vérification…</div>
-  <div class="hint">Raccourci : Alt+Shift+T</div>
+  <div id="status">…</div>
+  <div class="hint">Raccourci : Alt+Shift+T · <a href="#" id="options">Options / traducteur</a></div>
   <script src="popup.js"></script>
 </body>
 </html>

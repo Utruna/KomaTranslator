@@ -1,21 +1,38 @@
-// KomaTranslator Live — service worker
-// Récupère les images (sans contrainte CORS), les envoie au serveur local, renvoie le résultat.
+// KomaTranslator — arrière-plan
+// Récupère les images, lance l'OCR (dans le navigateur), traduit, met en cache.
+// Firefox: page d'arrière-plan (moteur OCR chargé directement).
+// Chrome: service worker + document "offscreen" pour le moteur OCR (WebAssembly).
 
-const DEFAULTS = { server: "http://127.0.0.1:8765", src: "auto", tgt: "fr", sites: {} };
+const IS_SW = typeof ServiceWorkerGlobalScope !== "undefined" && self instanceof ServiceWorkerGlobalScope;
+if (IS_SW) importScripts("lib/translate.js", "lib/store.js");
+
+const DEFAULTS = { src: "auto", tgt: "fr", sites: {} };
+const CFG_DEFAULTS = {
+  provider: "google",          // google | ollama | openai | anthropic
+  ollamaUrl: "http://localhost:11434",
+  ollamaModel: "qwen3.5:latest",
+  apiBase: "https://api.deepseek.com/v1",
+  apiKey: "",
+  apiModel: "deepseek-chat",
+  anthropicKey: "",
+  anthropicModel: "claude-haiku-5-5",
+  review: true,                // relecture (seulement avec un LLM)
+};
 const MAX_PARALLEL = 2;
 
 async function getSettings() {
-  return { ...DEFAULTS, ...(await chrome.storage.sync.get(null)) };
+  const [sync, local] = await Promise.all([chrome.storage.sync.get(null), chrome.storage.local.get("cfg")]);
+  return { ...DEFAULTS, ...sync, cfg: { ...CFG_DEFAULTS, ...(local.cfg || {}) } };
 }
 
-// ── File d'attente (le serveur traite une image à la fois de toute façon) ──
+// Crédits / pubs de scantrad: ni effacés ni traduits
+const CREDITS = /(https?:\/\/|www\.|\w\.(com|net|org|io|gg|me|xyz|to|cc|fr)\b|discord|patreon|ko-?fi|paypal|\b\w+ ?scans\b|\bscantrad|read (the )?(latest|this|new|more)? ?chapters? (on|at)|translat(or|ed by)|proofread|typeset|clean(er|ed by)|\braw provider)/i;
+
+// ── File d'attente ──
 let active = 0;
 const queue = [];
 function schedule(job) {
-  return new Promise((resolve, reject) => {
-    queue.push({ job, resolve, reject });
-    pump();
-  });
+  return new Promise((resolve, reject) => { queue.push({ job, resolve, reject }); pump(); });
 }
 function pump() {
   while (active < MAX_PARALLEL && queue.length) {
@@ -31,11 +48,11 @@ function badge(tabId, delta) {
   if (tabId == null || tabId < 0) return;
   const n = Math.max(0, (pending.get(tabId) || 0) + delta);
   pending.set(tabId, n);
-  chrome.action.setBadgeBackgroundColor({ tabId, color: "#6b46c1" });
+  chrome.action.setBadgeBackgroundColor({ tabId, color: "#6b46c1" }).catch?.(() => {});
   chrome.action.setBadgeText({ tabId, text: n ? String(n) : "" }).catch(() => {});
 }
 
-// ── Utilitaires base64 ──
+// ── base64 ──
 function bufToB64(buf) {
   const bytes = new Uint8Array(buf);
   let s = "";
@@ -49,11 +66,13 @@ function b64ToBytes(b64) {
   return out;
 }
 
-// Beaucoup de CDN de scans refusent les requêtes sans le bon Referer.
+// ── Règles réseau ──
+// 1) beaucoup de CDN de scans refusent les requêtes sans le bon Referer
+// 2) Ollama refuse les requêtes d'extensions (en-tête Origin) sauf configuration: on retire l'en-tête
 function hostRuleId(host) {
   let h = 7;
   for (const c of host) h = (h * 31 + c.charCodeAt(0)) % 1000000;
-  return h + 1;
+  return h + 10;
 }
 async function setReferer(imageUrl, pageUrl) {
   const host = new URL(imageUrl).hostname;
@@ -61,19 +80,93 @@ async function setReferer(imageUrl, pageUrl) {
   await chrome.declarativeNetRequest.updateSessionRules({
     removeRuleIds: [id],
     addRules: [{
-      id,
-      priority: 1,
+      id, priority: 1,
       action: { type: "modifyHeaders", requestHeaders: [{ header: "referer", operation: "set", value: pageUrl }] },
       condition: { urlFilter: `||${host}/`, tabIds: [chrome.tabs.TAB_ID_NONE] },
     }],
   });
 }
+async function ollamaRule() {
+  const { cfg } = await getSettings();
+  try {
+    const u = new URL(cfg.ollamaUrl);
+    await chrome.declarativeNetRequest.updateSessionRules({
+      removeRuleIds: [1],
+      addRules: [{
+        id: 1, priority: 2,
+        action: { type: "modifyHeaders", requestHeaders: [{ header: "origin", operation: "remove" }] },
+        condition: { urlFilter: `|${u.protocol}//${u.host}/`, tabIds: [chrome.tabs.TAB_ID_NONE] },
+      }],
+    });
+  } catch (e) { console.warn("[KomaTranslator] règle Ollama", e); }
+}
+ollamaRule();
+chrome.storage.onChanged.addListener((ch, area) => { if (area === "local" && ch.cfg) ollamaRule(); });
 
 async function fetchImage(url, pageUrl) {
   try { await setReferer(url, pageUrl); } catch (e) { console.warn("referer", e); }
   const r = await fetch(url, { credentials: "include" });
   if (!r.ok) throw new Error(`image HTTP ${r.status}`);
   return { bytes: new Uint8Array(await r.arrayBuffer()), type: r.headers.get("content-type") || "image/jpeg" };
+}
+
+// ── OCR: directement (Firefox) ou via le document offscreen (Chrome) ──
+let offscreenReady = null;
+function ensureOffscreen() {
+  if (!offscreenReady) {
+    offscreenReady = (async () => {
+      const exists = (await chrome.runtime.getContexts?.({ contextTypes: ["OFFSCREEN_DOCUMENT"] }))?.length;
+      if (!exists) {
+        await chrome.offscreen.createDocument({
+          url: "engine/engine.html",
+          reasons: ["WORKERS"],
+          justification: "OCR des bulles avec ONNX Runtime (WebAssembly)",
+        });
+      }
+    })().catch((e) => { offscreenReady = null; throw e; });
+  }
+  return offscreenReady;
+}
+
+async function runOcr(bytes, mime, lang) {
+  if (self.KomaOCR) return self.KomaOCR.analyze(new Blob([bytes], { type: mime }), lang);
+  await ensureOffscreen();
+  const res = await chrome.runtime.sendMessage({ target: "offscreen", type: "ocr", b64: bufToB64(bytes), mime, lang });
+  if (!res?.ok) throw new Error(res?.error || "moteur OCR indisponible");
+  return res.data;
+}
+
+// ── Traduction d'une image ──
+function providerSig(cfg) {
+  const model = { ollama: cfg.ollamaModel, openai: cfg.apiModel, anthropic: cfg.anthropicModel }[cfg.provider] || "";
+  return `${cfg.provider}|${model}|${cfg.review && cfg.provider !== "google"}`;
+}
+
+async function translate(msg) {
+  const s = await getSettings();
+  const img = msg.bytes ? { bytes: b64ToBytes(msg.bytes), type: msg.mime || "image/png" } : await fetchImage(msg.url, msg.pageUrl);
+  const skey = KomaStore.seriesKey(msg.pageUrl);
+  const cacheKey = `${await KomaStore.sha1(img.bytes)}|${s.src}|${s.tgt}|${providerSig(s.cfg)}`;
+
+  let data = await KomaStore.cacheGet(cacheKey);
+  if (!data) {
+    const t0 = performance.now();
+    const ocr = await runOcr(img.bytes, img.type, s.src);
+    const blocks = ocr.blocks.filter((b) => !CREDITS.test(b.text));
+    const t1 = performance.now();
+    const texts = blocks.map((b) => b.text);
+    const ctx = await KomaStore.contextFor(skey, texts);
+    const tr = await KomaTranslate.translateAll(texts, s.src, s.tgt, s.cfg, ctx);
+    blocks.forEach((b, i) => (b.translation = tr[i]));
+    if (blocks.length) await KomaStore.addHistory(skey, texts.map((t, i) => [t, tr[i]]));
+    console.log(`[KomaTranslator] ${ocr.width}x${ocr.height}: ${blocks.length} bulles, OCR ${Math.round(t1 - t0)} ms, trad ${Math.round(performance.now() - t1)} ms`);
+    data = { width: ocr.width, height: ocr.height, blocks };
+    await KomaStore.cachePut(cacheKey, data);
+  }
+  // corrections manuelles de la série (toujours prioritaires, même sur le cache)
+  const { corrections } = await KomaStore.load(skey);
+  data = { ...data, blocks: data.blocks.map((b) => ({ ...b, translation: corrections[b.text] ?? b.translation })) };
+  return { data, image: `data:${img.type};base64,${bufToB64(img.bytes)}` };
 }
 
 // ── Wiki ──
@@ -119,30 +212,53 @@ async function mapLimit(items, n, fn) {
   return out;
 }
 
-const resultCache = new Map(); // url|src|tgt → résultat serveur
-async function translate(msg) {
+async function importWiki(msg) {
   const s = await getSettings();
-  const img = msg.bytes
-    ? { bytes: b64ToBytes(msg.bytes), type: msg.mime || "image/png" }
-    : await fetchImage(msg.url, msg.pageUrl);
-
-  const key = `${msg.url.startsWith("blob:") ? bufToB64(img.bytes.slice(0, 64)) + img.bytes.length : msg.url}|${s.src}|${s.tgt}`;
-  let data = resultCache.get(key);
-  if (!data) {
-    const r = await fetch(`${s.server}/translate?src=${s.src}&tgt=${s.tgt}&page=${encodeURIComponent(msg.pageUrl || "")}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/octet-stream" },
-      body: img.bytes,
-    });
-    data = await r.json();
-    if (!r.ok) throw new Error(data.error || `serveur HTTP ${r.status}`);
-    resultCache.set(key, data);
-    if (resultCache.size > 200) resultCache.delete(resultCache.keys().next().value);
+  if (s.cfg.provider === "google") throw new Error("l'import wiki nécessite un LLM (Ollama ou clé API) : voir les options");
+  const html = await fetchText(msg.wiki);
+  if (!html) throw new Error("impossible de lire la page wiki");
+  let subpages = [];
+  if (msg.subpages) {
+    const links = wikiLinks(html, msg.wiki).slice(0, 20);
+    subpages = (await mapLimit(links, 4, async (url) => ({ url, html: await fetchText(url) }))).filter((p) => p.html);
   }
-  return { data, image: `data:${img.type};base64,${bufToB64(img.bytes)}` };
+  const key = KomaStore.seriesKey(msg.page);
+  const d = await KomaStore.importWiki(key, msg.wiki, html, subpages, s.src, s.tgt, s.cfg);
+  return { key, terms: d.glossary.length, summary: d.summary, wiki: d.wiki };
 }
 
+// ── Messages ──
+const HANDLERS = {
+  async series(msg) {
+    const d = await KomaStore.load(KomaStore.seriesKey(msg.page));
+    return { key: d.key, wiki: d.wiki, terms: d.glossary.length, summary: d.summary };
+  },
+  async seriesFull(msg) { return { data: await KomaStore.load(KomaStore.seriesKey(msg.page)) }; },
+  async seriesSave(msg) { await KomaStore.saveEdit(KomaStore.seriesKey(msg.page), msg.body); return {}; },
+  importWiki,
+  async correct(msg) { await KomaStore.setCorrection(KomaStore.seriesKey(msg.page), msg.text, msg.translation); return {}; },
+  async retranslate(msg) {
+    await KomaStore.cacheClear();
+    await chrome.tabs.sendMessage(msg.tabId, { type: "retranslate" });
+    return {};
+  },
+  async health() {
+    const { cfg } = await getSettings();
+    const model = { ollama: cfg.ollamaModel, openai: cfg.apiModel, anthropic: cfg.anthropicModel }[cfg.provider] || "";
+    return { provider: cfg.provider, model, lastError: self.KomaLastError || "" };
+  },
+  async testProvider(msg) {
+    const cfg = { ...CFG_DEFAULTS, ...msg.cfg };
+    self.KomaLastError = "";
+    const t = performance.now();
+    const out = await KomaTranslate.translateAll(["Hey! W-what are you doing here?!"], "en", "fr", cfg, {});
+    if (cfg.provider !== "google" && self.KomaLastError) throw new Error(self.KomaLastError);
+    return { result: out[0], ms: Math.round(performance.now() - t) };
+  },
+};
+
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg.target === "offscreen") return false; // destiné au document offscreen
   if (msg.type === "translate") {
     const tabId = sender.tab?.id;
     badge(tabId, +1);
@@ -150,72 +266,12 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       .then((res) => sendResponse({ ok: true, ...res }))
       .catch((e) => sendResponse({ ok: false, error: String(e.message || e) }))
       .finally(() => badge(tabId, -1));
-    return true; // réponse asynchrone
-  }
-  if (msg.type === "series") {
-    getSettings()
-      .then((s) => fetch(`${s.server}/series?page=${encodeURIComponent(msg.page)}`))
-      .then((r) => r.json())
-      .then((j) => sendResponse({ ok: true, ...j }))
-      .catch((e) => sendResponse({ ok: false, error: String(e) }));
     return true;
   }
-  if (msg.type === "importWiki") {
-    (async () => {
-      const s = await getSettings();
-      // le navigateur lit la page wiki (comme une visite normale) et transmet son contenu
-      const html = await fetchText(msg.wiki);
-      let subpages = [];
-      if (msg.subpages && html) {
-        const links = wikiLinks(html, msg.wiki).slice(0, 20);
-        const pages = await mapLimit(links, 4, async (url) => ({ url, html: await fetchText(url) }));
-        subpages = pages.filter((p) => p.html);
-      }
-      return fetch(`${s.server}/series/import`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ page: msg.page, wiki: msg.wiki, html, subpages, src: s.src, tgt: s.tgt }),
-      });
-    })()
-      .then(async (r) => ({ r, j: await r.json() }))
-      .then(({ r, j }) => sendResponse(r.ok ? { ok: true, ...j } : { ok: false, error: j.error }))
-      .catch((e) => sendResponse({ ok: false, error: String(e) }));
-    return true;
-  }
-  if (msg.type === "retranslate") {
-    getSettings()
-      .then((s) => fetch(`${s.server}/cache/clear`, { method: "POST" }))
-      .then(() => {
-        resultCache.clear();
-        return chrome.tabs.sendMessage(msg.tabId, { type: "retranslate" });
-      })
-      .then(() => sendResponse({ ok: true }))
-      .catch((e) => sendResponse({ ok: false, error: String(e) }));
-    return true;
-  }
-  if (msg.type === "correct") {
-    getSettings()
-      .then((s) => fetch(`${s.server}/correct`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ page: msg.page, text: msg.text, translation: msg.translation }),
-      }))
-      .then(() => {
-        // le cache de l'extension garderait l'ancienne traduction
-        resultCache.clear();
-        sendResponse({ ok: true });
-      })
-      .catch((e) => sendResponse({ ok: false, error: String(e) }));
-    return true;
-  }
-  if (msg.type === "health") {
-    getSettings()
-      .then((s) => fetch(`${s.server}/health`))
-      .then((r) => r.json())
-      .then((j) => sendResponse({ ok: true, ...j }))
-      .catch(() => sendResponse({ ok: false }));
-    return true;
-  }
+  const h = HANDLERS[msg.type];
+  if (!h) return false;
+  h(msg).then((r) => sendResponse({ ok: true, ...r })).catch((e) => sendResponse({ ok: false, error: String(e.message || e) }));
+  return true;
 });
 
 // Raccourci clavier: (dés)active le site courant
@@ -226,3 +282,6 @@ chrome.commands.onCommand.addListener(async (cmd, tab) => {
   sites[host] = !sites[host];
   await chrome.storage.sync.set({ sites });
 });
+
+// Première installation: ouvrir les options
+chrome.runtime.onInstalled.addListener((d) => { if (d.reason === "install") chrome.runtime.openOptionsPage(); });
