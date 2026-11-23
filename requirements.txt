@@ -1,10 +1,18 @@
 # KomaTranslator Live — serveur local
-paddlepaddle>=3.0
-paddleocr>=3.0
+#
+# OCR rapide (ONNX). rapidocr dépend de "opencv-python-headless" : si opencv-python est déjà installé,
+# installer rapidocr avec --no-deps pour ne pas avoir deux OpenCV :
+#   pip install --no-deps rapidocr
+#   pip install onnxruntime colorlog omegaconf pyclipper shapely six tqdm
+rapidocr>=3.0
+onnxruntime>=1.18
 opencv-python>=4.8
 numpy>=1.24
 Pillow>=10.0
 requests>=2.31
-# Optionnels (traduction par LLM)
+# OCR de repli (plus lent) si rapidocr n'est pas installé
+# paddlepaddle>=3.0
+# paddleocr>=3.0
+# Optionnels (traduction par LLM via API)
 anthropic>=0.40
 openai>=1.0

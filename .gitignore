@@ -51,3 +51,8 @@ legacy/models/*
 legacy/src/police/*
 legacy/koharu_windows_x64.exe
 legacy/komatranslator_sprints.html
+server/series/
+server/cache/
+
+dist/
+server.log

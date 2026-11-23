@@ -29,9 +29,42 @@ const $ = (id) => document.getElementById(id);
   $("src").onchange = () => chrome.storage.sync.set({ src: $("src").value });
   $("tgt").onchange = () => chrome.storage.sync.set({ tgt: $("tgt").value });
 
+  // ── Série: glossaire / wiki ──
+  const showSeries = (j) => {
+    $("skey").textContent = j.key || "";
+    $("sinfo").textContent = j.terms ? `${j.terms} termes dans le glossaire` : "Pas encore de glossaire";
+    $("sinfo").title = j.summary || "";
+    if (j.wiki && !$("wiki").value) $("wiki").value = j.wiki;
+  };
+  chrome.runtime.sendMessage({ type: "series", page: tab.url }).then((j) => j?.ok && showSeries(j));
+  $("edit").onclick = () => {
+    chrome.tabs.create({ url: chrome.runtime.getURL("editor.html?page=" + encodeURIComponent(tab.url)) });
+    window.close();
+  };
+  $("import").onclick = async () => {
+    const wiki = $("wiki").value.trim();
+    if (!wiki) return;
+    $("import").disabled = true;
+    const sub = $("subpages").checked;
+    $("imsg").textContent = sub
+      ? "Lecture du wiki et des sous-pages… (quelques minutes, tu peux fermer ce popup)"
+      : "Lecture du wiki par le LLM… (~20 s)";
+    const j = await chrome.runtime.sendMessage({ type: "importWiki", page: tab.url, wiki, subpages: sub });
+    $("import").disabled = false;
+    $("imsg").textContent = j?.ok ? "Glossaire importé ✔" : "Échec : " + (j?.error || "?");
+    if (j?.ok) showSeries({ ...j, wiki });
+  };
+
+  $("retranslate").onclick = async () => {
+    $("retranslate").disabled = true;
+    $("retranslate").textContent = "↻ Retraduction…";
+    await chrome.runtime.sendMessage({ type: "retranslate", tabId: tab.id });
+    window.close();
+  };
+
   const h = await chrome.runtime.sendMessage({ type: "health" });
   $("status").className = h?.ok ? "ok" : "ko";
   $("status").textContent = h?.ok
-    ? `Serveur OK (traduction : ${h.provider})`
+    ? `Serveur OK (traduction : ${h.provider}${h.model ? " · " + h.model : ""})`
     : "Serveur éteint — lance start_server.bat";
 })();

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glossaire de série</title>
+<style>
+  :root { --bg: #fafafa; --fg: #1d1d1f; --muted: #6b6b70; --line: #e2e2e6; --accent: #6b46c1; --card: #fff; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #17171a; --fg: #ececf0; --muted: #9a9aa3; --line: #2e2e34; --accent: #9f7aea; --card: #1f1f23; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.45 system-ui, sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 80px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  h2 { font-size: 15px; margin: 28px 0 8px; }
+  .key { color: var(--muted); font-size: 13px; word-break: break-all; }
+  textarea, input[type=text] { width: 100%; background: var(--card); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; font: inherit; }
+  textarea { min-height: 90px; resize: vertical; }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  th, td { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: left; vertical-align: top; }
+  th { font-size: 12px; color: var(--muted); font-weight: 600; background: var(--bg); position: sticky; top: 0; }
+  td input { border: 0; background: transparent; padding: 4px 2px; }
+  td input:focus { outline: 2px solid var(--accent); border-radius: 4px; }
+  .del { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 16px; }
+  .del:hover { color: #d33; }
+  .bar { position: fixed; left: 0; right: 0; bottom: 0; background: var(--card); border-top: 1px solid var(--line); padding: 10px 16px; display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; }
+  button.main { background: var(--accent); color: #fff; border: 0; border-radius: 6px; padding: 8px 18px; font-weight: 600; cursor: pointer; }
+  button.sec { background: none; border: 1px solid var(--line); color: var(--fg); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+  #filter { max-width: 280px; }
+  #msg { color: var(--muted); font-size: 13px; }
+  .scroll { overflow-x: auto; }
+  .hint { color: var(--muted); font-size: 12px; margin: 4px 0 8px; }
+  ol.hist { padding-left: 20px; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Glossaire de série</h1>
+  <div class="key" id="key">…</div>
+
+  <h2>Résumé / personnages</h2>
+  <div class="hint">Envoyé au traducteur à chaque page : prémisse, personnages, genre (pour les pronoms).</div>
+  <textarea id="summary"></textarea>
+
+  <h2>Termes (<span id="count">0</span>)</h2>
+  <div class="hint">« Original » = forme dans la VO (萧炎, 斗气…). « Traduction » est imposée au traducteur.</div>
+  <p><input type="text" id="filter" placeholder="Filtrer…"> <button class="sec" id="add">+ Ajouter un terme</button></p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Terme (wiki)</th><th>Original</th><th>Traduction</th><th>Type</th><th>Note</th><th></th></tr></thead>
+      <tbody id="terms"></tbody>
+    </table>
+  </div>
+
+  <h2>Corrections manuelles (<span id="ccount">0</span>)</h2>
+  <div class="hint">Faites avec Alt+clic sur une bulle. Appliquées à chaque fois que la même phrase réapparaît.</div>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Texte original</th><th>Traduction imposée</th><th></th></tr></thead>
+      <tbody id="fixes"></tbody>
+    </table>
+  </div>
+
+  <h2>Dernières répliques mémorisées</h2>
+  <ol class="hist" id="history"></ol>
+</main>
+<div class="bar">
+  <label><input type="checkbox" id="clearHist"> Vider l'historique</label>
+  <button class="main" id="save">Enregistrer</button>
+  <span id="msg"></span>
+</div>
+<script src="editor.js"></script>
+</body>
+</html>

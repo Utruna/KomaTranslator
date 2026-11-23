@@ -14,6 +14,15 @@
   #status.ok { background: #e3f7e8; color: #146c2e; }
   #status.ko { background: #fde8e8; color: #9b1c1c; }
   #grant { width: 100%; padding: 8px; margin-bottom: 8px; background: #6b46c1; color: #fff; border: 0; border-radius: 6px; font-weight: 600; cursor: pointer; }
+  fieldset { border: 1px solid #ddd; border-radius: 6px; margin: 10px 0 0; padding: 6px 8px 8px; }
+  legend { font-weight: 600; padding: 0 4px; }
+  #skey { font-size: 11px; color: #555; word-break: break-all; }
+  #sinfo { font-size: 12px; margin: 4px 0; }
+  #wiki { width: 100%; box-sizing: border-box; padding: 4px; margin: 4px 0; }
+  #retranslate { width: 100%; padding: 6px; margin-top: 10px; cursor: pointer; }
+  #import, #edit { width: 100%; padding: 5px; cursor: pointer; margin-top: 4px; }
+  #imsg { font-size: 11px; color: #555; margin-top: 4px; }
+  label.sub { justify-content: flex-start; margin: 2px 0 6px; font-size: 12px; }
   .hint { color: #888; font-size: 11px; margin-top: 10px; }
 </style>
 </head>
@@ -40,6 +49,17 @@
       <option value="pt">Portugais</option>
     </select>
   </label>
+  <fieldset id="series">
+    <legend>Série</legend>
+    <div id="skey">…</div>
+    <div id="sinfo"></div>
+    <input id="wiki" type="url" placeholder="URL de la page wiki de la série">
+    <label class="sub"><input type="checkbox" id="subpages" checked> Inclure les sous-pages (max 20)</label>
+    <button id="import">Importer le glossaire</button>
+    <button id="edit">Voir / modifier le glossaire</button>
+    <div id="imsg"></div>
+  </fieldset>
+  <button id="retranslate" title="Vide le cache et retraduit la page (utile après un import de glossaire)">↻ Retraduire la page</button>
   <div id="status">Serveur: vérification…</div>
   <div class="hint">Raccourci : Alt+Shift+T</div>
   <script src="popup.js"></script>

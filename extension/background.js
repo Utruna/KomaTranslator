@@ -76,6 +76,49 @@ async function fetchImage(url, pageUrl) {
   return { bytes: new Uint8Array(await r.arrayBuffer()), type: r.headers.get("content-type") || "image/jpeg" };
 }
 
+// ── Wiki ──
+async function fetchText(url) {
+  try {
+    const r = await fetch(url, { credentials: "include" });
+    if (!r.ok) return "";
+    let t = await r.text();
+    const i = t.indexOf('id="mw-content-text"'); // on ne garde que le contenu (MediaWiki / Fandom)
+    if (i > 0) t = t.slice(i);
+    return t.replace(/<(script|style|noscript)[\s\S]*?<\/\1>/gi, " ").slice(0, 300000);
+  } catch {
+    return "";
+  }
+}
+
+// Liens vers les autres articles du même wiki (personnages, techniques, lieux…)
+function wikiLinks(html, baseUrl) {
+  const base = new URL(baseUrl);
+  const prefix = base.pathname.slice(0, base.pathname.lastIndexOf("/") + 1); // ex: "/wiki/"
+  const seen = new Set([base.origin + base.pathname]);
+  const out = [];
+  for (const m of html.matchAll(/href="([^"#]+)/g)) {
+    let u;
+    try { u = new URL(m[1].replace(/&amp;/g, "&"), base); } catch { continue; }
+    const name = decodeURIComponent(u.pathname.slice(prefix.length));
+    if (u.origin !== base.origin || !u.pathname.startsWith(prefix) || u.search) continue;
+    if (!name || name.includes(":") || name.includes("/") || /^(Main_Page|.*_Wiki)$/i.test(name)) continue;
+    const key = u.origin + u.pathname;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(key);
+  }
+  return out;
+}
+
+async function mapLimit(items, n, fn) {
+  const out = new Array(items.length);
+  let i = 0;
+  await Promise.all(Array.from({ length: n }, async () => {
+    while (i < items.length) { const k = i++; out[k] = await fn(items[k]); }
+  }));
+  return out;
+}
+
 const resultCache = new Map(); // url|src|tgt → résultat serveur
 async function translate(msg) {
   const s = await getSettings();
@@ -86,7 +129,7 @@ async function translate(msg) {
   const key = `${msg.url.startsWith("blob:") ? bufToB64(img.bytes.slice(0, 64)) + img.bytes.length : msg.url}|${s.src}|${s.tgt}`;
   let data = resultCache.get(key);
   if (!data) {
-    const r = await fetch(`${s.server}/translate?src=${s.src}&tgt=${s.tgt}`, {
+    const r = await fetch(`${s.server}/translate?src=${s.src}&tgt=${s.tgt}&page=${encodeURIComponent(msg.pageUrl || "")}`, {
       method: "POST",
       headers: { "Content-Type": "application/octet-stream" },
       body: img.bytes,
@@ -108,6 +151,62 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       .catch((e) => sendResponse({ ok: false, error: String(e.message || e) }))
       .finally(() => badge(tabId, -1));
     return true; // réponse asynchrone
+  }
+  if (msg.type === "series") {
+    getSettings()
+      .then((s) => fetch(`${s.server}/series?page=${encodeURIComponent(msg.page)}`))
+      .then((r) => r.json())
+      .then((j) => sendResponse({ ok: true, ...j }))
+      .catch((e) => sendResponse({ ok: false, error: String(e) }));
+    return true;
+  }
+  if (msg.type === "importWiki") {
+    (async () => {
+      const s = await getSettings();
+      // le navigateur lit la page wiki (comme une visite normale) et transmet son contenu
+      const html = await fetchText(msg.wiki);
+      let subpages = [];
+      if (msg.subpages && html) {
+        const links = wikiLinks(html, msg.wiki).slice(0, 20);
+        const pages = await mapLimit(links, 4, async (url) => ({ url, html: await fetchText(url) }));
+        subpages = pages.filter((p) => p.html);
+      }
+      return fetch(`${s.server}/series/import`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ page: msg.page, wiki: msg.wiki, html, subpages, src: s.src, tgt: s.tgt }),
+      });
+    })()
+      .then(async (r) => ({ r, j: await r.json() }))
+      .then(({ r, j }) => sendResponse(r.ok ? { ok: true, ...j } : { ok: false, error: j.error }))
+      .catch((e) => sendResponse({ ok: false, error: String(e) }));
+    return true;
+  }
+  if (msg.type === "retranslate") {
+    getSettings()
+      .then((s) => fetch(`${s.server}/cache/clear`, { method: "POST" }))
+      .then(() => {
+        resultCache.clear();
+        return chrome.tabs.sendMessage(msg.tabId, { type: "retranslate" });
+      })
+      .then(() => sendResponse({ ok: true }))
+      .catch((e) => sendResponse({ ok: false, error: String(e) }));
+    return true;
+  }
+  if (msg.type === "correct") {
+    getSettings()
+      .then((s) => fetch(`${s.server}/correct`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ page: msg.page, text: msg.text, translation: msg.translation }),
+      }))
+      .then(() => {
+        // le cache de l'extension garderait l'ancienne traduction
+        resultCache.clear();
+        sendResponse({ ok: true });
+      })
+      .catch((e) => sendResponse({ ok: false, error: String(e) }));
+    return true;
   }
   if (msg.type === "health") {
     getSettings()

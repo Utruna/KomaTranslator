@@ -20,11 +20,40 @@
   })();
 
   // ── Détection des images à traiter ──
+  // "near" = images proches de l'écran; on traite d'abord celle qui est à l'écran,
+  // puis celles juste en dessous; celles qu'on a dépassées passent en dernier.
+  const near = new Set();
+  const retries = new WeakMap();
+  const MAX_INFLIGHT = 2;
+  let inflight = 0;
+
   const io = new IntersectionObserver((entries) => {
-    for (const e of entries) {
-      if (e.isIntersecting) { io.unobserve(e.target); processImg(e.target); }
+    for (const e of entries) e.isIntersecting ? near.add(e.target) : near.delete(e.target);
+    pump();
+  }, { rootMargin: "4000px 0px" });
+
+  function priority(img) {
+    const r = img.getBoundingClientRect();
+    if (r.bottom >= 0 && r.top <= innerHeight) return 0;   // visible
+    if (r.top > innerHeight) return r.top - innerHeight;    // plus bas: dans l'ordre de lecture
+    return 3 * -r.bottom;                                    // déjà dépassée
+  }
+
+  function pump() {
+    while (enabled && inflight < MAX_INFLIGHT && near.size) {
+      let best = null, bestP = Infinity;
+      for (const img of near) {
+        if (!img.isConnected) { near.delete(img); continue; }
+        const p = priority(img);
+        if (p < bestP) { best = img; bestP = p; }
+      }
+      if (!best) return;
+      near.delete(best);
+      inflight++;
+      processImg(best).finally(() => { inflight--; pump(); });
     }
-  }, { rootMargin: "1500px 0px" });
+  }
+  addEventListener("scroll", () => { if (inflight < MAX_INFLIGHT) pump(); }, { passive: true });
 
   function watch(img) {
     if (!enabled) return;
@@ -71,9 +100,12 @@
       const res = await chrome.runtime.sendMessage(msg);
       if (!res?.ok) throw new Error(res?.error || "pas de réponse");
       if (!enabled || (img.currentSrc || img.src) !== url) return; // l'image a changé entre-temps
+      io.unobserve(img);
       if (!res.data.blocks.length) return;
       const out = await render(res.image, res.data);
       st.translatedUrl = out;
+      st.res = res; // pour l'infobulle et les corrections
+      attachInteractions(img);
       img.removeAttribute("srcset");
       const pic = img.parentElement?.tagName === "PICTURE" ? img.parentElement : null;
       pic?.querySelectorAll("source").forEach((s) => {
@@ -83,11 +115,57 @@
       img.src = out;
     } catch (e) {
       console.warn("[KomaTranslator]", url, e);
-      img.title = "KomaTranslator: " + e.message;
+      const n = retries.get(img) || 0;
+      if (n < 2 && enabled) { // requête perdue / serveur occupé: on réessaie (le serveur garde le résultat en cache)
+        retries.set(img, n + 1);
+        state.delete(img);
+        setTimeout(() => { near.add(img); pump(); }, 1500 * (n + 1));
+      } else img.title = "KomaTranslator: " + e.message;
     } finally {
       st.busy = false;
       img.classList.remove("kt-busy");
     }
+  }
+
+  // ── Survol: texte d'origine · Alt+clic: corriger la traduction ──
+  function blockAt(img, ev) {
+    const st = state.get(img);
+    if (!st?.res || img.src !== st.translatedUrl) return null;
+    const r = img.getBoundingClientRect();
+    const x = (ev.clientX - r.left) * (st.res.data.width / r.width);
+    const y = (ev.clientY - r.top) * (st.res.data.height / r.height);
+    return st.res.data.blocks.find((b) => {
+      const [x0, y0, x1, y1] = b.fit_box || b.box;
+      return x >= x0 - 10 && x <= x1 + 10 && y >= y0 - 10 && y <= y1 + 10;
+    }) || null;
+  }
+
+  function attachInteractions(img) {
+    if (img.dataset.ktHooks) return;
+    img.dataset.ktHooks = "1";
+    img.addEventListener("mousemove", (ev) => {
+      if (!enabled) return;
+      const b = blockAt(img, ev);
+      const t = b ? `${b.text}\n→ ${b.translation}\n(Alt+clic pour corriger)` : "";
+      if (img.title !== t) img.title = t;
+      img.style.cursor = b && ev.altKey ? "text" : "";
+    });
+    img.addEventListener("click", async (ev) => {
+      if (!enabled || !ev.altKey) return;
+      const b = blockAt(img, ev);
+      if (!b) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      const fixed = prompt(`Original :\n${b.text}\n\nTraduction corrigée :`, b.translation);
+      if (fixed == null || fixed.trim() === b.translation) return;
+      b.translation = fixed.trim();
+      const st = state.get(img);
+      const out = await render(st.res.image, st.res.data);
+      URL.revokeObjectURL(st.translatedUrl);
+      st.translatedUrl = out;
+      img.src = out;
+      chrome.runtime.sendMessage({ type: "correct", page: location.href, text: b.text, translation: b.translation });
+    }, true);
   }
 
   function restoreAll() {
@@ -128,13 +206,15 @@
   function drawText(ctx, b) {
     const text = (b.translation || "").trim();
     if (!text) return;
-    let [x0, y0, x1, y1] = b.box;
+    let [x0, y0, x1, y1] = b.fit_box || b.box; // fit_box = intérieur de la bulle détectée
     let w = x1 - x0, h = y1 - y0;
-    // le français est plus long que le chinois: on s'autorise un peu plus de largeur
-    const extra = Math.min(w * 0.05, 8);
-    if (w < h * 0.6) { x0 -= (h * 0.6 - w) / 2; w = h * 0.6; } // texte vertical (manga)
-    x0 -= extra; w += 2 * extra;
-    y0 -= 4; h += 8;
+    if (!b.fit_box) {
+      // pas de bulle détectée: zone du texte d'origine, un peu élargie
+      const extra = Math.min(w * 0.05, 8);
+      if (w < h * 0.6) { x0 -= (h * 0.6 - w) / 2; w = h * 0.6; } // texte vertical (manga)
+      x0 -= extra; w += 2 * extra;
+      y0 -= 4; h += 8;
+    } else if (w < h * 0.6) { x0 -= (h * 0.6 - w) / 2; w = h * 0.6; }
     const lineH0 = b.lines.reduce((s, l) => s + (l[3] - l[1]), 0) / b.lines.length;
     const maxSize = Math.max(12, Math.min(72, lineH0 * 1.15));
 
@@ -217,9 +297,14 @@
     } else {
       mo.disconnect();
       io.disconnect();
+      near.clear();
       restoreAll();
     }
   }
+
+  chrome.runtime.onMessage.addListener((msg) => {
+    if (msg.type === "retranslate" && enabled) { setEnabled(false); setEnabled(true); }
+  });
 
   chrome.storage.sync.get(["sites"]).then(({ sites = {} }) => setEnabled(!!sites[HOST]));
   chrome.storage.onChanged.addListener((ch) => {
