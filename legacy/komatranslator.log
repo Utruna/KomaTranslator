@@ -5206,3 +5206,253 @@ Personne ne sait ce que le monde extérieur ressemble. Il est dit que les humain
 [2026-06-28 16:12:18] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
 [2026-06-28 16:12:19] INFO     src.pipeline – Saved translated image to 'output\803.jpg'.
 [2026-06-28 16:12:19] INFO     __main__ – Done.
+[2026-06-28 16:21:18] INFO     __main__ – Initialising OCR engine …
+[2026-06-28 16:21:18] INFO     __main__ – Initialising translation engine …
+[2026-06-28 16:21:18] INFO     __main__ – Initialising inpainter …
+[2026-06-28 16:21:20] WARNING  src.inpainter – LaMa model failed to load (Could not run 'aten::empty_strided' with arguments from the 'CUDA' backend. This could be because the operator doesn't exist for this backend, or was omitted during the selective/custom build process (if using custom build). If you are a Facebook employee using PyTorch on mobile, please visit https://fburl.com/ptmfixes for possible resolutions. 'aten::empty_strided' is only available for these backends: [CPU, Meta, QuantizedCPU, BackendSelect, Python, FuncTorchDynamicLayerBackMode, Functionalize, Named, Conjugate, Negative, ZeroTensor, ADInplaceOrView, AutogradOther, AutogradCPU, AutogradCUDA, AutogradHIP, AutogradXLA, AutogradMPS, AutogradIPU, AutogradXPU, AutogradHPU, AutogradVE, AutogradLazy, AutogradMTIA, AutogradMAIA, AutogradPrivateUse1, AutogradPrivateUse2, AutogradPrivateUse3, AutogradMeta, AutogradNestedTensor, Tracer, AutocastCPU, AutocastMTIA, AutocastMAIA, AutocastXPU, AutocastMPS, AutocastCUDA, FuncTorchBatched, BatchedNestedTensor, FuncTorchVmapMode, Batched, VmapMode, FuncTorchGradWrapper, PythonTLSSnapshot, FuncTorchDynamicLayerFrontMode, PreDispatch, PythonDispatcher].
+
+CPU: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\build\aten\src\ATen\RegisterCPU_2.cpp:2480 [kernel]
+Meta: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\build\aten\src\ATen\RegisterMeta_0.cpp:5509 [kernel]
+QuantizedCPU: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\build\aten\src\ATen\RegisterQuantizedCPU_0.cpp:475 [kernel]
+BackendSelect: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\build\aten\src\ATen\RegisterBackendSelect.cpp:792 [kernel]
+Python: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\core\PythonFallbackKernel.cpp:198 [backend fallback]
+FuncTorchDynamicLayerBackMode: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\functorch\DynamicLayer.cpp:477 [backend fallback]
+Functionalize: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\FunctionalizeFallbackKernel.cpp:384 [backend fallback]
+Named: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\core\NamedRegistrations.cpp:5 [backend fallback]
+Conjugate: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\ConjugateFallback.cpp:21 [kernel]
+Negative: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\native\NegateFallback.cpp:22 [kernel]
+ZeroTensor: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\ZeroTensorFallback.cpp:119 [kernel]
+ADInplaceOrView: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\core\VariableFallbackKernel.cpp:103 [backend fallback]
+AutogradOther: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradCPU: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradCUDA: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradHIP: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradXLA: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradMPS: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradIPU: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradXPU: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradHPU: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradVE: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradLazy: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradMTIA: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradMAIA: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradPrivateUse1: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradPrivateUse2: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradPrivateUse3: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradMeta: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradNestedTensor: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+Tracer: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\TraceType_2.cpp:17975 [kernel]
+AutocastCPU: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\autocast_mode.cpp:336 [backend fallback]
+AutocastMTIA: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\autocast_mode.cpp:480 [backend fallback]
+AutocastMAIA: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\autocast_mode.cpp:518 [backend fallback]
+AutocastXPU: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\autocast_mode.cpp:556 [backend fallback]
+AutocastMPS: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\autocast_mode.cpp:221 [backend fallback]
+AutocastCUDA: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\autocast_mode.cpp:177 [backend fallback]
+FuncTorchBatched: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\functorch\LegacyBatchingRegistrations.cpp:727 [backend fallback]
+BatchedNestedTensor: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\functorch\LegacyBatchingRegistrations.cpp:754 [backend fallback]
+FuncTorchVmapMode: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\functorch\VmapModeRegistrations.cpp:22 [backend fallback]
+Batched: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\LegacyBatchingRegistrations.cpp:1072 [backend fallback]
+VmapMode: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\VmapModeRegistrations.cpp:32 [backend fallback]
+FuncTorchGradWrapper: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\functorch\TensorWrapper.cpp:210 [backend fallback]
+PythonTLSSnapshot: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\core\PythonFallbackKernel.cpp:206 [backend fallback]
+FuncTorchDynamicLayerFrontMode: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\functorch\DynamicLayer.cpp:473 [backend fallback]
+PreDispatch: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\core\PythonFallbackKernel.cpp:210 [backend fallback]
+PythonDispatcher: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\core\PythonFallbackKernel.cpp:202 [backend fallback]
+). Falling back to OpenCV inpainting.
+[2026-06-28 16:21:20] INFO     __main__ – Initialising typesetter …
+[2026-06-28 16:21:20] INFO     src.pipeline – Processing '803.jpg' …
+[2026-06-28 16:21:20] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-06-28 16:21:20] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-06-28 16:21:20] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-06-28 16:21:20] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr]
+[2026-06-28 16:21:20] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'paddle-ocr'
+[2026-06-28 16:21:20] DEBUG    src.ocr_engine – OCR engine 'paddle-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-06-28 16:21:20] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ppocr]
+[2026-06-28 16:21:20] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ppocr'
+[2026-06-28 16:21:20] DEBUG    src.ocr_engine – OCR engine 'ppocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-06-28 16:21:20] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ch-ocr]
+[2026-06-28 16:21:20] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ch-ocr'
+[2026-06-28 16:21:20] DEBUG    src.ocr_engine – OCR engine 'ch-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-06-28 16:21:20] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr-vl-1.5]
+[2026-06-28 16:21:20] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 200 for OCR engine 'paddle-ocr-vl-1.5'
+[2026-06-28 16:21:20] DEBUG    src.ocr_engine – Koharu POST /pipelines response: {'operationId': '2512649a-e18f-4dfd-a89d-77c499e6e200'}
+[2026-06-28 16:21:20] INFO     src.ocr_engine – Using Koharu OCR engine 'paddle-ocr-vl-1.5' with operation 2512649a-e18f-4dfd-a89d-77c499e6e200.
+[2026-06-28 16:21:20] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-06-28 16:21:21] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': '358f70eb-dabf-4a21-a3e9-13b1817c14ec', 'kind': 'pipeline', 'status': 'completed'}, {'id': '2512649a-e18f-4dfd-a89d-77c499e6e200', 'kind': 'pipeline', 'status': 'completed'}, {'id': '102bc10c-1604-41c4-9e0b-178a72a9f040', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-06-28 16:21:23] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-06-28 16:21:23] DEBUG    src.ocr_engine – Koharu scene node preview (first 3): [{'page_id': '019f0e9b-3402-7551-9fac-f3896772d4cb', 'node_id': '019f0e9b-3402-7551-9fac-f397638c354b', 'kind': {'image': {'role': 'source', 'blob': 'bc1a63f290903ed6c19fef5caceae866dbec5e9017d60b3fdeeb3e1e32149350', 'opacity': 1.0, 'naturalWidth': 800, 'naturalHeight': 1131, 'name': 'page.png'}}}, {'page_id': '019f0e9b-3402-7551-9fac-f3896772d4cb', 'node_id': '019f0e9b-35bc-76d0-8ec8-7a9d67e37dec', 'kind': {'mask': {'role': 'segment', 'blob': '09fdfa419068f0c7b2ffdb787db9a425f61faef434e4f8bc5b7e7a6bcc0b5100'}}}, {'page_id': '019f0e9b-3402-7551-9fac-f3896772d4cb', 'node_id': '019f0e9b-35bc-76d0-8ec8-7aa1068560a9', 'kind': {'text': {'confidence': 0.4869995, 'sourceLang': None, 'sourceDirection': None, 'renderedDirection': None, 'linePolygons': None, 'rotationDeg': None, 'detectedFontSizePx': None, 'detector': 'ctd', 'text': '圣祖山脉之外的世界，已经被妖兽所占领，这里的人们已经有数百年不曾与外界有过联系了。', 'translation': None, 'style': None, 'fontPrediction': None, 'sprite': None, 'spriteTransform': None, 'lockLayoutBox': False}}}]
+[2026-06-28 16:21:23] INFO     src.ocr_engine – Koharu API returned 5 text regions.
+[2026-06-28 16:21:23] INFO     src.pipeline – 5 / 5 box(es) passed confidence threshold (0.40).
+[2026-06-28 16:21:23] INFO     src.pipeline – Grouped into 3 contiguous text block(s) for translation.
+[2026-06-28 16:21:23] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-06-28 16:21:23] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+圣祖山脉之外的世界，已经被妖兽所占领，这里的人们已经有数百年不曾与外界有过联系了。 圣祖山脉之外的世界，已经被妖兽所占领，这里的人们已经有数百年不曾与外界有过联系了。
+---------------------
+[2026-06-28 16:21:31] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Le monde au-delà de la chaîne de montagnes Sainte-Ancêtre est sous le contrôle des créatures surnaturelles. Depuis plusieurs siècles, les habitants de ce lieu n'ont pas eu de contact avec l'extérieur.
+
+ ou 
+
+ Le monde qui se trouve en dehors de la chaîne de montagnes Sainte-Ancêtre est occupé par des monstres. Les gens qui vivent ici n'ont pas eu de relations avec le monde extérieur depuis plusieurs siècles.
+----------------------
+[2026-06-28 16:21:31] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+虽然经常会受到山脉中风雪妖兽的袭击，但这座城池还是在次次毁灭性的战争中不断重建了起来。 光辉之城
+---------------------
+[2026-06-28 16:21:34] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Même si elle est souvent attaquée par les créatures de tempête qui hantent les montagnes, cette ville a toujours réussi à se relever après chaque guerre dévastatrice. La Ville Éclatante.
+----------------------
+[2026-06-28 16:21:34] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+谁也不清楚外面的世界是怎样的。传说人类在鼎盛时期有着庞大的帝国，但如今都已灰飞烟灭，不复存在。这座城市由于位置隐秘，才得以从黑暗时代完整保留下来。
+---------------------
+[2026-06-28 16:21:38] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Personne ne sait ce que le monde extérieur est devenu. On raconte qu'au sommet de leur puissance, les humains avaient un empire immense, mais aujourd'hui il n'en reste plus rien. C'est grâce à sa position cachée que cette ville a réussi à survivre jusqu'à présent intacte.
+----------------------
+[2026-06-28 16:21:38] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-06-28 16:21:38] INFO     src.bubble_segmentation – Segmentation complete: 3 textboxes classified (0 bubbles, 3 floating text)
+[2026-06-28 16:21:38] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-06-28 16:21:38] INFO     src.pipeline – Saved translated image to 'output\803.jpg'.
+[2026-06-28 16:21:38] INFO     __main__ – Done.
+[2026-06-28 16:27:09] INFO     __main__ – Initialising OCR engine …
+[2026-06-28 16:27:09] INFO     __main__ – Initialising translation engine …
+[2026-06-28 16:27:10] INFO     __main__ – Initialising inpainter …
+[2026-06-28 16:27:11] WARNING  src.inpainter – LaMa model failed to load (Could not run 'aten::empty_strided' with arguments from the 'CUDA' backend. This could be because the operator doesn't exist for this backend, or was omitted during the selective/custom build process (if using custom build). If you are a Facebook employee using PyTorch on mobile, please visit https://fburl.com/ptmfixes for possible resolutions. 'aten::empty_strided' is only available for these backends: [CPU, Meta, QuantizedCPU, BackendSelect, Python, FuncTorchDynamicLayerBackMode, Functionalize, Named, Conjugate, Negative, ZeroTensor, ADInplaceOrView, AutogradOther, AutogradCPU, AutogradCUDA, AutogradHIP, AutogradXLA, AutogradMPS, AutogradIPU, AutogradXPU, AutogradHPU, AutogradVE, AutogradLazy, AutogradMTIA, AutogradMAIA, AutogradPrivateUse1, AutogradPrivateUse2, AutogradPrivateUse3, AutogradMeta, AutogradNestedTensor, Tracer, AutocastCPU, AutocastMTIA, AutocastMAIA, AutocastXPU, AutocastMPS, AutocastCUDA, FuncTorchBatched, BatchedNestedTensor, FuncTorchVmapMode, Batched, VmapMode, FuncTorchGradWrapper, PythonTLSSnapshot, FuncTorchDynamicLayerFrontMode, PreDispatch, PythonDispatcher].
+
+CPU: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\build\aten\src\ATen\RegisterCPU_2.cpp:2480 [kernel]
+Meta: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\build\aten\src\ATen\RegisterMeta_0.cpp:5509 [kernel]
+QuantizedCPU: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\build\aten\src\ATen\RegisterQuantizedCPU_0.cpp:475 [kernel]
+BackendSelect: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\build\aten\src\ATen\RegisterBackendSelect.cpp:792 [kernel]
+Python: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\core\PythonFallbackKernel.cpp:198 [backend fallback]
+FuncTorchDynamicLayerBackMode: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\functorch\DynamicLayer.cpp:477 [backend fallback]
+Functionalize: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\FunctionalizeFallbackKernel.cpp:384 [backend fallback]
+Named: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\core\NamedRegistrations.cpp:5 [backend fallback]
+Conjugate: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\ConjugateFallback.cpp:21 [kernel]
+Negative: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\native\NegateFallback.cpp:22 [kernel]
+ZeroTensor: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\ZeroTensorFallback.cpp:119 [kernel]
+ADInplaceOrView: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\core\VariableFallbackKernel.cpp:103 [backend fallback]
+AutogradOther: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradCPU: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradCUDA: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradHIP: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradXLA: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradMPS: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradIPU: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradXPU: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradHPU: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradVE: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradLazy: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradMTIA: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradMAIA: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradPrivateUse1: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradPrivateUse2: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradPrivateUse3: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradMeta: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+AutogradNestedTensor: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\VariableType_2.cpp:20416 [autograd kernel]
+Tracer: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\TraceType_2.cpp:17975 [kernel]
+AutocastCPU: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\autocast_mode.cpp:336 [backend fallback]
+AutocastMTIA: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\autocast_mode.cpp:480 [backend fallback]
+AutocastMAIA: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\autocast_mode.cpp:518 [backend fallback]
+AutocastXPU: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\autocast_mode.cpp:556 [backend fallback]
+AutocastMPS: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\autocast_mode.cpp:221 [backend fallback]
+AutocastCUDA: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\autocast_mode.cpp:177 [backend fallback]
+FuncTorchBatched: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\functorch\LegacyBatchingRegistrations.cpp:727 [backend fallback]
+BatchedNestedTensor: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\functorch\LegacyBatchingRegistrations.cpp:754 [backend fallback]
+FuncTorchVmapMode: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\functorch\VmapModeRegistrations.cpp:22 [backend fallback]
+Batched: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\LegacyBatchingRegistrations.cpp:1072 [backend fallback]
+VmapMode: fallthrough registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\VmapModeRegistrations.cpp:32 [backend fallback]
+FuncTorchGradWrapper: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\functorch\TensorWrapper.cpp:210 [backend fallback]
+PythonTLSSnapshot: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\core\PythonFallbackKernel.cpp:206 [backend fallback]
+FuncTorchDynamicLayerFrontMode: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\functorch\DynamicLayer.cpp:473 [backend fallback]
+PreDispatch: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\core\PythonFallbackKernel.cpp:210 [backend fallback]
+PythonDispatcher: registered at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\core\PythonFallbackKernel.cpp:202 [backend fallback]
+). Falling back to OpenCV inpainting.
+[2026-06-28 16:27:11] INFO     __main__ – Initialising typesetter …
+[2026-06-28 16:27:11] INFO     src.pipeline – Processing '803.jpg' …
+[2026-06-28 16:27:11] INFO     src.pipeline – ── Step 1 / 4  OCR detection ───────────────────────────
+[2026-06-28 16:27:11] INFO     src.ocr_engine – Connecting to Koharu headless API at http://127.0.0.1:4000/api/v1...
+[2026-06-28 16:27:11] INFO     src.ocr_engine – Uploading image to Koharu...
+[2026-06-28 16:27:11] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr]
+[2026-06-28 16:27:11] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'paddle-ocr'
+[2026-06-28 16:27:11] DEBUG    src.ocr_engine – OCR engine 'paddle-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-06-28 16:27:11] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ppocr]
+[2026-06-28 16:27:11] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ppocr'
+[2026-06-28 16:27:11] DEBUG    src.ocr_engine – OCR engine 'ppocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-06-28 16:27:11] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, ch-ocr]
+[2026-06-28 16:27:11] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 400 for OCR engine 'ch-ocr'
+[2026-06-28 16:27:11] DEBUG    src.ocr_engine – OCR engine 'ch-ocr' failed: 400 Client Error: Bad Request for url: http://127.0.0.1:4000/api/v1/pipelines
+[2026-06-28 16:27:11] INFO     src.ocr_engine – Triggering Koharu pipeline steps: [comic-text-detector, paddle-ocr-vl-1.5]
+[2026-06-28 16:27:11] DEBUG    src.ocr_engine – Koharu POST /pipelines HTTP 200 for OCR engine 'paddle-ocr-vl-1.5'
+[2026-06-28 16:27:11] DEBUG    src.ocr_engine – Koharu POST /pipelines response: {'operationId': '96d74b95-9d10-4cca-a187-62bed3092c24'}
+[2026-06-28 16:27:11] INFO     src.ocr_engine – Using Koharu OCR engine 'paddle-ocr-vl-1.5' with operation 96d74b95-9d10-4cca-a187-62bed3092c24.
+[2026-06-28 16:27:11] INFO     src.ocr_engine – Waiting for Koharu pipeline to complete...
+[2026-06-28 16:27:12] DEBUG    src.ocr_engine – Koharu GET /operations response: {'operations': [{'id': '358f70eb-dabf-4a21-a3e9-13b1817c14ec', 'kind': 'pipeline', 'status': 'completed'}, {'id': '96d74b95-9d10-4cca-a187-62bed3092c24', 'kind': 'pipeline', 'status': 'completed'}, {'id': '2512649a-e18f-4dfd-a89d-77c499e6e200', 'kind': 'pipeline', 'status': 'completed'}, {'id': '102bc10c-1604-41c4-9e0b-178a72a9f040', 'kind': 'pipeline', 'status': 'completed'}]}
+[2026-06-28 16:27:14] INFO     src.ocr_engine – Fetching scene.json from Koharu...
+[2026-06-28 16:27:14] DEBUG    src.ocr_engine – Koharu scene node preview (first 3): [{'page_id': '019f0ea0-902b-7e72-8afd-2b6f52bfda63', 'node_id': '019f0ea0-902b-7e72-8afd-2b7d6e9b7bf5', 'kind': {'image': {'role': 'source', 'blob': 'bc1a63f290903ed6c19fef5caceae866dbec5e9017d60b3fdeeb3e1e32149350', 'opacity': 1.0, 'naturalWidth': 800, 'naturalHeight': 1131, 'name': 'page.png'}}}, {'page_id': '019f0ea0-902b-7e72-8afd-2b6f52bfda63', 'node_id': '019f0ea0-9203-79d3-a6b7-407eba6bc47b', 'kind': {'mask': {'role': 'segment', 'blob': '09fdfa419068f0c7b2ffdb787db9a425f61faef434e4f8bc5b7e7a6bcc0b5100'}}}, {'page_id': '019f0ea0-902b-7e72-8afd-2b6f52bfda63', 'node_id': '019f0ea0-9203-79d3-a6b7-40803aa4eafd', 'kind': {'text': {'confidence': 0.4869995, 'sourceLang': None, 'sourceDirection': None, 'renderedDirection': None, 'linePolygons': None, 'rotationDeg': None, 'detectedFontSizePx': None, 'detector': 'ctd', 'text': '圣祖山脉之外的世界，已经被妖兽所占领，这里的人们已经有数百年不曾与外界有过联系了。', 'translation': None, 'style': None, 'fontPrediction': None, 'sprite': None, 'spriteTransform': None, 'lockLayoutBox': False}}}]
+[2026-06-28 16:27:14] INFO     src.ocr_engine – Koharu API returned 5 text regions.
+[2026-06-28 16:27:14] INFO     src.pipeline – 5 / 5 box(es) passed confidence threshold (0.40).
+[2026-06-28 16:27:14] INFO     src.pipeline – Grouped into 3 contiguous text block(s) for translation.
+[2026-06-28 16:27:14] INFO     src.pipeline – ── Step 2 / 4  Translation ─────────────────────────────
+[2026-06-28 16:27:14] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+圣祖山脉之外的世界，已经被妖兽所占领，这里的人们已经有数百年不曾与外界有过联系了。 圣祖山脉之外的世界，已经被妖兽所占领，这里的人们已经有数百年不曾与外界有过联系了。
+---------------------
+[2026-06-28 16:27:19] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Le monde au-delà de la Chaîne Sainte, est déjà occupé par des créatures surnaturelles. Les gens qui vivent ici n'ont pas eu de contact avec l'extérieur depuis plusieurs siècles.
+----------------------
+[2026-06-28 16:27:19] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+虽然经常会受到山脉中风雪妖兽的袭击，但这座城池还是在次次毁灭性的战争中不断重建了起来。 光辉之城
+---------------------
+[2026-06-28 16:27:22] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Malgré les attaques fréquentes de ces créatures surnaturelles qui hantent les montagnes, la ville est constamment reconstruite après chaque guerre dévastatrice. La cité resplendissante.
+----------------------
+[2026-06-28 16:27:22] INFO     src.translation_engine – 
+--- LLM API INPUT ---
+Model: llama3.1
+Prompt:
+Translate the following Chinese manga dialogue into French.
+
+Original text:
+谁也不清楚外面的世界是怎样的。传说人类在鼎盛时期有着庞大的帝国，但如今都已灰飞烟灭，不复存在。这座城市由于位置隐秘，才得以从黑暗时代完整保留下来。
+---------------------
+[2026-06-28 16:27:26] INFO     src.translation_engine – 
+--- LLM API OUTPUT ---
+Personne ne sait ce que le monde extérieur ressemble. Il est dit que les humains avaient un immense empire au sommet de leur puissance, mais tout cela n'existe plus aujourd'hui. Cette ville a pu se conserver intacte grâce à son emplacement caché, elle a échappé aux temps obscurs.
+----------------------
+[2026-06-28 16:27:26] INFO     src.pipeline – ── Step 3 / 4  Inpainting ──────────────────────────────
+[2026-06-28 16:27:26] INFO     src.bubble_segmentation – Segmentation complete: 3 textboxes classified (0 bubbles, 3 floating text)
+[2026-06-28 16:27:26] INFO     src.pipeline – ── Step 4 / 4  Typesetting ─────────────────────────────
+[2026-06-28 16:27:26] INFO     src.pipeline – Saved translated image to 'output\803.jpg'.
+[2026-06-28 16:27:26] INFO     __main__ – Done.

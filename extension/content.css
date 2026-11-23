@@ -1,0 +1,4 @@
+img.kt-busy {
+  outline: 3px dashed rgba(107, 70, 193, 0.7) !important;
+  outline-offset: -3px;
+}

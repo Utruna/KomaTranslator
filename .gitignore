@@ -33,18 +33,21 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
-# ── Project runtime data (keep structure, ignore actual files) ───────────
-# Processed outputs and source images are not version-controlled
-input/*
-!input/.gitkeep
-output/*
-!output/.gitkeep
-fonts/*
-!fonts/.gitkeep
-models/*
-!models/.gitkeep
+# ── Pages de test (non versionnées) ──────────────────────────────────────
+samples/*
+!samples/.gitkeep
 
-# ── PaddleOCR auto-downloaded model cache ────────────────────────────────
-~/.paddleocr/
-koharu_windows_x64.exe
-src/police/*
+# ── KomaTranslator Live ──────────────────────────────────────────────────
+server/config.json
+extension/fonts/*.otf
+extension/fonts/*.ttf
+
+# ── Ancien pipeline (legacy/) ────────────────────────────────────────────
+legacy/input/*
+legacy/output/*
+legacy/fonts/*
+legacy/models/*
+!legacy/**/.gitkeep
+legacy/src/police/*
+legacy/koharu_windows_x64.exe
+legacy/komatranslator_sprints.html

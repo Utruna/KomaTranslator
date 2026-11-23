@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<style>
+  body { font: 13px system-ui, sans-serif; width: 260px; margin: 0; padding: 14px; color: #222; }
+  h1 { font-size: 15px; margin: 0 0 12px; }
+  label { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; gap: 8px; }
+  select { flex: 0 0 140px; padding: 3px; }
+  .toggle { font-weight: 600; font-size: 14px; }
+  .toggle input { width: 18px; height: 18px; }
+  #host { color: #666; font-size: 12px; word-break: break-all; }
+  #status { margin-top: 12px; padding: 6px 8px; border-radius: 6px; font-size: 12px; background: #eee; }
+  #status.ok { background: #e3f7e8; color: #146c2e; }
+  #status.ko { background: #fde8e8; color: #9b1c1c; }
+  #grant { width: 100%; padding: 8px; margin-bottom: 8px; background: #6b46c1; color: #fff; border: 0; border-radius: 6px; font-weight: 600; cursor: pointer; }
+  .hint { color: #888; font-size: 11px; margin-top: 10px; }
+</style>
+</head>
+<body>
+  <h1>KomaTranslator Live</h1>
+  <button id="grant" hidden>Autoriser l'accès aux sites</button>
+  <label class="toggle">Traduire ce site <input type="checkbox" id="enabled"></label>
+  <div id="host"></div>
+  <label>Langue source
+    <select id="src">
+      <option value="auto">Chinois</option>
+      <option value="ja">Japonais</option>
+      <option value="ko">Coréen</option>
+      <option value="en">Anglais</option>
+    </select>
+  </label>
+  <label>Traduire en
+    <select id="tgt">
+      <option value="fr">Français</option>
+      <option value="en">Anglais</option>
+      <option value="es">Espagnol</option>
+      <option value="de">Allemand</option>
+      <option value="it">Italien</option>
+      <option value="pt">Portugais</option>
+    </select>
+  </label>
+  <div id="status">Serveur: vérification…</div>
+  <div class="hint">Raccourci : Alt+Shift+T</div>
+  <script src="popup.js"></script>
+</body>
+</html>
