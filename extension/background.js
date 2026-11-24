@@ -266,6 +266,12 @@ const HANDLERS = {
   async seriesFull(msg) { return { data: await KomaStore.load(KomaStore.seriesKey(msg.page)) }; },
   async seriesSave(msg) { await KomaStore.saveEdit(KomaStore.seriesKey(msg.page), msg.body); return {}; },
   importWiki: (msg) => withKeepAlive(() => importWiki(msg)),
+  // Écran « Mémoire et cache »: le background reste le seul à écrire (même verrou que les traductions)
+  async memList() { return { series: await KomaStore.listSeries() }; },
+  async memClear(msg) { await KomaStore.clearPart(msg.key, msg.part); return {}; },
+  async memDelete(msg) { await KomaStore.deleteSeries(msg.key); return {}; },
+  async cacheInfo() { return { count: await KomaStore.cacheCount() }; },
+  async cacheClear() { await KomaStore.cacheClear(); return {}; },
   async correct(msg) { await KomaStore.setCorrection(KomaStore.seriesKey(msg.page), msg.text, msg.translation); return {}; },
   async retranslate(msg) {
     await KomaStore.cacheClear();

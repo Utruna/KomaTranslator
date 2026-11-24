@@ -36,7 +36,8 @@ Ordre de grandeur : 0,5–2 s d'OCR par page (CPU), + 0,1 s (Google) à 1–2 s 
 - **Traducteur** : un clic pour passer de Google à DeepSeek, Gemini, Ollama, Claude ou une autre API compatible OpenAI. Chaque traducteur garde sa clé et son modèle ;
   celui dont la clé manque est grisé (« clé à ajouter »). Modèle, relecture, bouton **Tester** ; pour Ollama : adresse, durée en VRAM et **Libérer la VRAM**.
 - **Texte traduit** : police installée et majuscules, appliquées tout de suite.
-- **Série** : glossaire et import depuis un wiki. **Retraduire la page** et **Options**.
+- **Série** : glossaire et import depuis un wiki. **Retraduire la page**, **Mémoire** et **Options**.
+- **Mémoire** : toutes les séries retenues (wiki, glossaire, résumé, corrections, historique, taille) avec suppression partielle (retirer le wiki et le glossaire, vider les corrections ou l'historique) ou totale, et le cache des pages (nombre, stockage utilisé, vider).
 
 ### Utilisation
 - Sur le site de lecture : icône de l'extension → **Traduire ce site** (raccourci `Alt+Shift+T`).

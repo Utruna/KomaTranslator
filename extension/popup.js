@@ -171,5 +171,6 @@ function h(tag, attrs = {}, ...kids) {
     await chrome.runtime.sendMessage({ type: "retranslate", tabId: tab.id });
     window.close();
   };
+  $("memory").onclick = () => { chrome.tabs.create({ url: chrome.runtime.getURL("memoire.html") }); window.close(); };
   $("options").onclick = () => { chrome.runtime.openOptionsPage(); window.close(); };
 })();

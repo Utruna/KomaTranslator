@@ -12,7 +12,7 @@ Vue d'ensemble pour lire le code. Tout le code utile est dans `extension/` (le d
 | `lib/translate.js` | background | Google / Ollama / API OpenAI / Claude, prompt, relecture |
 | `presets.js` | background, popup, options | réglages par défaut du traducteur, préréglages DeepSeek / Gemini, profils (une clé par traducteur) |
 | `lib/store.js` | background | mémoire par série (`storage.local`) + cache des pages (IndexedDB) |
-| `popup.*`, `options.*`, `editor.*` | pages de l'extension | interface ; parlent au background par messages |
+| `popup.*`, `options.*`, `editor.*`, `memoire.*` | pages de l'extension | interface ; parlent au background par messages (`memoire.*`: séries retenues et cache, suppression partielle ou totale) |
 
 Pourquoi deux modes pour l'OCR : les service workers de Chrome ne peuvent pas charger ONNX Runtime (WebAssembly),
 donc `background.js` crée un document *offscreen* et lui envoie l'image en base64. Firefox charge le moteur directement.

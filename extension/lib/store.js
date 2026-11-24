@@ -66,6 +66,34 @@
     return { summary: d.summary, terms, history: d.history.slice(-12), corrections: d.corrections };
   }
 
+  // ── Gestion de la mémoire (écran « Mémoire et cache ») ──
+  /** Toutes les séries enregistrées, de la plus volumineuse à la plus petite. */
+  async function listSeries() {
+    const all = await chrome.storage.local.get(null);
+    return Object.entries(all).filter(([k]) => k.startsWith("series:")).map(([k, v]) => ({
+      key: v.key || k.slice("series:".length),
+      wiki: v.wiki || "",
+      terms: (v.glossary || []).length,
+      summary: !!v.summary,
+      corrections: Object.keys(v.corrections || {}).length,
+      history: (v.history || []).length,
+      bytes: JSON.stringify(v).length,
+    })).sort((a, b) => b.bytes - a.bytes);
+  }
+
+  /** Efface une partie d'une série: « wiki » (URL, résumé et glossaire), « corrections » ou « history ». */
+  const clearPart = (key, part) => locked(async () => {
+    const d = await load(key);
+    if (part === "wiki") { d.wiki = ""; d.summary = ""; d.glossary = []; }
+    else if (part === "corrections") d.corrections = {};
+    else if (part === "history") d.history = [];
+    else throw new Error("partie inconnue: " + part);
+    await save(d);
+  });
+
+  /** Supprime une série entière (glossaire, résumé, corrections, historique). */
+  const deleteSeries = (key) => locked(() => chrome.storage.local.remove(sk(key)));
+
   /** Empreinte (8 hex) de ce qui change la traduction d'une page: résumé + glossaire de la série (pas l'historique). */
   async function seriesSig(serie) {
     return (await sha1(new TextEncoder().encode(JSON.stringify([serie.summary || "", serie.glossary || []])))).slice(0, 8);
@@ -220,6 +248,10 @@
       }
     } catch (e) { console.warn("[KomaTranslator] cache", e); }
   }
+  /** Nombre de pages en cache (0 si IndexedDB est indisponible). */
+  async function cacheCount() {
+    try { return (await tx("readonly", (s) => s.count())) || 0; } catch { return 0; }
+  }
   async function cacheClear() {
     try { await tx("readwrite", (s) => s.clear()); } catch { /* rien */ }
   }
@@ -229,5 +261,5 @@
     return [...h].map((b) => b.toString(16).padStart(2, "0")).join("");
   }
 
-  self.KomaStore = { seriesKey, load, save, addHistory, setCorrection, saveEdit, contextFor, seriesSig, bestCorrection, acquire, importWiki, cacheGet, cachePut, cacheClear, sha1 };
+  self.KomaStore = { seriesKey, load, save, addHistory, setCorrection, saveEdit, contextFor, seriesSig, bestCorrection, listSeries, clearPart, deleteSeries, cacheCount, acquire, importWiki, cacheGet, cachePut, cacheClear, sha1 };
 })();
