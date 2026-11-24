@@ -183,7 +183,11 @@
       const r = await fetchTimeout(base + "/chat/completions", {
         method: "POST", timeout: REMOTE_TIMEOUT, retries: 1, retryOnTimeout: false,
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + (cfg.apiKey || "none") },
-        body: JSON.stringify({ model: cfg.apiModel, temperature: 0, messages: [{ role: "user", content: text }] }),
+        body: JSON.stringify({
+          model: cfg.apiModel, temperature: 0, messages: [{ role: "user", content: text }],
+          // DeepSeek réfléchit par défaut (plus lent, plus de jetons facturés): inutile pour traduire
+          ...(/deepseek\.com/.test(base) ? { thinking: { type: "disabled" } } : {}),
+        }),
       });
       if (!r.ok) throw new Error("API HTTP " + r.status + " " + (await r.text()).slice(0, 200));
       return extractJson((await r.json()).choices[0].message.content || "");

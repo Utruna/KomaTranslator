@@ -54,6 +54,17 @@ Ollama refuse par défaut les requêtes d'extensions ; l'extension retire l'en-t
 Si le test des options affiche quand même « 403 » : variable d'environnement
 `OLLAMA_ORIGINS=moz-extension://*,chrome-extension://*`, puis redémarrer Ollama.
 
+## Comparer les traducteurs
+
+`node tools/bench.js` (Node 18+) traduit 8 vraies bulles (`tests/fixtures/bench-bulles.json`) avec chaque traducteur configuré par variables
+d'environnement, avec et sans contexte, et affiche temps, requêtes, jetons, respect du glossaire, coût estimé (DeepSeek) et les traductions côte à côte :
+
+```
+GEMINI_API_KEY=… DEEPSEEK_API_KEY=… OLLAMA_URL=http://localhost:11434 node tools/bench.js --out resultats.md
+```
+
+Google est toujours testé ; `OLLAMA_MODEL`, `GEMINI_MODEL`, `DEEPSEEK_MODEL`, `ANTHROPIC_API_KEY` et `REVIEW=0` sont optionnels. Les clés ne sont lues que dans l'environnement.
+
 ## Mémoire par série
 
 La série est déduite de l'URL (`site.com/manga/ma-serie/chapitre-12` → `site.com/manga/ma-serie`). Pour chaque série

@@ -1,0 +1,56 @@
+{
+  "_note": "Bulles lues par l'OCR sur le chapitre 130 de « I Got the Weakest Class, Dragon Tamer » (anglais, scan en majuscules), regroupées par KomaOCR. Les fautes de lecture (SWORUS, ATTACHS, SOO%…) sont volontairement conservées.",
+  "src": "en",
+  "tgt": "fr",
+  "texts": [
+    "HUANG YUTIAN PEERLESS SWORD CULTIVATOR IV",
+    "LEVEL:98 HUANG CLAN OF THE WESTERN REALM",
+    "PEERLESS NINE SWORUS: TRANSFORMS THE WEAPON INTO 9 IDENTICAL SWORDS, ALL WITH THE SAME ATTRIBUTES AND EFFECTS:ALL 9 ATTACHING TOGETHER DEAL SOO% DAMAGE AND CAN AUTOMATICALLY PARRY ENEMY ATTACHS",
+    "ICE SWORD DIFUSION: ADDS ICE ELEMENTAL AOE DAMAGE TO THE CURRENT WEAPON'S ATTACHS FOR 3O SECONDS: TARGETS HIT SUFFER 2O% MOVEMENT SPEED REDUCTION",
+    "SWORD LIGHT PIERCES ILLUSION: DURING ADE ATTACHS, AUTOMATICALLY REVEALS HIDDEN UINITS WITHIN RANGE, FORCES THEM OUT OF CONCEALMENT, AND INFLICTS CONFUSION",
+    "FROST SWORD ARRAY: SLASH: MERGES ALL WEAPONS AND STRIHES THE TARGET AREA WITH A POWERFUL BLOW, DEALING CNUMBER OF MERGED WEAPONS ×STRENGTH STATI DAMAGE:IF NO DAMAGE IS DEALT, THE SHILL CAN BE RECAST IMMEDIATELY",
+    "BLOOD SWORD SHACHLES: ACTIVATES THE WEAPON WITH BLOOD, LAUNCHING A SHACHLE WIND: THE TARGET STRUCH IS IMPRISONED FOR BO SECONDS. THIS SHILL CANNOT BE IMMUNIZED AND CAN ONLY AFFECT EACH TARGET ONCE",
+    "I DIDN'T EXPECT THAT IT COULD BE REASSEMBLED AFTER TURNING INTO ASHES. THIS SKILL'S A BIT OVERPOWERED."
+  ],
+  "context": {
+    "summary": "Action manhua: Huang Yutian, a Level 98 Peerless Sword Cultivator IV of the Huang Clan of the Western Realm, fights with powerful sword skills.",
+    "terms": [
+      {
+        "src": "Huang Yutian",
+        "orig": "",
+        "tgt": "Huang Yutian",
+        "type": "character",
+        "note": "male"
+      },
+      {
+        "src": "Huang Clan",
+        "orig": "",
+        "tgt": "Clan Huang",
+        "type": "organization",
+        "note": ""
+      },
+      {
+        "src": "Western Realm",
+        "orig": "",
+        "tgt": "Royaume de l'Ouest",
+        "type": "place",
+        "note": ""
+      },
+      {
+        "src": "Frost Sword Array",
+        "orig": "",
+        "tgt": "Formation d'épées de givre",
+        "type": "technique",
+        "note": ""
+      },
+      {
+        "src": "Sword Light",
+        "orig": "",
+        "tgt": "Lumière d'épée",
+        "type": "technique",
+        "note": ""
+      }
+    ],
+    "history": []
+  }
+}

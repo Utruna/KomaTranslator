@@ -10,7 +10,7 @@ const PRESETS = {
       + "et Google peut y réutiliser les textes envoyés pour améliorer ses produits : à vérifier dans leurs conditions. "
       + "Les modèles changent vite : si le test répond 404, prends un autre « gemini-…-flash-lite ».",
   },
-  deepseek: { apiBase: "https://api.deepseek.com/v1", apiModel: "deepseek-chat", note: "Clé payante (quelques centimes par chapitre), sur platform.deepseek.com." },
+  deepseek: { apiBase: "https://api.deepseek.com/v1", apiModel: "deepseek-flash", note: "Clé payante (quelques centimes par chapitre), sur platform.deepseek.com." },
 };
 const presetFor = (base) => Object.keys(PRESETS).find((k) => PRESETS[k].apiBase === base) || "";
 function showPreset() {

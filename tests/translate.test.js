@@ -214,3 +214,12 @@ test("setLastError: mémorise l'erreur, aussi dans storage.session quand il exis
 test("PROMPT_VERSION est un nombre (partie de la clé de cache)", () => {
   assert.equal(typeof T.PROMPT_VERSION, "number");
 });
+
+test("DeepSeek: le mode réflexion est désactivé; les autres API ne reçoivent pas ce champ", async () => {
+  const bodies = [];
+  globalThis.fetch = async (url, opts) => { bodies.push(JSON.parse(opts.body)); return llmReply('{"1":"x"}'); };
+  await T.translateAll(["a"], "en", "fr", { provider: "openai", apiBase: "https://api.deepseek.com/v1", apiModel: "deepseek-flash", review: false });
+  await T.translateAll(["a"], "en", "fr", { provider: "openai", apiBase: "https://api.openai.com/v1", apiModel: "m", review: false });
+  assert.deepEqual(bodies[0].thinking, { type: "disabled" });
+  assert.equal("thinking" in bodies[1], false);
+});

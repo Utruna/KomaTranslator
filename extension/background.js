@@ -15,7 +15,7 @@ const CFG_DEFAULTS = {
   ollamaModel: "qwen3.5:latest",
   apiBase: "https://api.deepseek.com/v1",
   apiKey: "",
-  apiModel: "deepseek-chat",
+  apiModel: "deepseek-flash",
   anthropicKey: "",
   anthropicModel: "claude-haiku-5-5",
   ollamaKeepAlive: "5m",       // durée pendant laquelle Ollama garde le modèle en VRAM après la dernière requête
