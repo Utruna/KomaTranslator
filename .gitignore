@@ -40,6 +40,7 @@ samples/*
 # ── KomaTranslator Live ──────────────────────────────────────────────────
 legacy/live-server/server/config.json
 extension/fonts/font.*
+extension/.amo-upload-uuid
 
 # ── Ancien pipeline (legacy/) ────────────────────────────────────────────
 legacy/input/*

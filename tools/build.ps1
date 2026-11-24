@@ -14,7 +14,7 @@ if (Test-Path $zip) { Remove-Item $zip }
 Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
 $archive = [System.IO.Compression.ZipFile]::Open($zip, "Create")
 try {
-    Get-ChildItem $ext -Recurse -File | Where-Object { $_.Name -notlike "font.*" } | ForEach-Object {
+    Get-ChildItem $ext -Recurse -File | Where-Object { $_.Name -notlike "font.*" -and $_.Name -ne ".amo-upload-uuid" } | ForEach-Object {
         # chemins avec "/" (obligatoire pour Firefox)
         $rel = $_.FullName.Substring($ext.Length + 1).Replace("\", "/")
         [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($archive, $_.FullName, $rel, "Optimal") | Out-Null
