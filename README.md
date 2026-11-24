@@ -77,6 +77,8 @@ c'est gratuit. Une seule fois : compte sur addons.mozilla.org + identifiants API
 (<https://addons.mozilla.org/developers/addon/api/key/>). Avant chaque nouvelle version, augmenter `version`
 dans `extension/manifest.json`.
 
+**Police du texte traduit** (page d'options) : nom d'une police installée sur ton ordinateur (ex. Anime Ace) et option « tout en majuscules » ; appliqués tout de suite aux pages ouvertes, sans retraduire (le texte est redessiné à partir des résultats déjà en mémoire).
+
 La police perso `extension/fonts/font.*` (ex. Anime Ace, licence non redistribuable) n'est jamais incluse dans les
 paquets : les amis ont Comic Neue (licence OFL).
 

@@ -5,7 +5,9 @@
 (() => {
   const MIN_W = 250, MIN_H = 200;           // ignore icônes, avatars, pubs...
   const IS_FIREFOX = navigator.userAgent.includes("Firefox");
-  const FONT = "KomaFont, 'Comic Sans MS', 'Comic Neue', 'Segoe UI', sans-serif";
+  const BASE_FONT = "KomaFont, 'Comic Sans MS', 'Comic Neue', 'Segoe UI', sans-serif";
+  let FONT = BASE_FONT; // police choisie dans les options (storage.sync « font ») en tête de la pile
+  let CAPS = false;     // option « tout en majuscules » (storage.sync « caps »): lettrage BD
 
   // Le site "actif" est celui de l'onglet (même dans une iframe de lecteur)
   const anc = location.ancestorOrigins;
@@ -13,6 +15,27 @@
 
   let enabled = false;
   const state = new Map(); // img → {origSrc, origSrcset, url, translatedUrl, busy}
+
+  /** Police des options: un nom de police installée sur le système, placé avant la pile par défaut (vide = défaut). */
+  function applyFont(name) {
+    const n = String(name || "").replace(/["'\\;{}]/g, "").trim();
+    FONT = n ? `"${n}", ${BASE_FONT}` : BASE_FONT;
+  }
+
+  /** Redessine toutes les images déjà traduites avec la police courante, sans OCR ni traduction (résultats en mémoire). */
+  let rerenderId = 0;
+  async function rerenderAll() {
+    const id = ++rerenderId; // un nouveau changement de police interrompt le précédent
+    for (const [img, st] of state) {
+      if (id !== rerenderId) return;
+      if (!st.res || !st.translatedUrl || img.src !== st.translatedUrl) continue;
+      const out = await render(st.res.image, st.res.data);
+      if (id !== rerenderId || img.src !== st.translatedUrl) { URL.revokeObjectURL(out); continue; }
+      URL.revokeObjectURL(st.translatedUrl);
+      st.translatedUrl = out;
+      img.src = out;
+    }
+  }
 
   // ── Police BD: fonts/font.otf si présente (police perso), sinon Comic Neue (OFL, embarquée) ──
   (async () => {
@@ -221,8 +244,9 @@
    * La taille de police est cherchée par dichotomie: la plus grande qui tient en largeur ET en hauteur.
    */
   function drawText(ctx, b) {
-    const text = (b.translation || "").trim();
+    let text = (b.translation || "").trim();
     if (!text) return;
+    if (CAPS) text = text.toLocaleUpperCase("fr");
     let [x0, y0, x1, y1] = b.fit_box || b.box; // fit_box = intérieur de la bulle détectée
     let w = x1 - x0, h = y1 - y0;
     if (!b.fit_box) {
@@ -324,8 +348,13 @@
     if (msg.type === "retranslate" && enabled) { setEnabled(false); setEnabled(true); }
   });
 
-  chrome.storage.sync.get(["sites"]).then(({ sites = {} }) => setEnabled(!!sites[HOST]));
+  chrome.storage.sync.get(["sites", "font", "caps"]).then(({ sites = {}, font, caps }) => { applyFont(font); CAPS = !!caps; setEnabled(!!sites[HOST]); });
   chrome.storage.onChanged.addListener((ch) => {
+    if (ch.font || ch.caps) {
+      if (ch.font) applyFont(ch.font.newValue);
+      if (ch.caps) CAPS = !!ch.caps.newValue;
+      if (enabled) rerenderAll();
+    }
     if (ch.sites) setEnabled(!!(ch.sites.newValue || {})[HOST]);
     if ((ch.src || ch.tgt) && enabled) { setEnabled(false); setEnabled(true); } // langue changée → retraduire
   });
