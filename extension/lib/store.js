@@ -3,6 +3,10 @@
   const HISTORY_MAX = 30;
   const CHAPTER = /(chap|chapter|chapitre|episode|ep[-_]?\d|ch[-_.]?\d|^\d+$|^c\d+$|viewer|read)/i;
 
+  /**
+   * Identifiant d'une série déduit de l'URL: hôte + segments du chemin avant le premier segment « chapitre »
+   * (3 max). Ex: site.com/manga/ma-serie/chapitre-12 → "site.com/manga/ma-serie".
+   */
   function seriesKey(pageUrl) {
     if (!pageUrl) return "inconnu";
     let u;
@@ -15,6 +19,7 @@
     return [u.hostname || "local", ...kept.slice(0, 3)].join("/");
   }
 
+  // Une série = { key, wiki, summary, glossary[{src,orig,tgt,type,note}], corrections{texte→traduction}, history[[orig,trad]] }
   const sk = (key) => "series:" + key;
   const empty = (key) => ({ key, wiki: "", summary: "", glossary: [], corrections: {}, history: [] });
 
@@ -52,6 +57,7 @@
     await save(d);
   });
 
+  /** Contexte donné au LLM pour une page: résumé, glossaire (filtré aux termes présents si > 60), 12 dernières répliques. */
   async function contextFor(key, texts) {
     const d = await load(key);
     const page = texts.join("\n").toLowerCase();
@@ -61,6 +67,7 @@
   }
 
   // ── Import wiki ──
+  /** HTML d'un wiki → texte brut (contenu de l'article seulement), tronqué à `limit` caractères. */
   function wikiText(html, limit = 14000) {
     let s = html;
     const i = s.search(/id="mw-content-text"/i);
@@ -91,6 +98,7 @@
     ].join("\n");
   }
 
+  /** Découpe le wiki en lots, fait extraire termes + résumé par le LLM, puis fusionne dans le glossaire (sans doublon sur `src`). */
   async function importWiki(key, url, mainHtml, subpages, src, tgt, cfg, log = console.log) {
     const chunks = [wikiText(mainHtml, 12000)];
     let cur = "";
@@ -125,6 +133,7 @@
   }
 
   // ── Cache des pages traduites (IndexedDB) ──
+  // Clé = sha1 de l'image + langues + fournisseur; valeur = résultat OCR+traduction. Les plus anciens sont purgés au-delà de CACHE_MAX.
   const CACHE_MAX = 2000;
   let dbp = null;
   function db() {

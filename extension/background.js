@@ -6,7 +6,9 @@
 const IS_SW = typeof ServiceWorkerGlobalScope !== "undefined" && self instanceof ServiceWorkerGlobalScope;
 if (IS_SW) importScripts("lib/translate.js", "lib/store.js");
 
+// Réglages synchronisés (chrome.storage.sync): langues et sites activés ({ "site.com": true }).
 const DEFAULTS = { src: "auto", tgt: "fr", sites: {} };
+// Réglages du traducteur (chrome.storage.local, clé "cfg"; les clés API ne sont donc jamais synchronisées).
 const CFG_DEFAULTS = {
   provider: "google",          // google | ollama | openai | anthropic
   ollamaUrl: "http://localhost:11434",
@@ -18,8 +20,9 @@ const CFG_DEFAULTS = {
   anthropicModel: "claude-haiku-5-5",
   review: true,                // relecture (seulement avec un LLM)
 };
-const MAX_PARALLEL = 2;
+const MAX_PARALLEL = 2; // images traduites en même temps (l'OCR est de toute façon sérialisé)
 
+/** Fusionne valeurs par défaut + réglages enregistrés → { src, tgt, sites, cfg }. */
 async function getSettings() {
   const [sync, local] = await Promise.all([chrome.storage.sync.get(null), chrome.storage.local.get("cfg")]);
   return { ...DEFAULTS, ...sync, cfg: { ...CFG_DEFAULTS, ...(local.cfg || {}) } };
@@ -29,6 +32,7 @@ async function getSettings() {
 const CREDITS = /(https?:\/\/|www\.|\w\.(com|net|org|io|gg|me|xyz|to|cc|fr)\b|discord|patreon|ko-?fi|paypal|\b\w+ ?scans\b|\bscantrad|read (the )?(latest|this|new|more)? ?chapters? (on|at)|translat(or|ed by)|proofread|typeset|clean(er|ed by)|\braw provider)/i;
 
 // ── File d'attente ──
+// Limite le nombre d'images traitées en parallèle (MAX_PARALLEL), le reste attend son tour.
 let active = 0;
 const queue = [];
 function schedule(job) {
@@ -69,11 +73,13 @@ function b64ToBytes(b64) {
 // ── Règles réseau ──
 // 1) beaucoup de CDN de scans refusent les requêtes sans le bon Referer
 // 2) Ollama refuse les requêtes d'extensions (en-tête Origin) sauf configuration: on retire l'en-tête
+/** Identifiant numérique stable (hash) de la règle réseau d'un hôte; 1 est réservé à la règle Ollama. */
 function hostRuleId(host) {
   let h = 7;
   for (const c of host) h = (h * 31 + c.charCodeAt(0)) % 1000000;
   return h + 10;
 }
+/** Pour les requêtes de l'extension vers ce CDN d'images, impose Referer = page de lecture. */
 async function setReferer(imageUrl, pageUrl) {
   const host = new URL(imageUrl).hostname;
   const id = hostRuleId(host);
@@ -86,6 +92,7 @@ async function setReferer(imageUrl, pageUrl) {
     }],
   });
 }
+/** Retire l'en-tête Origin des requêtes vers Ollama (sinon 403); à refaire quand l'URL change. */
 async function ollamaRule() {
   const { cfg } = await getSettings();
   try {
@@ -103,6 +110,7 @@ async function ollamaRule() {
 ollamaRule();
 chrome.storage.onChanged.addListener((ch, area) => { if (area === "local" && ch.cfg) ollamaRule(); });
 
+/** Télécharge une image avec les cookies du site → { bytes, type }. */
 async function fetchImage(url, pageUrl) {
   try { await setReferer(url, pageUrl); } catch (e) { console.warn("referer", e); }
   const r = await fetch(url, { credentials: "include" });
@@ -128,6 +136,7 @@ function ensureOffscreen() {
   return offscreenReady;
 }
 
+/** Lance l'OCR: directement si le moteur est chargé ici (Firefox), sinon via le document offscreen (Chrome). */
 async function runOcr(bytes, mime, lang) {
   if (self.KomaOCR) return self.KomaOCR.analyze(new Blob([bytes], { type: mime }), lang);
   await ensureOffscreen();
@@ -137,11 +146,18 @@ async function runOcr(bytes, mime, lang) {
 }
 
 // ── Traduction d'une image ──
+/** Empreinte du traducteur (fournisseur, modèle, relecture): fait partie de la clé de cache. */
 function providerSig(cfg) {
   const model = { ollama: cfg.ollamaModel, openai: cfg.apiModel, anthropic: cfg.anthropicModel }[cfg.provider] || "";
   return `${cfg.provider}|${model}|${cfg.review && cfg.provider !== "google"}`;
 }
 
+/**
+ * Pipeline complet pour une image: téléchargement → cache → OCR → traduction → mémoire de la série.
+ * @param msg { url, pageUrl } ou { bytes (base64), mime, pageUrl } pour les images blob:/data:
+ * @returns { data: { width, height, blocks[] }, image: data-URL de l'image d'origine }
+ *   Chaque bloc: texte d'origine, traduction, boîtes, couleurs, patch effacé (voir engine/ocr.js).
+ */
 async function translate(msg) {
   const s = await getSettings();
   const img = msg.bytes ? { bytes: b64ToBytes(msg.bytes), type: msg.mime || "image/png" } : await fetchImage(msg.url, msg.pageUrl);
@@ -170,6 +186,7 @@ async function translate(msg) {
 }
 
 // ── Wiki ──
+/** Télécharge une page wiki et ne garde que son contenu (MediaWiki/Fandom), tronqué à 300 ko. */
 async function fetchText(url) {
   try {
     const r = await fetch(url, { credentials: "include" });
@@ -184,6 +201,7 @@ async function fetchText(url) {
 }
 
 // Liens vers les autres articles du même wiki (personnages, techniques, lieux…)
+// (même dossier d'URL, sans « : », sans sous-chemin, sans paramètres)
 function wikiLinks(html, baseUrl) {
   const base = new URL(baseUrl);
   const prefix = base.pathname.slice(0, base.pathname.lastIndexOf("/") + 1); // ex: "/wiki/"
@@ -203,6 +221,7 @@ function wikiLinks(html, baseUrl) {
   return out;
 }
 
+/** Comme Promise.all(items.map(fn)) mais avec au plus n appels simultanés (ordre conservé). */
 async function mapLimit(items, n, fn) {
   const out = new Array(items.length);
   let i = 0;
@@ -212,6 +231,7 @@ async function mapLimit(items, n, fn) {
   return out;
 }
 
+/** Lit le wiki (et jusqu'à 20 sous-pages) puis demande au LLM d'en tirer glossaire + résumé pour la série. */
 async function importWiki(msg) {
   const s = await getSettings();
   if (s.cfg.provider === "google") throw new Error("l'import wiki nécessite un LLM (Ollama ou clé API) : voir les options");
@@ -228,6 +248,8 @@ async function importWiki(msg) {
 }
 
 // ── Messages ──
+// Protocole: chaque message { type, ... } reçoit { ok: true, ... } ou { ok: false, error }.
+// « translate » (venant du content script) passe par la file d'attente; les autres types sont dans HANDLERS.
 const HANDLERS = {
   async series(msg) {
     const d = await KomaStore.load(KomaStore.seriesKey(msg.page));

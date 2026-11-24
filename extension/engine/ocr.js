@@ -1,6 +1,10 @@
 // KomaTranslator — OCR dans le navigateur
 // PP-OCRv5 (ONNX Runtime Web / WebAssembly) + regroupement en bulles + effacement du texte.
 // Portage JS de server/ocr.py (mêmes modèles et mêmes réglages que RapidOCR).
+//
+// Étapes de analyze(): décodage → découpe en tranches → détection des lignes de texte (DBNet) →
+// reconnaissance de chaque ligne (CRNN + CTC) → regroupement des lignes en bulles et ordre de lecture →
+// effacement du texte (inpainting) + couleurs → recherche de l'intérieur de la bulle.
 /* global ort */
 (() => {
   const TILE_H = 1600;     // hauteur max d'une tranche (webtoons très longs)
@@ -86,6 +90,7 @@
   }
 
   // ── Détection (DBNet) ──────────────────────────────────────────────────
+  /** Trouve les lignes de texte d'une tranche (y0, hauteur th) → boîtes [x0,y0,x1,y1] relatives à la tranche. */
   async function detect(img, y0, th) {
     const w = img.width;
     let ratio = Math.max(w, th) > DET_LIMIT ? DET_LIMIT / Math.max(w, th) : 1;
@@ -153,6 +158,7 @@
   }
 
   // ── Reconnaissance (CTC) ───────────────────────────────────────────────
+  /** Lit le texte d'une boîte (colonnes verticales pivotées de 90°) → { text, score moyen }. */
   async function recognize(img, box, recName) {
     const [x0, y0, x1, y1] = box;
     const cw = x1 - x0, ch = y1 - y0;
@@ -190,6 +196,7 @@
   }
 
   // ── Lecture complète (tranches) ────────────────────────────────────────
+  /** Découpe une image haute en tranches de TILE_H px qui se chevauchent de OVERLAP px. */
   function* tiles(h) {
     if (h <= TILE_H) { yield [0, h]; return; }
     let y = 0;
@@ -201,6 +208,7 @@
     }
   }
 
+  /** Vrai si la tranche est quasi uniforme (aucun texte à chercher). */
   function blankTile(img, y0, y1) {
     // écart-type sur un échantillon 1 pixel / 8
     const { data, width } = img;
@@ -227,6 +235,7 @@
     return inter / Math.min(area(a), area(b));
   }
 
+  /** Détection + reconnaissance sur toute l'image → lignes { box, text, score } fiables. */
   async function readLines(img, lang) {
     const recName = REC_MODEL[lang] || "rec_ch";
     const lines = [];
@@ -250,6 +259,7 @@
   // ── Regroupement lignes → bulles ──────────────────────────────────────
   const isVertical = (l) => (l.box[3] - l.box[1]) > 1.5 * (l.box[2] - l.box[0]) && l.text.length >= 2;
 
+  /** Deux lignes appartiennent-elles à la même bulle ? (même sens, hauteurs proches, voisines et alignées) */
   function sameBlock(a, b) {
     const va = isVertical(a), vb = isVertical(b);
     if (va !== vb) return false;
@@ -266,6 +276,7 @@
     return Math.abs(acx - bcx) < 1.5 * lh && vgap > -0.5 * lh;
   }
 
+  /** Regroupe les lignes en blocs (union-find) et les range dans l'ordre de lecture (rtl = manga japonais). */
   function groupBlocks(lines, rtl) {
     const parent = lines.map((_, i) => i);
     const find = (i) => { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
@@ -324,6 +335,7 @@
   const hex = (c) => "#" + c.map((v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0")).join("");
 
   // Remplissage des pixels masqués depuis les bords (couche par couche, moyenne des voisins connus)
+  // (rgba est modifié sur place)
   function inpaint(rgba, w, h, mask) {
     const known = new Uint8Array(w * h);
     for (let i = 0; i < w * h; i++) known[i] = mask[i] ? 0 : 1;
@@ -353,6 +365,7 @@
     }
   }
 
+  /** Efface le texte d'un bloc → { patchBox, clean (RGBA du rectangle nettoyé), bg, fg (couleurs du fond et du texte) }. */
   function cleanBlock(img, lineBoxes) {
     const { data, width, height } = img;
     const ctxPad = 12;
@@ -408,6 +421,7 @@
   }
 
   // Intérieur de la bulle (remplissage depuis le centre) → zone utilisable pour le texte
+  // Renvoie null si le fond n'est pas une bulle fermée et assez régulière.
   function bubbleBox(img, clean, patchBox, box) {
     const { data, width: W, height: H } = img;
     const [x0, y0, x1, y1] = box;
@@ -462,6 +476,10 @@
   }
 
   // ── API ────────────────────────────────────────────────────────────────
+  /**
+   * Point d'entrée: image → { width, height, blocks[], ms }.
+   * Un bloc = { box, fit_box (intérieur de bulle ou null), lines, text, bg, fg, patch_box, patch (PNG base64) }.
+   */
   async function analyze(blob, lang = "auto") {
     const t0 = performance.now();
     const img = await decode(blob);

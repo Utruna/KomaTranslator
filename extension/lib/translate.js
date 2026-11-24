@@ -9,6 +9,7 @@
 
   // ── Texte en MAJUSCULES (lettrage de scan) → casse normale ──
   const LATIN = /[A-Za-zÀ-ÿ]/g;
+  /** Si le texte est (presque) tout en majuscules, le repasse en casse normale en gardant les noms du glossaire. */
   function decaps(text, names) {
     const letters = text.match(LATIN) || [];
     if (letters.length < 4 || letters.filter((c) => c === c.toUpperCase() && c !== c.toLowerCase()).length < 0.8 * letters.length) return text;
@@ -35,6 +36,7 @@
   }
 
   // ── Prompt LLM ──
+  /** Construit le prompt de traduction: règles + résumé + glossaire + répliques précédentes + bulles de la page numérotées. */
   function prompt(texts, src, tgt, ctx) {
     const S = LANG_NAMES[src] || src, T = LANG_NAMES[tgt] || tgt;
     const p = [
@@ -69,6 +71,7 @@
     return p.join("\n");
   }
 
+  /** Extrait le JSON d'une réponse de LLM (ignore <think>, blocs ```json et texte autour). */
   function extractJson(raw) {
     raw = raw.replace(/<think>[\s\S]*?<\/think>/g, "").trim().replace(/^```(?:json)?|```$/gm, "").trim();
     try { return JSON.parse(raw); } catch {
@@ -79,6 +82,7 @@
   }
 
   // ── Appel LLM selon le fournisseur ──
+  /** Envoie le prompt au fournisseur choisi (ollama | openai | anthropic) et renvoie le JSON de la réponse. */
   async function llmJson(text, cfg, { numCtx } = {}) {
     const p = cfg.provider;
     if (p === "ollama") {
@@ -126,6 +130,7 @@
   }
 
   // ── Relecture (petites corrections seulement) ──
+  /** Similarité 0..1 entre deux textes (1 − distance de Levenshtein normalisée). */
   function similarity(a, b) {
     a = a.toLowerCase(); b = b.toLowerCase();
     if (a === b) return 1;
@@ -141,6 +146,7 @@
   }
   const norm = (t) => t.replace(/[\W_]+/gu, "").toLowerCase();
 
+  /** Deuxième passe LLM qui corrige orthographe/grammaire; on refuse les réécritures trop larges (similarité < 0,7). */
   async function review(texts, drafts, tgt, cfg) {
     const T = LANG_NAMES[tgt] || tgt;
     const pairs = Object.fromEntries(texts.map((s, i) => [String(i + 1), { source: s, draft: drafts[i] }]));
@@ -168,6 +174,11 @@
   }
 
   // ── Point d'entrée ──
+  /**
+   * Traduit toutes les bulles d'une page → tableau de traductions, dans le même ordre.
+   * LLM si configuré (puis relecture éventuelle); Google pour les bulles manquantes ou si le LLM échoue
+   * (l'erreur est alors gardée dans self.KomaLastError pour le popup).
+   */
   async function translateAll(texts, src, tgt, cfg, ctx = {}) {
     if (!texts.length) return [];
     const names = (ctx.terms || []).map((t) => t.src || "");

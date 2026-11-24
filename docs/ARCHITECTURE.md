@@ -1,0 +1,67 @@
+# Architecture de KomaTranslator
+
+Vue d'ensemble pour lire le code. Tout le code utile est dans `extension/` (le dossier `legacy/` est l'ancien pipeline).
+
+## Qui fait quoi
+
+| Fichier | Contexte d'exécution | Rôle |
+|---|---|---|
+| `content.js` | dans chaque page | repère les `<img>`, demande la traduction, remplace l'image par le rendu final |
+| `background.js` | service worker (Chrome) / page de fond (Firefox) | chef d'orchestre : file d'attente, téléchargement, cache, appels OCR et traduction |
+| `engine/ocr.js` | page de fond (Firefox) / document offscreen (Chrome, `engine/engine.html` + `offscreen.js`) | OCR + bulles + effacement du texte |
+| `lib/translate.js` | background | Google / Ollama / API OpenAI / Claude, prompt, relecture |
+| `lib/store.js` | background | mémoire par série (`storage.local`) + cache des pages (IndexedDB) |
+| `popup.*`, `options.*`, `editor.*` | pages de l'extension | interface ; parlent au background par messages |
+
+Pourquoi deux modes pour l'OCR : les service workers de Chrome ne peuvent pas charger ONNX Runtime (WebAssembly),
+donc `background.js` crée un document *offscreen* et lui envoie l'image en base64. Firefox charge le moteur directement.
+
+## Parcours d'une image
+
+```
+content.js  processImg()            message { type: "translate", url, pageUrl }
+   │
+   ▼
+background.js  translate()          (file d'attente, 2 images en parallèle)
+   1. fetchImage()                  télécharge avec cookies + Referer forcé (declarativeNetRequest)
+   2. clé de cache = sha1(image) | langue source | langue cible | fournisseur
+   3. cache IndexedDB ?  oui → étape 6
+   4. runOcr()  →  KomaOCR.analyze()
+        décodage → tranches de 1600 px → détection (DBNet) → lecture (CRNN/CTC)
+        → regroupement en bulles → effacement (inpainting) → intérieur de la bulle (fit_box)
+   5. KomaTranslate.translateAll()  LLM (+ relecture) ou Google ; l'historique de la série est mis à jour
+   6. corrections manuelles de la série appliquées (toujours prioritaires sur le cache)
+   │
+   ▼  { ok, data: { width, height, blocks[] }, image }
+content.js  render()                image d'origine + patchs effacés + texte traduit (canvas) → nouvelle `src`
+```
+
+Un **bloc** (une bulle) contient : `text`, `translation`, `box` (texte d'origine), `fit_box` (intérieur de bulle, ou
+`null`), `lines`, `bg`/`fg` (couleurs), `patch_box` + `patch` (zone effacée en PNG base64).
+
+## Messages (`chrome.runtime.sendMessage`)
+
+Réponse : `{ ok: true, ... }` ou `{ ok: false, error }`.
+
+| `type` | Émetteur | Effet |
+|---|---|---|
+| `translate` | content | traduit une image (file d'attente, badge sur l'icône) |
+| `series` / `seriesFull` / `seriesSave` | popup / éditeur | lit ou modifie glossaire, résumé, corrections |
+| `importWiki` | popup | extrait glossaire + résumé depuis un wiki (LLM requis) |
+| `correct` | content | enregistre une correction manuelle (Alt+clic) |
+| `retranslate` | popup / options | vide le cache et relance la page |
+| `health` / `testProvider` | popup / options | état et test du traducteur |
+
+## Données
+
+- `storage.sync` : `src`, `tgt`, `sites` (`{ "site.com": true }`).
+- `storage.local` : `cfg` (traducteur, clés API) et `series:<clé>` (glossaire, résumé, corrections, 30 dernières répliques).
+- IndexedDB `komatranslator` : cache des pages traduites (2000 entrées max).
+- La clé de série vient de l'URL : `site.com/manga/ma-serie/chapitre-12` → `site.com/manga/ma-serie`.
+
+## Pièges connus
+
+- Firefox : un `blob:` créé par un script de contenu n'est pas lisible par la page → le rendu y utilise une data URL.
+- ONNX Runtime Web n'accepte pas deux `run()` simultanés : `KomaOCR` sérialise tous ses appels.
+- Les règles `declarativeNetRequest` (Referer, retrait de `Origin` pour Ollama) ne visent que les requêtes de
+  l'extension (`tabIds: [TAB_ID_NONE]`), pas la navigation normale.

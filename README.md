@@ -95,6 +95,8 @@ tools/                 construction et signature des paquets
 legacy/                anciennes versions (pipeline Koharu, serveur Python « Live »)
 ```
 
+Vue détaillée : [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
 Firefox : le moteur OCR tourne dans la page d'arrière-plan. Chrome : dans un document « offscreen »
 (les service workers ne peuvent pas charger ONNX Runtime).
 Charger pour tester : Firefox `about:debugging` → *Charger un module temporaire* → `extension/manifest.json` ;

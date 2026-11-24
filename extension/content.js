@@ -1,4 +1,7 @@
-// KomaTranslator Live — script injecté dans les pages
+// KomaTranslator — script injecté dans les pages
+// Rôle: repérer les <img> de lecture, les envoyer au background (message "translate"),
+// puis remplacer leur source par l'image redessinée (zones effacées + texte traduit).
+// Il ne fait ni OCR ni traduction: tout se passe dans background.js.
 (() => {
   const MIN_W = 250, MIN_H = 200;           // ignore icônes, avatars, pubs...
   const IS_FIREFOX = navigator.userAgent.includes("Firefox");
@@ -35,6 +38,7 @@
     pump();
   }, { rootMargin: "4000px 0px" });
 
+  /** Plus petit = plus urgent: 0 si visible, sinon distance sous l'écran (ordre de lecture), les images dépassées en dernier. */
   function priority(img) {
     const r = img.getBoundingClientRect();
     if (r.bottom >= 0 && r.top <= innerHeight) return 0;   // visible
@@ -42,6 +46,7 @@
     return 3 * -r.bottom;                                    // déjà dépassée
   }
 
+  /** Lance le traitement des images proches, la plus prioritaire d'abord, MAX_INFLIGHT à la fois. */
   function pump() {
     while (enabled && inflight < MAX_INFLIGHT && near.size) {
       let best = null, bestP = Infinity;
@@ -58,6 +63,7 @@
   }
   addEventListener("scroll", () => { if (inflight < MAX_INFLIGHT) pump(); }, { passive: true });
 
+  /** Met une image sous surveillance si elle est assez grande (attend son chargement sinon). */
   function watch(img) {
     if (!enabled) return;
     const st = state.get(img);
@@ -84,6 +90,7 @@
   });
 
   // ── Traitement d'une image ──
+  /** Envoie l'image au background, dessine le résultat et remplace la source de l'<img> (avec reprises en cas d'échec). */
   async function processImg(img) {
     const url = img.currentSrc || img.src;
     if (!url) return;
@@ -131,6 +138,7 @@
   }
 
   // ── Survol: texte d'origine · Alt+clic: corriger la traduction ──
+  /** Bulle sous le curseur (coordonnées écran → coordonnées de l'image d'origine, marge de 10 px), ou null. */
   function blockAt(img, ev) {
     const st = state.get(img);
     if (!st?.res || img.src !== st.translatedUrl) return null;
@@ -171,6 +179,7 @@
     }, true);
   }
 
+  /** Remet toutes les images dans leur état d'origine (désactivation du site). */
   function restoreAll() {
     for (const [img, st] of state) {
       if (st.translatedUrl && img.src === st.translatedUrl) {
@@ -188,6 +197,7 @@
   }
 
   // ── Rendu: image d'origine + zones nettoyées + texte traduit ──
+  /** Dessine l'image d'origine, colle les zones nettoyées puis écrit les traductions → URL de l'image finale. */
   async function render(imageDataUrl, data) {
     const base = await createImageBitmap(dataUrlToBlob(imageDataUrl));
     const c = document.createElement("canvas");
@@ -206,6 +216,10 @@
     return URL.createObjectURL(blob);
   }
 
+  /**
+   * Écrit la traduction d'un bloc, centrée dans sa bulle (fit_box) ou, à défaut, dans la zone du texte d'origine.
+   * La taille de police est cherchée par dichotomie: la plus grande qui tient en largeur ET en hauteur.
+   */
   function drawText(ctx, b) {
     const text = (b.translation || "").trim();
     if (!text) return;
@@ -291,6 +305,7 @@
   }
 
   // ── Activation / désactivation ──
+  /** Active/désactive la traduction sur ce site (observateurs DOM + restauration des images). */
   function setEnabled(on) {
     if (on === enabled) return;
     enabled = on;
