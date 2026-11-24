@@ -24,7 +24,7 @@
   .providers b { display: block; margin-bottom: 2px; }
   .providers input { margin-right: 6px; }
   .field { display: grid; grid-template-columns: 140px 1fr; gap: 8px; align-items: center; margin: 8px 0; }
-  .field input { width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); font: inherit; }
+  .field input, .field select { width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); font: inherit; }
   @media (max-width: 520px) { .field { grid-template-columns: 1fr; } }
   .panel { display: none; }
   .panel.show { display: block; }
@@ -74,6 +74,13 @@
     </div>
 
     <div class="panel" data-for="openai">
+      <div class="field"><label for="preset">Préréglage</label>
+        <select id="preset">
+          <option value="">Personnalisé</option>
+          <option value="gemini">Gemini (palier gratuit)</option>
+          <option value="deepseek">DeepSeek</option>
+        </select></div>
+      <div class="muted" id="presetNote"></div>
       <div class="field"><label for="apiBase">URL de l'API</label><input id="apiBase" placeholder="https://api.deepseek.com/v1"></div>
       <div class="field"><label for="apiKey">Clé API</label><input id="apiKey" type="password" placeholder="sk-..."></div>
       <div class="field"><label for="apiModel">Modèle</label><input id="apiModel" placeholder="deepseek-chat"></div>
