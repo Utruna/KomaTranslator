@@ -66,6 +66,33 @@
     return { summary: d.summary, terms, history: d.history.slice(-12), corrections: d.corrections };
   }
 
+  /** Empreinte (8 hex) de ce qui change la traduction d'une page: résumé + glossaire de la série (pas l'historique). */
+  async function seriesSig(serie) {
+    return (await sha1(new TextEncoder().encode(JSON.stringify([serie.summary || "", serie.glossary || []])))).slice(0, 8);
+  }
+
+  const normText = (t) => String(t).replace(/[\W_]+/gu, "").toLowerCase();
+
+  /**
+   * Correction manuelle pour un texte d'origine: exacte, ou à la ponctuation/casse près, ou (textes de 8 lettres et plus)
+   * proche à 88 % (l'OCR lit parfois la même bulle avec une lettre de différence). undefined si aucune.
+   */
+  function bestCorrection(corrections, text) {
+    if (corrections[text] != null) return corrections[text];
+    const n = normText(text);
+    if (!n) return undefined;
+    const sim = self.KomaTranslate?.similarity;
+    let best, bestScore = 0.88;
+    for (const [k, v] of Object.entries(corrections)) {
+      const nk = normText(k);
+      if (nk === n) return v;
+      if (!sim || n.length < 8 || Math.abs(nk.length - n.length) > 0.15 * Math.max(nk.length, n.length)) continue;
+      const s = sim(nk, n);
+      if (s >= bestScore) { best = v; bestScore = s; }
+    }
+    return best;
+  }
+
   // ── Ordre de traduction par série ──
   // Les images d'une même série passent l'une après l'autre dans la phase « contexte → traduction → historique »
   // (chacune voit les répliques de la précédente). Parmi celles qui attendent, la plus haute dans la page passe d'abord.
@@ -202,5 +229,5 @@
     return [...h].map((b) => b.toString(16).padStart(2, "0")).join("");
   }
 
-  self.KomaStore = { seriesKey, load, save, addHistory, setCorrection, saveEdit, contextFor, acquire, importWiki, cacheGet, cachePut, cacheClear, sha1 };
+  self.KomaStore = { seriesKey, load, save, addHistory, setCorrection, saveEdit, contextFor, seriesSig, bestCorrection, acquire, importWiki, cacheGet, cachePut, cacheClear, sha1 };
 })();

@@ -41,6 +41,15 @@
     return out;
   }
 
+  // À augmenter quand le prompt ou le traitement change: invalide le cache des pages déjà traduites.
+  const PROMPT_VERSION = 2;
+
+  /** Dernière erreur du traducteur, pour le popup. Aussi dans storage.session: Chrome peut redémarrer le service worker. */
+  function setLastError(msg) {
+    self.KomaLastError = msg;
+    try { if (typeof chrome !== "undefined") chrome.storage?.session?.set?.({ komaLastError: msg }); } catch { /* rien */ }
+  }
+
   // ── Réseau: délai maximal + nouvelles tentatives ──
   const RETRY_STATUS = new Set([429, 502, 503, 504]);
   const OLLAMA_TIMEOUT = 180000; // un modèle local peut mettre longtemps à se charger en mémoire
@@ -323,12 +332,12 @@
         return await enforceGlossary(texts, final, src, tgt, cfg, c);
       } catch (e) {
         console.warn(`[KomaTranslator] ${cfg.provider} a échoué, repli sur Google:`, e.message);
-        self.KomaLastError = e.message;
+        setLastError(e.message);
         info.degraded = true;
       }
     }
     return google(texts, src, tgt, info);
   }
 
-  self.KomaTranslate = { translateAll, llmJson, fetchTimeout, dropCredits, LANG_NAMES, similarity, _internals: { decaps, extractJson, similarity, mentions } };
+  self.KomaTranslate = { translateAll, llmJson, fetchTimeout, dropCredits, setLastError, PROMPT_VERSION, LANG_NAMES, similarity, _internals: { decaps, extractJson, similarity, mentions } };
 })();

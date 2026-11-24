@@ -18,6 +18,7 @@ const CFG_DEFAULTS = {
   apiModel: "deepseek-chat",
   anthropicKey: "",
   anthropicModel: "claude-haiku-5-5",
+  ollamaKeepAlive: "5m",       // durée pendant laquelle Ollama garde le modèle en VRAM après la dernière requête
   review: true,                // relecture (seulement avec un LLM)
 };
 const MAX_PARALLEL = 2; // images traduites en même temps (l'OCR est de toute façon sérialisé)
@@ -41,6 +42,12 @@ function pump() {
     active++;
     job().then(resolve, reject).finally(() => { active--; pump(); });
   }
+}
+
+/** Garde le service worker Chrome éveillé pendant un long travail (il s'arrête après ~30 s sans appel d'API d'extension). */
+async function withKeepAlive(fn) {
+  const timer = setInterval(() => chrome.runtime.getPlatformInfo?.(), 20000);
+  try { return await fn(); } finally { clearInterval(timer); }
 }
 
 // ── Badge: nombre d'images en cours par onglet ──
@@ -160,7 +167,9 @@ async function translate(msg) {
   const s = await getSettings();
   const img = msg.bytes ? { bytes: b64ToBytes(msg.bytes), type: msg.mime || "image/png" } : await fetchImage(msg.url, msg.pageUrl);
   const skey = KomaStore.seriesKey(msg.pageUrl);
-  const cacheKey = `${await KomaStore.sha1(img.bytes)}|${s.src}|${s.tgt}|${providerSig(s.cfg)}`;
+  // La clé change avec l'image, les langues, le traducteur, la version du prompt et le glossaire/résumé de la série
+  const sig = await KomaStore.seriesSig(await KomaStore.load(skey));
+  const cacheKey = `${await KomaStore.sha1(img.bytes)}|${s.src}|${s.tgt}|${providerSig(s.cfg)}|p${KomaTranslate.PROMPT_VERSION}|${sig}`;
 
   let data = await KomaStore.cacheGet(cacheKey);
   if (!data) {
@@ -191,7 +200,7 @@ async function translate(msg) {
   }
   // corrections manuelles de la série (toujours prioritaires, même sur le cache)
   const { corrections } = await KomaStore.load(skey);
-  data = { ...data, blocks: data.blocks.map((b) => ({ ...b, translation: corrections[b.text] ?? b.translation })) };
+  data = { ...data, blocks: data.blocks.map((b) => ({ ...b, translation: KomaStore.bestCorrection(corrections, b.text) ?? b.translation })) };
   return { data, image: `data:${img.type};base64,${bufToB64(img.bytes)}` };
 }
 
@@ -267,7 +276,7 @@ const HANDLERS = {
   },
   async seriesFull(msg) { return { data: await KomaStore.load(KomaStore.seriesKey(msg.page)) }; },
   async seriesSave(msg) { await KomaStore.saveEdit(KomaStore.seriesKey(msg.page), msg.body); return {}; },
-  importWiki,
+  importWiki: (msg) => withKeepAlive(() => importWiki(msg)),
   async correct(msg) { await KomaStore.setCorrection(KomaStore.seriesKey(msg.page), msg.text, msg.translation); return {}; },
   async retranslate(msg) {
     await KomaStore.cacheClear();
@@ -277,11 +286,24 @@ const HANDLERS = {
   async health() {
     const { cfg } = await getSettings();
     const model = { ollama: cfg.ollamaModel, openai: cfg.apiModel, anthropic: cfg.anthropicModel }[cfg.provider] || "";
-    return { provider: cfg.provider, model, lastError: self.KomaLastError || "" };
+    const stored = (await chrome.storage.session?.get("komaLastError"))?.komaLastError;
+    return { provider: cfg.provider, model, lastError: self.KomaLastError || stored || "" };
+  },
+  /** Demande à Ollama de décharger le modèle de la VRAM tout de suite (keep_alive: 0). */
+  async unloadOllama(msg) {
+    const cfg = { ...CFG_DEFAULTS, ...msg.cfg };
+    const base = cfg.ollamaUrl.replace(/\/+$/, "").replace(/\/v1$/, "");
+    const r = await KomaTranslate.fetchTimeout(base + "/api/generate", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ model: cfg.ollamaModel, keep_alive: 0 }), timeout: 15000, retries: 0,
+    });
+    if (r.status === 403) throw new Error("Ollama refuse l'extension (403) : voir les options");
+    if (!r.ok) throw new Error("Ollama HTTP " + r.status);
+    return {};
   },
   async testProvider(msg) {
     const cfg = { ...CFG_DEFAULTS, ...msg.cfg };
-    self.KomaLastError = "";
+    KomaTranslate.setLastError("");
     const t = performance.now();
     const out = await KomaTranslate.translateAll(["Hey! W-what are you doing here?!"], "en", "fr", cfg, {});
     if (cfg.provider !== "google" && self.KomaLastError) throw new Error(self.KomaLastError);
@@ -294,7 +316,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === "translate") {
     const tabId = sender.tab?.id;
     badge(tabId, +1);
-    schedule(() => translate(msg))
+    schedule(() => withKeepAlive(() => translate(msg)))
       .then((res) => sendResponse({ ok: true, ...res }))
       .catch((e) => sendResponse({ ok: false, error: String(e.message || e) }))
       .finally(() => badge(tabId, -1));

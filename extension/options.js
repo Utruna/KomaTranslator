@@ -1,5 +1,5 @@
 const $ = (id) => document.getElementById(id);
-const FIELDS = ["ollamaUrl", "ollamaModel", "apiBase", "apiKey", "apiModel", "anthropicKey", "anthropicModel"];
+const FIELDS = ["ollamaUrl", "ollamaModel", "ollamaKeepAlive", "apiBase", "apiKey", "apiModel", "anthropicKey", "anthropicModel"];
 
 // Préréglages du fournisseur « API compatible OpenAI »: remplissent l'URL et le modèle.
 const PRESETS = {
@@ -70,6 +70,12 @@ $("save").onclick = async () => {
     $("result").className = "ko";
     $("result").textContent = "✘ " + (r?.error || "pas de réponse");
   }
+};
+
+$("unloadOllama").onclick = async () => {
+  $("unloadMsg").textContent = "…";
+  const r = await chrome.runtime.sendMessage({ type: "unloadOllama", cfg: readForm() });
+  $("unloadMsg").textContent = r?.ok ? "Modèle déchargé." : "✘ " + (r?.error || "pas de réponse");
 };
 
 $("clearCache").onclick = async () => {

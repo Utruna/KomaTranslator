@@ -32,3 +32,27 @@ test("acquire: le verrou est libéré quand plus personne n'attend", async () =>
   assert.equal(typeof r, "function");
   r();
 });
+
+test("seriesSig: change avec le glossaire ou le résumé, pas avec l'historique", async () => {
+  const base = { summary: "s", glossary: [{ src: "A", tgt: "B" }], history: [["x", "y"]] };
+  const sig = await S.seriesSig(base);
+  assert.match(sig, /^[0-9a-f]{8}$/);
+  assert.equal(await S.seriesSig({ ...base, history: [["autre", "chose"]] }), sig);
+  assert.notEqual(await S.seriesSig({ ...base, glossary: [{ src: "A", tgt: "C" }] }), sig);
+  assert.notEqual(await S.seriesSig({ ...base, summary: "autre" }), sig);
+});
+
+test("bestCorrection: exacte, à la ponctuation près, ou proche pour les textes longs", () => {
+  const c = {
+    "I DIDN'T EXPECT THAT IT COULD BE REASSEMBLED": "Je ne pensais pas qu'il pouvait se reconstituer",
+    "WAIT!": "Attends !",
+    "Zhan Xiao": "Zhan Xiao",
+  };
+  assert.equal(S.bestCorrection(c, "WAIT!"), "Attends !");
+  assert.equal(S.bestCorrection(c, "wait"), "Attends !", "casse et ponctuation");
+  assert.match(S.bestCorrection(c, "I DIDN'T EXPECT THAT IT COULD BE REASSEMBLEO"), /reconstituer/, "une lettre lue de travers");
+  assert.equal(S.bestCorrection(c, "WAIT, WHAT?"), undefined, "texte différent");
+  assert.equal(S.bestCorrection(c, "Zhan Xian"), undefined, "texte court: pas d'approximation");
+  assert.equal(S.bestCorrection(c, "THE SKY IS BLUE TODAY AND BIRDS SING"), undefined);
+  assert.equal(S.bestCorrection(c, "!!!"), undefined);
+});

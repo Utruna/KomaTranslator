@@ -62,6 +62,10 @@
     <div class="panel" data-for="ollama">
       <div class="field"><label for="ollamaUrl">Adresse</label><input id="ollamaUrl" placeholder="http://localhost:11434"></div>
       <div class="field"><label for="ollamaModel">Modèle</label><input id="ollamaModel" placeholder="qwen3.5:latest"></div>
+      <div class="field"><label for="ollamaKeepAlive">Garder en VRAM</label><input id="ollamaKeepAlive" placeholder="5m"></div>
+      <div class="muted">Durée pendant laquelle Ollama garde le modèle en mémoire graphique après la dernière page : <code>30s</code>, <code>5m</code>, <code>0</code>
+        (libère tout de suite), <code>-1</code> (toujours chargé). Plus court = moins de VRAM occupée, mais quelques secondes de rechargement après une pause.</div>
+      <div class="row"><button class="sec" id="unloadOllama" type="button">Libérer la VRAM maintenant</button><span class="muted" id="unloadMsg"></span></div>
       <details>
         <summary>Installer Ollama / erreur 403</summary>
         <ol>

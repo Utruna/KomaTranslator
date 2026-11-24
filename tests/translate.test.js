@@ -198,3 +198,19 @@ test("similarity: 1 = identique, proche de 0 = différent", () => {
   assert.ok(similarity("Tu vas mourir", "Tu vas mourrir") > 0.9);
   assert.ok(similarity("abc", "xyz") < 0.1);
 });
+
+test("setLastError: mémorise l'erreur, aussi dans storage.session quand il existe", () => {
+  const saved = [];
+  globalThis.chrome = { storage: { session: { set: (o) => saved.push(o) } } };
+  try {
+    T.setLastError("panne");
+    assert.equal(self.KomaLastError, "panne");
+    assert.deepEqual(saved, [{ komaLastError: "panne" }]);
+    T.setLastError("");
+    assert.equal(self.KomaLastError, "");
+  } finally { delete globalThis.chrome; }
+});
+
+test("PROMPT_VERSION est un nombre (partie de la clé de cache)", () => {
+  assert.equal(typeof T.PROMPT_VERSION, "number");
+});
