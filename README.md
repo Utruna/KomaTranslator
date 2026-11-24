@@ -31,6 +31,19 @@ Ordre de grandeur : 0,5–2 s d'OCR par page (CPU), + 0,1 s (Google) à 1–2 s 
 3. **Charger l'extension non empaquetée** → choisir le dossier dézippé.
    Chrome affiche parfois un avertissement « extensions en mode développeur » au démarrage : c'est normal hors store.
 
+### Le menu de l'icône
+- **Traduire ce site** (interrupteur). **Cette page** : progression (traduites, en cours, en attente, sans texte, en échec), **Pause** (plus aucune requête, et rien de plus n'est dépensé),
+  **Voir l'original** (sans retraduire), **mode économie** (ne prépare que ce qui est à l'écran : moins de jetons gaspillés, moins de charge).
+  **Alt+Maj+clic** sur une image la retraduit sans utiliser le cache.
+- **Langues** : la langue **source se règle par site** (un site coréen et un site chinois n'ont plus à être rechangés) ; « Général » reprend le réglage de la page d'options. Cible commune.
+- **Traducteur** : un clic pour passer de Google à DeepSeek, Gemini, Ollama, Claude ou une autre API compatible OpenAI. Chaque traducteur garde sa clé et son modèle ;
+  celui dont la clé manque est grisé (« clé à ajouter »). Modèle, relecture, bouton **Tester** ; pour Ollama : adresse, durée en VRAM et **Libérer la VRAM**.
+- **Consommation** (avec un LLM) : pages, jetons et coût estimé du jour et du mois, **plafond de dépense par jour** (au-delà, Google prend le relais),
+  **solde DeepSeek** sur demande. Tarif DeepSeek connu (heures creuses / de pointe) ; pour une autre API, saisis le tarif en $ par million de jetons.
+- **Texte traduit** : police installée et majuscules, appliquées tout de suite.
+- **Série** : glossaire et import depuis un wiki. **Retraduire la page**, **Mémoire** et **Options**.
+- **Mémoire** : toutes les séries retenues (wiki, glossaire, résumé, corrections, historique, taille) avec suppression partielle ou totale — **annulable** —, le cache des pages, le détail de la consommation par jour, et l'**export / import** des séries en fichier JSON (glossaires et corrections, jamais les clés ; l'import fusionne).
+
 ### Utilisation
 - Sur le site de lecture : icône de l'extension → **Traduire ce site** (raccourci `Alt+Shift+T`).
 - Contour pointillé violet = image en cours ; le badge de l'icône = nombre d'images en cours.
@@ -43,7 +56,7 @@ Ordre de grandeur : 0,5–2 s d'OCR par page (CPU), + 0,1 s (Google) à 1–2 s 
 |---|---|---|
 | **Google** (défaut) | littérale, sans contexte | rien |
 | **Ollama** | bonne, gratuite, locale | [Ollama](https://ollama.com/download) + `ollama pull qwen3.5` + carte graphique 8 Go+ |
-| **API compatible OpenAI** | très bonne, quelques centimes / chapitre | clé DeepSeek, OpenAI, OpenRouter, Mistral… |
+| **API compatible OpenAI** | très bonne, quelques centimes / chapitre | clé DeepSeek, OpenAI, OpenRouter, Mistral… ; préréglage **Gemini** (palier gratuit, clé sur aistudio.google.com/apikey) |
 | **Claude** | la meilleure | clé API Anthropic |
 
 Avec un LLM : toute la page part en une requête (contexte entre bulles), avec le glossaire et les dernières répliques
@@ -53,6 +66,17 @@ En cas d'échec du LLM : repli automatique sur Google (le popup affiche l'erreur
 Ollama refuse par défaut les requêtes d'extensions ; l'extension retire l'en-tête concerné automatiquement.
 Si le test des options affiche quand même « 403 » : variable d'environnement
 `OLLAMA_ORIGINS=moz-extension://*,chrome-extension://*`, puis redémarrer Ollama.
+
+## Comparer les traducteurs
+
+`node tools/bench.js` (Node 18+) traduit 8 vraies bulles (`tests/fixtures/bench-bulles.json`) avec chaque traducteur configuré par variables
+d'environnement, avec et sans contexte, et affiche temps, requêtes, jetons, respect du glossaire, coût estimé (DeepSeek) et les traductions côte à côte :
+
+```
+GEMINI_API_KEY=… DEEPSEEK_API_KEY=… OLLAMA_URL=http://localhost:11434 node tools/bench.js --out resultats.md
+```
+
+Google est toujours testé ; `OLLAMA_MODEL`, `GEMINI_MODEL`, `DEEPSEEK_MODEL`, `ANTHROPIC_API_KEY` et `REVIEW=0` sont optionnels. Les clés ne sont lues que dans l'environnement.
 
 ## Mémoire par série
 
@@ -77,6 +101,8 @@ c'est gratuit. Une seule fois : compte sur addons.mozilla.org + identifiants API
 (<https://addons.mozilla.org/developers/addon/api/key/>). Avant chaque nouvelle version, augmenter `version`
 dans `extension/manifest.json`.
 
+**Police du texte traduit** (page d'options) : nom d'une police installée sur ton ordinateur (ex. Anime Ace) et option « tout en majuscules » ; appliqués tout de suite aux pages ouvertes, sans retraduire (le texte est redessiné à partir des résultats déjà en mémoire).
+
 La police perso `extension/fonts/font.*` (ex. Anime Ace, licence non redistribuable) n'est jamais incluse dans les
 paquets : les amis ont Comic Neue (licence OFL).
 
@@ -94,6 +120,10 @@ extension/
 tools/                 construction et signature des paquets
 legacy/                anciennes versions (pipeline Koharu, serveur Python « Live »)
 ```
+
+Vue détaillée : [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+Tests unitaires (Node 20, sans dépendance) : `node --test tests/`. Ils couvrent `lib/translate.js` et `lib/store.js` ; l'OCR et le rendu ne sont pas testés.
 
 Firefox : le moteur OCR tourne dans la page d'arrière-plan. Chrome : dans un document « offscreen »
 (les service workers ne peuvent pas charger ONNX Runtime).

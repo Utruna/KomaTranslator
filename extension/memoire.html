@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KomaTranslator — Mémoire et cache</title>
+<style>
+  :root { --bg: #fafafa; --fg: #1d1d1f; --muted: #6b6b70; --line: #e2e2e6; --accent: #6b46c1; --card: #fff; --ok: #146c2e; --ko: #9b1c1c; --soft: #f1eefb; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #17171a; --fg: #ececf0; --muted: #9a9aa3; --line: #2e2e34; --accent: #9f7aea; --card: #1f1f23; --ok: #6fd98c; --ko: #ff8a8a; --soft: #2a2140; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.5 system-ui, sans-serif; }
+  main { max-width: 820px; margin: 0 auto; padding: 28px 16px 60px; }
+  header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+  header img { width: 40px; height: 40px; }
+  h1 { font-size: 22px; margin: 0; }
+  h2 { font-size: 15px; margin: 0 0 10px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin: 14px 0; }
+  .muted { color: var(--muted); font-size: 13px; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+  input { padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); font: inherit; flex: 1; min-width: 160px; }
+  button { background: var(--accent); color: #fff; border: 0; border-radius: 6px; padding: 6px 12px; font: inherit; font-weight: 600; cursor: pointer; }
+  button.sec { background: none; color: var(--fg); border: 1px solid var(--line); font-weight: 500; }
+  button.danger { background: none; color: var(--ko); border: 1px solid var(--ko); font-weight: 500; }
+  button:disabled { opacity: .5; cursor: default; }
+  .serie { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin-top: 10px; }
+  .serie b { word-break: break-all; }
+  .serie .meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 0; }
+  .tag { background: var(--soft); border-radius: 99px; padding: 1px 9px; font-size: 12px; }
+  .tag.none { background: none; border: 1px dashed var(--line); color: var(--muted); }
+  .serie .acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .serie .acts button { padding: 4px 10px; font-size: 12.5px; }
+  .size { float: right; color: var(--muted); font-size: 12px; }
+  #msg { font-size: 13px; min-height: 20px; }
+  #msg button { margin-left: 8px; padding: 2px 10px; font-size: 12.5px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+  th, td { text-align: right; padding: 4px 6px; border-bottom: 1px solid var(--line); }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--muted); font-weight: 600; }
+  #msg.ok { color: var(--ok); }
+  #msg.ko { color: var(--ko); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="icons/icon128.png" alt="">
+    <div>
+      <h1>Mémoire et cache</h1>
+      <div class="muted">Ce que l'extension retient dans ce navigateur. Rien n'est envoyé ailleurs.</div>
+    </div>
+  </header>
+  <div id="msg" aria-live="polite"></div>
+
+  <section class="card">
+    <h2>Cache des pages traduites</h2>
+    <div id="cacheInfo" class="muted">…</div>
+    <div class="row"><button class="danger" id="clearCache">Vider le cache</button></div>
+    <div class="muted" style="margin-top:8px">Les pages déjà lues seront retraduites au besoin (donc consommeront un peu de jetons avec un LLM). Glossaires, corrections et historiques ne sont pas touchés.</div>
+  </section>
+
+  <section class="card" id="conso">
+    <h2>Consommation</h2>
+    <div class="muted">Jetons et coût estimé de chaque jour (UTC), par traducteur. Estimation : elle ne remplace pas la facture du fournisseur.</div>
+    <div id="usageTable"></div>
+    <div class="row"><button class="danger" id="resetUsage">Réinitialiser le compteur</button></div>
+  </section>
+
+  <section class="card">
+    <h2>Sauvegarde et partage</h2>
+    <div class="muted">Un export contient les glossaires, résumés, corrections et URL de wiki des séries — jamais tes clés ni ta configuration. Un import fusionne avec l'existant : le glossaire importé complète le tien, tes corrections restent prioritaires.</div>
+    <div class="row">
+      <button id="exportAll" class="sec">Exporter toutes les séries</button>
+      <button id="importBtn" class="sec">Importer un fichier…</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Séries <span id="total" class="muted"></span></h2>
+    <div class="muted">Chaque série a son glossaire (souvent importé d'un wiki), son résumé, ses corrections manuelles et les dernières répliques. Retirer le wiki n'invalide que les pages dont la traduction en dépendait.</div>
+    <div class="row"><input id="filter" type="search" placeholder="Filtrer par site ou série…"></div>
+    <div id="list"></div>
+  </section>
+</main>
+<script src="memoire.js"></script>
+</body>
+</html>

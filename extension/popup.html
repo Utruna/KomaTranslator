@@ -2,67 +2,93 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<style>
-  body { font: 13px system-ui, sans-serif; width: 260px; margin: 0; padding: 14px; color: #222; }
-  h1 { font-size: 15px; margin: 0 0 12px; }
-  label { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; gap: 8px; }
-  select { flex: 0 0 140px; padding: 3px; }
-  .toggle { font-weight: 600; font-size: 14px; }
-  .toggle input { width: 18px; height: 18px; }
-  #host { color: #666; font-size: 12px; word-break: break-all; }
-  #status { margin-top: 12px; padding: 6px 8px; border-radius: 6px; font-size: 12px; background: #eee; }
-  #status.ok { background: #e3f7e8; color: #146c2e; }
-  #status.ko { background: #fde8e8; color: #9b1c1c; }
-  #grant { width: 100%; padding: 8px; margin-bottom: 8px; background: #6b46c1; color: #fff; border: 0; border-radius: 6px; font-weight: 600; cursor: pointer; }
-  fieldset { border: 1px solid #ddd; border-radius: 6px; margin: 10px 0 0; padding: 6px 8px 8px; }
-  legend { font-weight: 600; padding: 0 4px; }
-  #skey { font-size: 11px; color: #555; word-break: break-all; }
-  #sinfo { font-size: 12px; margin: 4px 0; }
-  #wiki { width: 100%; box-sizing: border-box; padding: 4px; margin: 4px 0; }
-  #retranslate { width: 100%; padding: 6px; margin-top: 10px; cursor: pointer; }
-  #import, #edit { width: 100%; padding: 5px; cursor: pointer; margin-top: 4px; }
-  #imsg { font-size: 11px; color: #555; margin-top: 4px; }
-  label.sub { justify-content: flex-start; margin: 2px 0 6px; font-size: 12px; }
-  .hint { color: #888; font-size: 11px; margin-top: 10px; }
-  .hint a { color: #6b46c1; }
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <h1>KomaTranslator</h1>
+  <header class="top">
+    <img src="icons/icon48.png" width="34" height="34" alt="">
+    <div class="ttl"><b>KomaTranslator</b><div id="host" class="muted"></div></div>
+    <label class="switch big" title="Traduire ce site (Alt+Shift+T)"><input type="checkbox" id="enabled"><span></span></label>
+  </header>
   <button id="grant" hidden>Autoriser l'accès aux sites</button>
-  <label class="toggle">Traduire ce site <input type="checkbox" id="enabled"></label>
-  <div id="host"></div>
-  <label>Langue source
-    <select id="src">
-      <option value="auto">Chinois</option>
-      <option value="ja">Japonais</option>
-      <option value="ko">Coréen</option>
-      <option value="en">Anglais</option>
-    </select>
-  </label>
-  <label>Traduire en
-    <select id="tgt">
-      <option value="fr">Français</option>
-      <option value="en">Anglais</option>
-      <option value="es">Espagnol</option>
-      <option value="de">Allemand</option>
-      <option value="it">Italien</option>
-      <option value="pt">Portugais</option>
-    </select>
-  </label>
-  <fieldset id="series">
-    <legend>Série</legend>
-    <div id="skey">…</div>
-    <div id="sinfo"></div>
+  <div id="status" class="pill">…</div>
+
+  <section class="card" id="pageCard">
+    <h2>Cette page</h2>
+    <div id="progress" class="small">…</div>
+    <div class="bar"><i id="barFill"></i></div>
+    <div class="row">
+      <button id="pause" class="sec" type="button">⏸ Pause</button>
+      <button id="orig" class="sec" type="button" title="Affiche les images d'origine sans rien perdre">👁 Voir l'original</button>
+    </div>
+    <details id="errs" hidden><summary class="small"><span id="errCount"></span></summary><div id="errList" class="small muted"></div></details>
+    <div class="line"><span>Mode économie <small class="muted">(seulement ce qui est à l'écran)</small></span><label class="switch"><input type="checkbox" id="eco"><span></span></label></div>
+  </section>
+
+  <section class="card">
+    <h2>Langues <span class="muted small" style="text-transform:none;letter-spacing:0">(source : pour ce site)</span></h2>
+    <div class="langs">
+      <select id="src" aria-label="Langue source de ce site">
+        <option value="">Général</option>
+        <option value="auto">Auto (chinois, japonais, anglais)</option>
+        <option value="zh">Chinois</option>
+        <option value="ja">Japonais</option>
+        <option value="ko">Coréen</option>
+        <option value="en">Anglais</option>
+      </select>
+      <span class="arrow">→</span>
+      <select id="tgt" aria-label="Langue cible">
+        <option value="fr">Français</option>
+        <option value="en">Anglais</option>
+        <option value="es">Espagnol</option>
+        <option value="de">Allemand</option>
+        <option value="it">Italien</option>
+        <option value="pt">Portugais</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Traducteur</h2>
+    <div class="chips" id="chips"></div>
+    <div id="prov"></div>
+  </section>
+
+  <details class="card" id="usageCard" hidden>
+    <summary>Consommation <span id="usageSum" class="muted small"></span></summary>
+    <div id="usageBody"></div>
+  </details>
+
+  <section class="card">
+    <h2>Texte traduit</h2>
+    <div class="row">
+      <input id="font" list="fontList" placeholder="Police installée (défaut : Comic Neue)">
+      <datalist id="fontList"><option value="Anime Ace"><option value="Comic Sans MS"><option value="Komika Text"><option value="Bangers"><option value="Arial Black"><option value="Impact"><option value="Georgia"></datalist>
+      <label class="chk" title="Lettrage BD en majuscules"><input type="checkbox" id="caps"> MAJ</label>
+    </div>
+    <div class="muted small">S'applique tout de suite, sans retraduire.</div>
+  </section>
+
+  <details class="card" id="series">
+    <summary>Série <span id="skey" class="muted small">…</span></summary>
+    <div id="sinfo" class="small"></div>
     <input id="wiki" type="url" placeholder="URL de la page wiki de la série">
-    <label class="sub"><input type="checkbox" id="subpages" checked> Inclure les sous-pages (max 20)</label>
-    <button id="import">Importer le glossaire</button>
-    <button id="edit">Voir / modifier le glossaire</button>
-    <div id="imsg"></div>
-  </fieldset>
-  <button id="retranslate" title="Vide le cache et retraduit la page (utile après un import de glossaire)">↻ Retraduire la page</button>
-  <div id="status">…</div>
-  <div class="hint">Raccourci : Alt+Shift+T · <a href="#" id="options">Options / traducteur</a></div>
+    <label class="chk sub"><input type="checkbox" id="subpages" checked> Inclure les sous-pages (max 20)</label>
+    <div class="row">
+      <button id="import">Importer le glossaire</button>
+      <button id="edit" class="sec">Voir / modifier</button>
+    </div>
+    <div id="imsg" class="muted small"></div>
+  </details>
+
+  <div class="actions">
+    <button id="retranslate" title="Vide le cache et retraduit la page (utile après un changement de traducteur ou de glossaire)">↻ Retraduire la page</button>
+    <button id="memory" class="sec" title="Séries, wiki, glossaires et cache des pages">🗂 Mémoire</button>
+    <button id="options" class="sec">⚙ Options</button>
+  </div>
+  <div class="hint">Raccourci : Alt+Shift+T</div>
+  <script src="presets.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

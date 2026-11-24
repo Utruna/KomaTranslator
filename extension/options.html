@@ -24,7 +24,7 @@
   .providers b { display: block; margin-bottom: 2px; }
   .providers input { margin-right: 6px; }
   .field { display: grid; grid-template-columns: 140px 1fr; gap: 8px; align-items: center; margin: 8px 0; }
-  .field input { width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); font: inherit; }
+  .field input, .field select { width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); font: inherit; }
   @media (max-width: 520px) { .field { grid-template-columns: 1fr; } }
   .panel { display: none; }
   .panel.show { display: block; }
@@ -62,6 +62,10 @@
     <div class="panel" data-for="ollama">
       <div class="field"><label for="ollamaUrl">Adresse</label><input id="ollamaUrl" placeholder="http://localhost:11434"></div>
       <div class="field"><label for="ollamaModel">Modèle</label><input id="ollamaModel" placeholder="qwen3.5:latest"></div>
+      <div class="field"><label for="ollamaKeepAlive">Garder en VRAM</label><input id="ollamaKeepAlive" placeholder="5m"></div>
+      <div class="muted">Durée pendant laquelle Ollama garde le modèle en mémoire graphique après la dernière page : <code>30s</code>, <code>5m</code>, <code>0</code>
+        (libère tout de suite), <code>-1</code> (toujours chargé). Plus court = moins de VRAM occupée, mais quelques secondes de rechargement après une pause.</div>
+      <div class="row"><button class="sec" id="unloadOllama" type="button">Libérer la VRAM maintenant</button><span class="muted" id="unloadMsg"></span></div>
       <details>
         <summary>Installer Ollama / erreur 403</summary>
         <ol>
@@ -74,9 +78,16 @@
     </div>
 
     <div class="panel" data-for="openai">
+      <div class="field"><label for="preset">Préréglage</label>
+        <select id="preset">
+          <option value="">Personnalisé</option>
+          <option value="gemini">Gemini (palier gratuit)</option>
+          <option value="deepseek">DeepSeek</option>
+        </select></div>
+      <div class="muted" id="presetNote"></div>
       <div class="field"><label for="apiBase">URL de l'API</label><input id="apiBase" placeholder="https://api.deepseek.com/v1"></div>
       <div class="field"><label for="apiKey">Clé API</label><input id="apiKey" type="password" placeholder="sk-..."></div>
-      <div class="field"><label for="apiModel">Modèle</label><input id="apiModel" placeholder="deepseek-chat"></div>
+      <div class="field"><label for="apiModel">Modèle</label><input id="apiModel" placeholder="deepseek-flash"></div>
       <div class="muted">Compatible OpenAI : DeepSeek, OpenAI, OpenRouter, Mistral, LM Studio… La clé reste dans ce navigateur.</div>
     </div>
 
@@ -97,6 +108,29 @@
   </section>
 
   <section class="card">
+    <h2>Langue source par défaut</h2>
+    <div class="field"><label for="defSrc">Source</label>
+      <select id="defSrc">
+        <option value="auto">Auto (chinois, japonais, anglais)</option>
+        <option value="zh">Chinois</option>
+        <option value="ja">Japonais</option>
+        <option value="ko">Coréen</option>
+        <option value="en">Anglais</option>
+      </select></div>
+    <div class="muted">S'applique aux sites sans réglage propre. Dans le menu de l'icône, la langue source se règle <b>par site</b> (un site coréen et un site chinois n'ont plus à être rechangés).</div>
+  </section>
+
+  <section class="card">
+    <h2>Police du texte traduit</h2>
+    <div class="field"><label for="font">Police</label>
+      <input id="font" list="fontList" placeholder="Par défaut (Comic Neue)">
+      <datalist id="fontList"><option value="Anime Ace"><option value="Comic Sans MS"><option value="Komika Text"><option value="Bangers"><option value="Arial Black"><option value="Impact"><option value="Georgia"></datalist></div>
+    <div class="row"><label><input type="checkbox" id="caps"> Tout en majuscules (lettrage BD)</label></div>
+    <div class="muted">Nom d'une police <b>installée sur ton ordinateur</b> (ex. Anime Ace si tu l'as). S'applique tout de suite aux pages ouvertes,
+      sans retraduire : quelques centaines de millisecondes par image. Vide ou introuvable : police par défaut.</div>
+  </section>
+
+  <section class="card">
     <h2>Utilisation</h2>
     <ol class="muted">
       <li>Sur le site de lecture : icône de l'extension → <b>Traduire ce site</b> (raccourci <code>Alt+Shift+T</code>).</li>
@@ -109,8 +143,10 @@
     <h2>Données</h2>
     <div class="muted">Glossaires, corrections et cache sont stockés dans ce navigateur uniquement.</div>
     <div class="row"><button class="sec" id="clearCache">Vider le cache des pages traduites</button><span id="cacheMsg" class="muted"></span></div>
+    <div class="row"><a href="memoire.html">Gérer la mémoire par série (wiki, glossaires, corrections)…</a></div>
   </section>
 </main>
+<script src="presets.js"></script>
 <script src="options.js"></script>
 </body>
 </html>

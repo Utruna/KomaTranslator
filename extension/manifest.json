@@ -20,6 +20,7 @@
       "engine/ocr.js",
       "lib/translate.js",
       "lib/store.js",
+      "presets.js",
       "background.js"
     ]
   },

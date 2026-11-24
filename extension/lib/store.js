@@ -3,6 +3,10 @@
   const HISTORY_MAX = 30;
   const CHAPTER = /(chap|chapter|chapitre|episode|ep[-_]?\d|ch[-_.]?\d|^\d+$|^c\d+$|viewer|read)/i;
 
+  /**
+   * Identifiant d'une série déduit de l'URL: hôte + segments du chemin avant le premier segment « chapitre »
+   * (3 max). Ex: site.com/manga/ma-serie/chapitre-12 → "site.com/manga/ma-serie".
+   */
   function seriesKey(pageUrl) {
     if (!pageUrl) return "inconnu";
     let u;
@@ -15,6 +19,7 @@
     return [u.hostname || "local", ...kept.slice(0, 3)].join("/");
   }
 
+  // Une série = { key, wiki, summary, glossary[{src,orig,tgt,type,note}], corrections{texte→traduction}, history[[orig,trad]] }
   const sk = (key) => "series:" + key;
   const empty = (key) => ({ key, wiki: "", summary: "", glossary: [], corrections: {}, history: [] });
 
@@ -52,6 +57,7 @@
     await save(d);
   });
 
+  /** Contexte donné au LLM pour une page: résumé, glossaire (filtré aux termes présents si > 60), 12 dernières répliques. */
   async function contextFor(key, texts) {
     const d = await load(key);
     const page = texts.join("\n").toLowerCase();
@@ -60,7 +66,193 @@
     return { summary: d.summary, terms, history: d.history.slice(-12), corrections: d.corrections };
   }
 
+  // ── Gestion de la mémoire (écran « Mémoire et cache ») ──
+  /** Toutes les séries enregistrées, de la plus volumineuse à la plus petite. */
+  async function listSeries() {
+    const all = await chrome.storage.local.get(null);
+    return Object.entries(all).filter(([k]) => k.startsWith("series:")).map(([k, v]) => ({
+      key: v.key || k.slice("series:".length),
+      wiki: v.wiki || "",
+      terms: (v.glossary || []).length,
+      summary: !!v.summary,
+      corrections: Object.keys(v.corrections || {}).length,
+      history: (v.history || []).length,
+      bytes: JSON.stringify(v).length,
+    })).sort((a, b) => b.bytes - a.bytes);
+  }
+
+  /** Efface une partie d'une série: « wiki » (URL, résumé et glossaire), « corrections » ou « history ». */
+  const clearPart = (key, part) => locked(async () => {
+    const d = await load(key);
+    if (part === "wiki") { d.wiki = ""; d.summary = ""; d.glossary = []; }
+    else if (part === "corrections") d.corrections = {};
+    else if (part === "history") d.history = [];
+    else throw new Error("partie inconnue: " + part);
+    await save(d);
+  });
+
+  /** Supprime une série entière (glossaire, résumé, corrections, historique). */
+  const deleteSeries = (key) => locked(() => chrome.storage.local.remove(sk(key)));
+
+  // ── Export / import / restauration d'une série ──
+  const str = (v, n) => String(v ?? "").slice(0, n);
+  const cleanTerm = (t) => Object.fromEntries(["src", "orig", "tgt", "type", "note"].map((k) => [k, str(t?.[k], 300)]));
+
+  /** Série valide (champs connus seulement, tailles bornées) à partir d'un objet quelconque, ou null s'il n'a pas de clé. */
+  function sanitizeSeries(raw) {
+    if (!raw || typeof raw !== "object" || typeof raw.key !== "string" || !raw.key.trim()) return null;
+    const corr = raw.corrections && typeof raw.corrections === "object" && !Array.isArray(raw.corrections) ? raw.corrections : {};
+    return {
+      key: str(raw.key.trim(), 300),
+      wiki: str(raw.wiki, 500),
+      summary: str(raw.summary, 5000),
+      glossary: (Array.isArray(raw.glossary) ? raw.glossary : []).filter((t) => t && t.src && t.tgt).slice(0, 2000).map(cleanTerm),
+      corrections: Object.fromEntries(Object.entries(corr).filter(([k, v]) => k && v).slice(0, 5000).map(([k, v]) => [str(k, 1000), str(v, 1000)])),
+      history: (Array.isArray(raw.history) ? raw.history : []).filter((p) => Array.isArray(p) && p.length >= 2).slice(-HISTORY_MAX).map((p) => [str(p[0], 1000), str(p[1], 1000)]),
+    };
+  }
+
+  /** Remet une série telle quelle (annulation d'une suppression). */
+  const putSeries = (serie) => locked(async () => {
+    const c = sanitizeSeries(serie);
+    if (!c) throw new Error("série invalide");
+    await save(c);
+  });
+
+  /** Fichier d'export: les séries demandées (toutes par défaut), sans l'historique des répliques (inutile à partager). */
+  async function exportSeries(keys) {
+    const all = await listSeries();
+    const series = [];
+    for (const s of all) {
+      if (keys && !keys.includes(s.key)) continue;
+      const d = await load(s.key);
+      series.push({ key: d.key, wiki: d.wiki, summary: d.summary, glossary: d.glossary, corrections: d.corrections });
+    }
+    return { app: "KomaTranslator", version: 1, exportedAt: new Date().toISOString(), series };
+  }
+
+  /**
+   * Importe un fichier d'export en fusionnant avec l'existant: glossaire par terme source (l'importé l'emporte),
+   * corrections (les tiennes l'emportent), résumé et wiki gardés s'ils existent déjà, historique inchangé.
+   * → { added (séries nouvelles), merged (séries existantes), skipped (entrées invalides) }.
+   */
+  const importSeries = (data) => locked(async () => {
+    if (!data || data.app !== "KomaTranslator" || !Array.isArray(data.series)) throw new Error("ce fichier n'est pas un export KomaTranslator");
+    const out = { added: 0, merged: 0, skipped: 0 };
+    for (const raw of data.series.slice(0, 500)) {
+      const c = sanitizeSeries(raw);
+      if (!c) { out.skipped++; continue; }
+      const existing = (await chrome.storage.local.get(sk(c.key)))[sk(c.key)];
+      if (!existing) { await save(c); out.added++; continue; }
+      const d = { ...empty(c.key), ...existing };
+      const terms = new Map(d.glossary.map((t) => [t.src.toLowerCase(), t]));
+      for (const t of c.glossary) terms.set(t.src.toLowerCase(), t);
+      d.glossary = [...terms.values()];
+      d.corrections = { ...c.corrections, ...d.corrections };
+      d.summary = d.summary || c.summary;
+      d.wiki = d.wiki || c.wiki;
+      await save(d);
+      out.merged++;
+    }
+    return out;
+  });
+
+  // ── Consommation: jetons et coût estimé, par jour (UTC) et par traducteur ──
+  const USAGE_DAYS = 62;
+  const dayOf = (d = new Date()) => d.toISOString().slice(0, 10);
+  let usageChain = Promise.resolve();
+
+  /** Ajoute à la consommation du jour pour ce traducteur: { req, tin, tout, pages, cost (dollars; null si le tarif est inconnu) }. */
+  function usageAdd(id, delta, now = new Date()) {
+    const run = async () => {
+      const { usage = {} } = await chrome.storage.local.get("usage");
+      const rec = (usage[dayOf(now)] ||= {});
+      const r = (rec[id] ||= { req: 0, tin: 0, tout: 0, pages: 0, cost: 0 });
+      for (const k of ["req", "tin", "tout", "pages"]) r[k] += delta[k] || 0;
+      if (delta.cost != null) r.cost += delta.cost;
+      for (const d of Object.keys(usage).sort().slice(0, -USAGE_DAYS)) delete usage[d];
+      await chrome.storage.local.set({ usage });
+    };
+    return (usageChain = usageChain.then(run, run));
+  }
+  const usageAll = async () => (await chrome.storage.local.get("usage")).usage || {};
+
+  /** Dollars dépensés aujourd'hui (tous traducteurs dont le tarif est connu). */
+  async function usageCostToday(now = new Date()) {
+    return Object.values((await usageAll())[dayOf(now)] || {}).reduce((s, r) => s + (r.cost || 0), 0);
+  }
+
+  /** { today: { id: rec }, month: { id: rec }, days: [{ day, req, tin, tout, pages, cost }] (récents d'abord) }. */
+  async function usageSummary(now = new Date()) {
+    const usage = await usageAll();
+    const sum = (recs) => {
+      const out = {};
+      for (const rec of recs) for (const [id, r] of Object.entries(rec)) {
+        const o = (out[id] ||= { req: 0, tin: 0, tout: 0, pages: 0, cost: 0 });
+        for (const k of Object.keys(o)) o[k] += r[k] || 0;
+      }
+      return out;
+    };
+    const month = dayOf(now).slice(0, 7);
+    const days = Object.keys(usage).sort().reverse().map((day) => {
+      const t = Object.values(sum([usage[day]]));
+      const tot = { day, req: 0, tin: 0, tout: 0, pages: 0, cost: 0 };
+      for (const r of t) for (const k of ["req", "tin", "tout", "pages", "cost"]) tot[k] += r[k];
+      return tot;
+    });
+    return { today: sum([usage[dayOf(now)] || {}]), month: sum(Object.keys(usage).filter((d) => d.startsWith(month)).map((d) => usage[d])), days };
+  }
+
+  /** Empreinte (8 hex) de ce qui change la traduction d'une page: résumé + glossaire de la série (pas l'historique). */
+  async function seriesSig(serie) {
+    return (await sha1(new TextEncoder().encode(JSON.stringify([serie.summary || "", serie.glossary || []])))).slice(0, 8);
+  }
+
+  const normText = (t) => String(t).replace(/[\W_]+/gu, "").toLowerCase();
+
+  /**
+   * Correction manuelle pour un texte d'origine: exacte, ou à la ponctuation/casse près, ou (textes de 8 lettres et plus)
+   * proche à 88 % (l'OCR lit parfois la même bulle avec une lettre de différence). undefined si aucune.
+   */
+  function bestCorrection(corrections, text) {
+    if (corrections[text] != null) return corrections[text];
+    const n = normText(text);
+    if (!n) return undefined;
+    const sim = self.KomaTranslate?.similarity;
+    let best, bestScore = 0.88;
+    for (const [k, v] of Object.entries(corrections)) {
+      const nk = normText(k);
+      if (nk === n) return v;
+      if (!sim || n.length < 8 || Math.abs(nk.length - n.length) > 0.15 * Math.max(nk.length, n.length)) continue;
+      const s = sim(nk, n);
+      if (s >= bestScore) { best = v; bestScore = s; }
+    }
+    return best;
+  }
+
+  // ── Ordre de traduction par série ──
+  // Les images d'une même série passent l'une après l'autre dans la phase « contexte → traduction → historique »
+  // (chacune voit les répliques de la précédente). Parmi celles qui attendent, la plus haute dans la page passe d'abord.
+  const seriesQueues = new Map(); // key → { busy, waiting: [{ pos, go }] }
+
+  /** Attend son tour pour la série `key` (pos = position de l'image dans la page) → fonction `release()` à appeler à la fin. */
+  function acquire(key, pos = 0) {
+    let q = seriesQueues.get(key);
+    if (!q) seriesQueues.set(key, (q = { busy: false, waiting: [] }));
+    return new Promise((resolve) => {
+      const release = () => {
+        const next = q.waiting.sort((a, b) => a.pos - b.pos).shift();
+        if (next) next.go();
+        else { q.busy = false; seriesQueues.delete(key); }
+      };
+      const go = () => resolve(release);
+      if (q.busy) q.waiting.push({ pos, go });
+      else { q.busy = true; go(); }
+    });
+  }
+
   // ── Import wiki ──
+  /** HTML d'un wiki → texte brut (contenu de l'article seulement), tronqué à `limit` caractères. */
   function wikiText(html, limit = 14000) {
     let s = html;
     const i = s.search(/id="mw-content-text"/i);
@@ -91,6 +283,7 @@
     ].join("\n");
   }
 
+  /** Découpe le wiki en lots, fait extraire termes + résumé par le LLM, puis fusionne dans le glossaire (sans doublon sur `src`). */
   async function importWiki(key, url, mainHtml, subpages, src, tgt, cfg, log = console.log) {
     const chunks = [wikiText(mainHtml, 12000)];
     let cur = "";
@@ -125,6 +318,7 @@
   }
 
   // ── Cache des pages traduites (IndexedDB) ──
+  // Clé = sha1 de l'image + langues + fournisseur; valeur = résultat OCR+traduction. Les plus anciens sont purgés au-delà de CACHE_MAX.
   const CACHE_MAX = 2000;
   let dbp = null;
   function db() {
@@ -163,6 +357,10 @@
       }
     } catch (e) { console.warn("[KomaTranslator] cache", e); }
   }
+  /** Nombre de pages en cache (0 si IndexedDB est indisponible). */
+  async function cacheCount() {
+    try { return (await tx("readonly", (s) => s.count())) || 0; } catch { return 0; }
+  }
   async function cacheClear() {
     try { await tx("readwrite", (s) => s.clear()); } catch { /* rien */ }
   }
@@ -172,5 +370,5 @@
     return [...h].map((b) => b.toString(16).padStart(2, "0")).join("");
   }
 
-  self.KomaStore = { seriesKey, load, save, addHistory, setCorrection, saveEdit, contextFor, importWiki, cacheGet, cachePut, cacheClear, sha1 };
+  self.KomaStore = { seriesKey, load, save, addHistory, setCorrection, saveEdit, contextFor, seriesSig, bestCorrection, listSeries, clearPart, deleteSeries, sanitizeSeries, putSeries, exportSeries, importSeries, usageAdd, usageCostToday, usageSummary, cacheCount, acquire, importWiki, cacheGet, cachePut, cacheClear, sha1 };
 })();

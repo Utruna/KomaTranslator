@@ -1,5 +1,19 @@
 const $ = (id) => document.getElementById(id);
-const FIELDS = ["ollamaUrl", "ollamaModel", "apiBase", "apiKey", "apiModel", "anthropicKey", "anthropicModel"];
+const FIELDS = ["ollamaUrl", "ollamaModel", "ollamaKeepAlive", "apiBase", "apiKey", "apiModel", "anthropicKey", "anthropicModel"];
+
+// Préréglages du fournisseur « API compatible OpenAI » (voir presets.js): remplissent l'URL, le modèle et la clé mémorisée.
+const { PRESETS } = KomaPresets;
+const presetFor = (base) => { const k = KomaPresets.presetOfBase(base); return PRESETS[k] ? k : ""; };
+let profiles = {};   // { deepseek: { apiKey, apiModel }, … } (cfg.profiles)
+let shownPreset = ""; // préréglage actuellement affiché dans le formulaire
+
+/** Range les champs « API » du formulaire dans le profil du préréglage affiché. */
+function stashProfile() {
+  if (shownPreset) profiles[shownPreset] = { apiKey: $("apiKey").value.trim(), apiModel: $("apiModel").value.trim() || PRESETS[shownPreset].apiModel };
+}
+function showPreset() {
+  $("presetNote").textContent = PRESETS[$("preset").value]?.note || "";
+}
 
 function showPanels() {
   const p = document.querySelector("input[name=provider]:checked")?.value || "google";
@@ -19,15 +33,44 @@ function readForm() {
   document.querySelector(`input[name=provider][value=${provider}]`).checked = true;
   for (const f of FIELDS) if (cfg[f]) $(f).value = cfg[f];
   $("review").checked = cfg.review !== false; // activée par défaut
+  const st = await chrome.storage.sync.get(["font", "caps", "src"]);
+  $("defSrc").value = st.src || "auto";
+  $("font").value = st.font || "";
+  $("caps").checked = !!st.caps;
+  profiles = { ...(cfg.profiles || {}) };
+  shownPreset = presetFor($("apiBase").value.trim());
+  $("preset").value = shownPreset;
+  showPreset();
   showPanels();
 })();
 
 document.querySelectorAll("input[name=provider]").forEach((r) => (r.onchange = showPanels));
 
+$("defSrc").onchange = () => chrome.storage.sync.set({ src: $("defSrc").value });
+$("caps").onchange = () => chrome.storage.sync.set({ caps: $("caps").checked });
+$("font").onchange = () => chrome.storage.sync.set({ font: $("font").value.trim() });
+
+$("preset").onchange = () => {
+  stashProfile(); // on ne perd pas la clé du préréglage qu'on quitte
+  shownPreset = $("preset").value;
+  const p = PRESETS[shownPreset];
+  if (p) {
+    $("apiBase").value = p.apiBase;
+    $("apiModel").value = profiles[shownPreset]?.apiModel || p.apiModel;
+    $("apiKey").value = profiles[shownPreset]?.apiKey || "";
+  }
+  showPreset();
+};
+$("apiBase").oninput = () => { stashProfile(); shownPreset = presetFor($("apiBase").value.trim()); $("preset").value = shownPreset; showPreset(); };
+
 $("save").onclick = async () => {
-  const cfg = readForm();
+  let cfg = readForm();
   // champs vides = valeurs par défaut
   for (const f of FIELDS) if (!cfg[f]) delete cfg[f];
+  stashProfile();
+  cfg.profiles = profiles;
+  cfg = KomaPresets.remember(cfg); // aussi pour « Autre API »
+  profiles = cfg.profiles;
   await chrome.storage.local.set({ cfg });
   $("result").className = "";
   $("result").textContent = "Enregistré, test en cours…";
@@ -39,6 +82,12 @@ $("save").onclick = async () => {
     $("result").className = "ko";
     $("result").textContent = "✘ " + (r?.error || "pas de réponse");
   }
+};
+
+$("unloadOllama").onclick = async () => {
+  $("unloadMsg").textContent = "…";
+  const r = await chrome.runtime.sendMessage({ type: "unloadOllama", cfg: readForm() });
+  $("unloadMsg").textContent = r?.ok ? "Modèle déchargé." : "✘ " + (r?.error || "pas de réponse");
 };
 
 $("clearCache").onclick = async () => {

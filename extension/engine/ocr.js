@@ -1,6 +1,10 @@
 // KomaTranslator — OCR dans le navigateur
 // PP-OCRv5 (ONNX Runtime Web / WebAssembly) + regroupement en bulles + effacement du texte.
 // Portage JS de server/ocr.py (mêmes modèles et mêmes réglages que RapidOCR).
+//
+// Étapes de analyze(): décodage → découpe en tranches → détection des lignes de texte (DBNet) →
+// reconnaissance de chaque ligne (CRNN + CTC) → regroupement des lignes en bulles et ordre de lecture →
+// effacement du texte (inpainting) + couleurs → recherche de l'intérieur de la bulle.
 /* global ort */
 (() => {
   const TILE_H = 1600;     // hauteur max d'une tranche (webtoons très longs)
@@ -86,6 +90,7 @@
   }
 
   // ── Détection (DBNet) ──────────────────────────────────────────────────
+  /** Trouve les lignes de texte d'une tranche (y0, hauteur th) → boîtes [x0,y0,x1,y1] relatives à la tranche. */
   async function detect(img, y0, th) {
     const w = img.width;
     let ratio = Math.max(w, th) > DET_LIMIT ? DET_LIMIT / Math.max(w, th) : 1;
@@ -153,6 +158,7 @@
   }
 
   // ── Reconnaissance (CTC) ───────────────────────────────────────────────
+  /** Lit le texte d'une boîte (colonnes verticales pivotées de 90°) → { text, score moyen }. */
   async function recognize(img, box, recName) {
     const [x0, y0, x1, y1] = box;
     const cw = x1 - x0, ch = y1 - y0;
@@ -190,6 +196,7 @@
   }
 
   // ── Lecture complète (tranches) ────────────────────────────────────────
+  /** Découpe une image haute en tranches de TILE_H px qui se chevauchent de OVERLAP px. */
   function* tiles(h) {
     if (h <= TILE_H) { yield [0, h]; return; }
     let y = 0;
@@ -201,6 +208,7 @@
     }
   }
 
+  /** Vrai si la tranche est quasi uniforme (aucun texte à chercher). */
   function blankTile(img, y0, y1) {
     // écart-type sur un échantillon 1 pixel / 8
     const { data, width } = img;
@@ -227,6 +235,7 @@
     return inter / Math.min(area(a), area(b));
   }
 
+  /** Détection + reconnaissance sur toute l'image → lignes { box, text, score } fiables. */
   async function readLines(img, lang) {
     const recName = REC_MODEL[lang] || "rec_ch";
     const lines = [];
@@ -250,6 +259,7 @@
   // ── Regroupement lignes → bulles ──────────────────────────────────────
   const isVertical = (l) => (l.box[3] - l.box[1]) > 1.5 * (l.box[2] - l.box[0]) && l.text.length >= 2;
 
+  /** Deux lignes appartiennent-elles à la même bulle ? (même sens, hauteurs proches, voisines et alignées) */
   function sameBlock(a, b) {
     const va = isVertical(a), vb = isVertical(b);
     if (va !== vb) return false;
@@ -260,12 +270,25 @@
     const lh = (ha + hb) / 2;
     const vgap = Math.max(B[1] - A[3], A[1] - B[3]);
     if (vgap > 0.9 * lh) return false;
+    if (!va) {
+      // Un bloc est aligné à gauche ou centré: deux lignes qui ne partagent ni le bord gauche ni le centre
+      // (ex. une colonne « niveau » à droite d'un nom) ne sont pas du même bloc.
+      const acx0 = (A[0] + A[2]) / 2, bcx0 = (B[0] + B[2]) / 2;
+      if (Math.abs(A[0] - B[0]) > 3 * lh && Math.abs(acx0 - bcx0) > 3 * lh) return false;
+      // Fin de paragraphe: une ligne alignée à gauche nettement plus courte que la suivante (écart > 3 hauteurs de ligne;
+      // dans un paragraphe l'écart reste de quelques pixels). Les bulles centrées ne sont pas concernées: leur bord
+      // gauche bouge de la moitié de l'écart.
+      const [U, D] = A[1] <= B[1] ? [A, B] : [B, A];
+      const shortfall = D[2] - U[2];
+      if (shortfall > 3 * lh && Math.abs(U[0] - D[0]) < 0.3 * shortfall) return false;
+    }
     if (Math.min(A[2], B[2]) - Math.max(A[0], B[0]) > 0) return true;
     if (va) return false;
     const acx = (A[0] + A[2]) / 2, bcx = (B[0] + B[2]) / 2;
     return Math.abs(acx - bcx) < 1.5 * lh && vgap > -0.5 * lh;
   }
 
+  /** Regroupe les lignes en blocs (union-find) et les range dans l'ordre de lecture (rtl = manga japonais). */
   function groupBlocks(lines, rtl) {
     const parent = lines.map((_, i) => i);
     const find = (i) => { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
@@ -324,6 +347,7 @@
   const hex = (c) => "#" + c.map((v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0")).join("");
 
   // Remplissage des pixels masqués depuis les bords (couche par couche, moyenne des voisins connus)
+  // (rgba est modifié sur place)
   function inpaint(rgba, w, h, mask) {
     const known = new Uint8Array(w * h);
     for (let i = 0; i < w * h; i++) known[i] = mask[i] ? 0 : 1;
@@ -353,6 +377,7 @@
     }
   }
 
+  /** Efface le texte d'un bloc → { patchBox, clean (RGBA du rectangle nettoyé), mask (1 = pixel effacé), bg, fg (couleurs du fond et du texte) }. */
   function cleanBlock(img, lineBoxes) {
     const { data, width, height } = img;
     const ctxPad = 12;
@@ -404,10 +429,11 @@
     if (Math.abs(fg[0] - bg[0]) + Math.abs(fg[1] - bg[1]) + Math.abs(fg[2] - bg[2]) < 150) {
       fg = (bg[0] + bg[1] + bg[2]) / 3 > 127 ? [0, 0, 0] : [255, 255, 255];
     }
-    return { patchBox: [X0, Y0, X1, Y1], clean: crop, bg: hex(bg), fg: hex(fg) };
+    return { patchBox: [X0, Y0, X1, Y1], clean: crop, mask: dil, bg: hex(bg), fg: hex(fg) };
   }
 
   // Intérieur de la bulle (remplissage depuis le centre) → zone utilisable pour le texte
+  // Renvoie null si le fond n'est pas une bulle fermée et assez régulière.
   function bubbleBox(img, clean, patchBox, box) {
     const { data, width: W, height: H } = img;
     const [x0, y0, x1, y1] = box;
@@ -452,6 +478,13 @@
     return [Math.floor(Math.min(cx - hw, x0)), Math.floor(Math.min(cy - hh, y0)), Math.ceil(Math.max(cx + hw, x1)), Math.ceil(Math.max(cy + hh, y1))];
   }
 
+  /** Copie de `rgba` transparente partout sauf là où mask = 1: le patch ne modifie que les pixels de texte effacés. */
+  function withAlpha(rgba, mask) {
+    const out = new Uint8ClampedArray(rgba);
+    for (let i = 0; i < mask.length; i++) out[i * 4 + 3] = mask[i] ? 255 : 0;
+    return out;
+  }
+
   async function pngB64(rgba, w, h) {
     const c = new OffscreenCanvas(w, h);
     c.getContext("2d").putImageData(new ImageData(rgba, w, h), 0, 0);
@@ -462,6 +495,11 @@
   }
 
   // ── API ────────────────────────────────────────────────────────────────
+  /**
+   * Point d'entrée: image → { width, height, blocks[], ms }.
+   * Un bloc = { box, fit_box (intérieur de bulle ou null), lines, text, bg, fg, patch_box,
+   *   patch (PNG base64, transparent sauf sur le texte effacé: des patchs voisins ne s'écrasent pas) }.
+   */
   async function analyze(blob, lang = "auto") {
     const t0 = performance.now();
     const img = await decode(blob);
@@ -471,7 +509,7 @@
       const boxes = group.map((l) => l.box);
       const box = [Math.min(...boxes.map((b) => b[0])), Math.min(...boxes.map((b) => b[1])),
         Math.max(...boxes.map((b) => b[2])), Math.max(...boxes.map((b) => b[3]))];
-      const { patchBox, clean, bg, fg } = cleanBlock(img, boxes);
+      const { patchBox, clean, mask, bg, fg } = cleanBlock(img, boxes);
       blocks.push({
         box,
         fit_box: bubbleBox(img, clean, patchBox, box),
@@ -479,7 +517,7 @@
         text: joinLines(group.map((l) => l.text)),
         bg, fg,
         patch_box: patchBox,
-        patch: await pngB64(clean, patchBox[2] - patchBox[0], patchBox[3] - patchBox[1]),
+        patch: await pngB64(withAlpha(clean, mask), patchBox[2] - patchBox[0], patchBox[3] - patchBox[1]),
       });
     }
     // une zone de bulle ne doit jamais empiéter sur le texte d'une autre bulle
@@ -499,6 +537,7 @@
   const serial = (fn) => (...a) => { const p = chain.then(() => fn(...a)); chain = p.catch(() => {}); return p; };
 
   self.KomaOCR = {
+    _internals: { sameBlock, groupBlocks, joinLines, cleanBlock, withAlpha }, // pour les tests
     analyze: serial(analyze),
     warmup: serial(warmup),
     readLines: serial(async (blob, lang) => readLines(await decode(blob), lang)),
