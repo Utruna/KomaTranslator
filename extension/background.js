@@ -113,7 +113,7 @@ chrome.storage.onChanged.addListener((ch, area) => { if (area === "local" && ch.
 /** Télécharge une image avec les cookies du site → { bytes, type }. */
 async function fetchImage(url, pageUrl) {
   try { await setReferer(url, pageUrl); } catch (e) { console.warn("referer", e); }
-  const r = await fetch(url, { credentials: "include" });
+  const r = await KomaTranslate.fetchTimeout(url, { credentials: "include" });
   if (!r.ok) throw new Error(`image HTTP ${r.status}`);
   return { bytes: new Uint8Array(await r.arrayBuffer()), type: r.headers.get("content-type") || "image/jpeg" };
 }
@@ -154,7 +154,8 @@ function providerSig(cfg) {
 
 /**
  * Pipeline complet pour une image: téléchargement → cache → OCR → traduction → mémoire de la série.
- * @param msg { url, pageUrl } ou { bytes (base64), mime, pageUrl } pour les images blob:/data:
+ * @param msg { url, pageUrl, pos } ou { bytes (base64), mime, pageUrl, pos } pour les images blob:/data:
+ *   (pos = position verticale de l'image dans la page, sert à traduire dans l'ordre de lecture)
  * @returns { data: { width, height, blocks[] }, image: data-URL de l'image d'origine }
  *   Chaque bloc: texte d'origine, traduction, boîtes, couleurs, patch effacé (voir engine/ocr.js).
  */
@@ -171,13 +172,25 @@ async function translate(msg) {
     const blocks = ocr.blocks.filter((b) => !CREDITS.test(b.text));
     const t1 = performance.now();
     const texts = blocks.map((b) => b.text);
-    const ctx = await KomaStore.contextFor(skey, texts);
-    const tr = await KomaTranslate.translateAll(texts, s.src, s.tgt, s.cfg, ctx);
-    blocks.forEach((b, i) => (b.translation = tr[i]));
-    if (blocks.length) await KomaStore.addHistory(skey, texts.map((t, i) => [t, tr[i]]));
+    // Phase ordonnée par série: chaque image voit l'historique de la précédente (voir KomaStore.acquire)
+    const release = await KomaStore.acquire(skey, msg.pos ?? 0);
+    try {
+      const ctx = await KomaStore.contextFor(skey, texts);
+      const info = {};
+      const tr = await KomaTranslate.translateAll(texts, s.src, s.tgt, s.cfg, ctx, info);
+      blocks.forEach((b, i) => (b.translation = tr[i]));
+      data = { width: ocr.width, height: ocr.height, blocks };
+      if (info.degraded) {
+        // repli ou bulle non traduite: affiché cette fois, mais ni mis en cache ni retenu comme contexte
+        console.warn("[KomaTranslator] traduction dégradée, non mise en cache");
+      } else {
+        if (blocks.length) await KomaStore.addHistory(skey, texts.map((t, i) => [t, tr[i]]));
+        await KomaStore.cachePut(cacheKey, data);
+      }
+    } finally {
+      release();
+    }
     console.log(`[KomaTranslator] ${ocr.width}x${ocr.height}: ${blocks.length} bulles, OCR ${Math.round(t1 - t0)} ms, trad ${Math.round(performance.now() - t1)} ms`);
-    data = { width: ocr.width, height: ocr.height, blocks };
-    await KomaStore.cachePut(cacheKey, data);
   }
   // corrections manuelles de la série (toujours prioritaires, même sur le cache)
   const { corrections } = await KomaStore.load(skey);
@@ -189,7 +202,7 @@ async function translate(msg) {
 /** Télécharge une page wiki et ne garde que son contenu (MediaWiki/Fandom), tronqué à 300 ko. */
 async function fetchText(url) {
   try {
-    const r = await fetch(url, { credentials: "include" });
+    const r = await KomaTranslate.fetchTimeout(url, { credentials: "include", retries: 1 });
     if (!r.ok) return "";
     let t = await r.text();
     const i = t.indexOf('id="mw-content-text"'); // on ne garde que le contenu (MediaWiki / Fandom)

@@ -39,6 +39,15 @@ content.js  render()                image d'origine + patchs effacés + texte tr
 Un **bloc** (une bulle) contient : `text`, `translation`, `box` (texte d'origine), `fit_box` (intérieur de bulle, ou
 `null`), `lines`, `bg`/`fg` (couleurs), `patch_box` + `patch` (zone effacée en PNG base64).
 
+## Fiabilité
+
+- Un résultat **dégradé** (repli Google, bulle non traduite : `info.degraded` dans `translateAll`) est affiché mais ni mis
+  en cache ni ajouté à l'historique de la série.
+- Les requêtes réseau passent par `KomaTranslate.fetchTimeout` : délai maximal (15 s Google, 30 s images et wiki, 180 s LLM)
+  et nouvelles tentatives sur erreur réseau, 429, 502, 503, 504.
+- Pour une même série, la phase contexte → traduction → historique est ordonnée (`KomaStore.acquire`) : les images attendent
+  leur tour, la plus haute dans la page (`pos`) d'abord.
+
 ## Messages (`chrome.runtime.sendMessage`)
 
 Réponse : `{ ok: true, ... }` ou `{ ok: false, error }`.

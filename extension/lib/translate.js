@@ -22,17 +22,47 @@
     return out;
   }
 
+  // ── Réseau: délai maximal + nouvelles tentatives ──
+  const RETRY_STATUS = new Set([429, 502, 503, 504]);
+  const LLM_TIMEOUT = 180000; // un modèle local peut mettre longtemps à se charger
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  /**
+   * fetch avec délai maximal (`timeout`, 30 s par défaut) et `retries` nouvelles tentatives (2 par défaut)
+   * si le réseau échoue ou si le serveur répond 429 / 502 / 503 / 504 (attente 0,6 s, 1,2 s…).
+   * Le délai ne couvre que l'attente des en-têtes, pas la lecture du corps de la réponse.
+   */
+  async function fetchTimeout(url, { timeout = 30000, retries = 2, ...opts } = {}) {
+    for (let attempt = 0; ; attempt++) {
+      const ctl = new AbortController();
+      const timer = setTimeout(() => ctl.abort(), timeout);
+      let r;
+      try {
+        r = await fetch(url, { ...opts, signal: ctl.signal });
+      } catch (e) {
+        clearTimeout(timer);
+        if (attempt >= retries) throw e.name === "AbortError" ? new Error(`délai dépassé (${Math.round(timeout / 1000)} s)`) : e;
+        await sleep(600 * 2 ** attempt);
+        continue;
+      }
+      clearTimeout(timer);
+      if (!RETRY_STATUS.has(r.status) || attempt >= retries) return r;
+      await sleep(600 * 2 ** attempt);
+    }
+  }
+
   // ── Google (endpoint public gratuit) ──
   async function googleOne(text, src, tgt) {
     const sl = { zh: "zh-CN" }[src] || src;
     const u = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl}&tl=${tgt}&dt=t&q=${encodeURIComponent(text)}`;
-    const r = await fetch(u);
+    const r = await fetchTimeout(u, { timeout: 15000 });
     if (!r.ok) throw new Error("Google HTTP " + r.status);
     const j = await r.json();
     return j[0].map((p) => p[0]).filter(Boolean).join("").trim();
   }
-  async function google(texts, src, tgt) {
-    return Promise.all(texts.map((t) => googleOne(t, src, tgt).catch(() => t)));
+  /** Une bulle qui échoue garde son texte d'origine et marque le résultat comme dégradé (info.degraded). */
+  async function google(texts, src, tgt, info = {}) {
+    return Promise.all(texts.map((t) => googleOne(t, src, tgt).catch(() => { info.degraded = true; return t; })));
   }
 
   // ── Prompt LLM ──
@@ -87,8 +117,8 @@
     const p = cfg.provider;
     if (p === "ollama") {
       const base = (cfg.ollamaUrl || "http://localhost:11434").replace(/\/+$/, "").replace(/\/v1$/, "");
-      const r = await fetch(base + "/api/chat", {
-        method: "POST",
+      const r = await fetchTimeout(base + "/api/chat", {
+        method: "POST", timeout: LLM_TIMEOUT, retries: 1,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: cfg.ollamaModel || "qwen3.5:latest",
@@ -103,8 +133,8 @@
     }
     if (p === "openai") {
       const base = (cfg.apiBase || "https://api.openai.com/v1").replace(/\/+$/, "");
-      const r = await fetch(base + "/chat/completions", {
-        method: "POST",
+      const r = await fetchTimeout(base + "/chat/completions", {
+        method: "POST", timeout: LLM_TIMEOUT, retries: 1,
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + (cfg.apiKey || "none") },
         body: JSON.stringify({ model: cfg.apiModel, temperature: 0.3, messages: [{ role: "user", content: text }] }),
       });
@@ -112,8 +142,8 @@
       return extractJson((await r.json()).choices[0].message.content || "");
     }
     if (p === "anthropic") {
-      const r = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
+      const r = await fetchTimeout("https://api.anthropic.com/v1/messages", {
+        method: "POST", timeout: LLM_TIMEOUT, retries: 1,
         headers: {
           "Content-Type": "application/json",
           "x-api-key": cfg.anthropicKey || "",
@@ -178,8 +208,10 @@
    * Traduit toutes les bulles d'une page → tableau de traductions, dans le même ordre.
    * LLM si configuré (puis relecture éventuelle); Google pour les bulles manquantes ou si le LLM échoue
    * (l'erreur est alors gardée dans self.KomaLastError pour le popup).
+   * `info.degraded` passe à true si le résultat n'est pas celui attendu (repli, bulle non traduite):
+   * l'appelant ne doit alors ni le mettre en cache ni le retenir comme contexte.
    */
-  async function translateAll(texts, src, tgt, cfg, ctx = {}) {
+  async function translateAll(texts, src, tgt, cfg, ctx = {}, info = {}) {
     if (!texts.length) return [];
     const names = (ctx.terms || []).map((t) => t.src || "");
     const dec = texts.map((t) => decaps(t, names));
@@ -192,17 +224,19 @@
         if (!out || typeof out !== "object") throw new Error("réponse LLM invalide");
         const missing = texts.map((_, i) => i).filter((i) => typeof out[String(i + 1)] !== "string");
         if (missing.length > texts.length / 2) throw new Error(`réponse LLM incomplète (${texts.length - missing.length}/${texts.length})`);
-        const fb = missing.length ? await google(missing.map((i) => texts[i]), src, tgt) : [];
+        if (missing.length) info.degraded = true;
+        const fb = missing.length ? await google(missing.map((i) => texts[i]), src, tgt, info) : [];
         let result = texts.map((_, i) => (missing.includes(i) ? fb[missing.indexOf(i)] : out[String(i + 1)]));
         if (cfg.review) result = await review(texts, result, tgt, cfg);
         return result;
       } catch (e) {
         console.warn(`[KomaTranslator] ${cfg.provider} a échoué, repli sur Google:`, e.message);
         self.KomaLastError = e.message;
+        info.degraded = true;
       }
     }
-    return google(texts, src, tgt);
+    return google(texts, src, tgt, info);
   }
 
-  self.KomaTranslate = { translateAll, llmJson, LANG_NAMES };
+  self.KomaTranslate = { translateAll, llmJson, fetchTimeout, LANG_NAMES, _internals: { decaps, extractJson, similarity } };
 })();

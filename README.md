@@ -97,6 +97,8 @@ legacy/                anciennes versions (pipeline Koharu, serveur Python « Li
 
 Vue détaillée : [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
+Tests unitaires (Node 20, sans dépendance) : `node --test tests/`. Ils couvrent `lib/translate.js` et `lib/store.js` ; l'OCR et le rendu ne sont pas testés.
+
 Firefox : le moteur OCR tourne dans la page d'arrière-plan. Chrome : dans un document « offscreen »
 (les service workers ne peuvent pas charger ONNX Runtime).
 Charger pour tester : Firefox `about:debugging` → *Charger un module temporaire* → `extension/manifest.json` ;

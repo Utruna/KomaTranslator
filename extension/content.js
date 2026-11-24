@@ -101,7 +101,7 @@
     state.set(img, st);
     img.classList.add("kt-busy");
     try {
-      const msg = { type: "translate", url, pageUrl: location.href };
+      const msg = { type: "translate", url, pageUrl: location.href, pos: Math.round(img.getBoundingClientRect().top + scrollY) };
       if (url.startsWith("blob:") || url.startsWith("data:")) {
         const blob = await (await fetch(url)).blob();
         msg.bytes = await blobToB64(blob);

@@ -66,6 +66,27 @@
     return { summary: d.summary, terms, history: d.history.slice(-12), corrections: d.corrections };
   }
 
+  // ── Ordre de traduction par série ──
+  // Les images d'une même série passent l'une après l'autre dans la phase « contexte → traduction → historique »
+  // (chacune voit les répliques de la précédente). Parmi celles qui attendent, la plus haute dans la page passe d'abord.
+  const seriesQueues = new Map(); // key → { busy, waiting: [{ pos, go }] }
+
+  /** Attend son tour pour la série `key` (pos = position de l'image dans la page) → fonction `release()` à appeler à la fin. */
+  function acquire(key, pos = 0) {
+    let q = seriesQueues.get(key);
+    if (!q) seriesQueues.set(key, (q = { busy: false, waiting: [] }));
+    return new Promise((resolve) => {
+      const release = () => {
+        const next = q.waiting.sort((a, b) => a.pos - b.pos).shift();
+        if (next) next.go();
+        else { q.busy = false; seriesQueues.delete(key); }
+      };
+      const go = () => resolve(release);
+      if (q.busy) q.waiting.push({ pos, go });
+      else { q.busy = true; go(); }
+    });
+  }
+
   // ── Import wiki ──
   /** HTML d'un wiki → texte brut (contenu de l'article seulement), tronqué à `limit` caractères. */
   function wikiText(html, limit = 14000) {
@@ -181,5 +202,5 @@
     return [...h].map((b) => b.toString(16).padStart(2, "0")).join("");
   }
 
-  self.KomaStore = { seriesKey, load, save, addHistory, setCorrection, saveEdit, contextFor, importWiki, cacheGet, cachePut, cacheClear, sha1 };
+  self.KomaStore = { seriesKey, load, save, addHistory, setCorrection, saveEdit, contextFor, acquire, importWiki, cacheGet, cachePut, cacheClear, sha1 };
 })();
