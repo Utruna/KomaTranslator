@@ -50,6 +50,15 @@ Un **bloc** (une bulle) contient : `text`, `translation`, `box` (texte d'origine
 - Pour une même série, la phase contexte → traduction → historique est ordonnée (`KomaStore.acquire`) : les images attendent
   leur tour, la plus haute dans la page (`pos`) d'abord.
 
+## Contrôle de la dépense et de la page
+
+- Chaque appel LLM remonte ses jetons (`KomaTranslate.setUsageHook`) ; le background les cumule par jour et par traducteur (`KomaStore.usageAdd`)
+  avec le coût estimé (`KomaPresets.costOf`). Le **plafond** (`cfg.dailyCapCents`) est vérifié sous le verrou de série, avant chaque appel : au-delà, repli sur Google
+  (résultat marqué dégradé : ni cache ni historique).
+- Les content scripts envoient leurs statistiques (`pageStats`, une entrée par frame) ; le menu les lit par `tabStats`. **Pause** : le content script vide sa file et
+  prévient le background (`cancelQueue`), qui retire les travaux en attente de l'onglet et annule ceux qui n'ont pas encore atteint l'OCR ou le LLM (`pausedTabs`).
+- La langue source se choisit par site (`siteLangs` dans `storage.sync`, repli sur `src`) ; le content script envoie son `host` avec chaque image.
+
 ## Messages (`chrome.runtime.sendMessage`)
 
 Réponse : `{ ok: true, ... }` ou `{ ok: false, error }`.

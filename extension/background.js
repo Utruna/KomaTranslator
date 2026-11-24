@@ -7,7 +7,7 @@ const IS_SW = typeof ServiceWorkerGlobalScope !== "undefined" && self instanceof
 if (IS_SW) importScripts("lib/translate.js", "lib/store.js", "presets.js");
 
 // Réglages synchronisés (chrome.storage.sync): langues et sites activés ({ "site.com": true }).
-const DEFAULTS = { src: "auto", tgt: "fr", sites: {} };
+const DEFAULTS = { src: "auto", tgt: "fr", sites: {}, siteLangs: {} };
 // Réglages du traducteur (chrome.storage.local, clé "cfg"; les clés API ne sont donc jamais synchronisées): voir presets.js
 const CFG_DEFAULTS = KomaPresets.CFG_DEFAULTS;
 const MAX_PARALLEL = 2; // images traduites en même temps (l'OCR est de toute façon sérialisé)
@@ -22,9 +22,53 @@ async function getSettings() {
 // Limite le nombre d'images traitées en parallèle (MAX_PARALLEL), le reste attend son tour.
 let active = 0;
 const queue = [];
-function schedule(job) {
-  return new Promise((resolve, reject) => { queue.push({ job, resolve, reject }); pump(); });
+function schedule(job, tabId) {
+  return new Promise((resolve, reject) => { queue.push({ job, resolve, reject, tabId }); pump(); });
 }
+/** Annule les travaux en attente d'un onglet (ceux déjà lancés se terminent) → nombre annulé. */
+function cancelQueued(tabId) {
+  let n = 0;
+  for (let i = queue.length - 1; i >= 0; i--) {
+    if (queue[i].tabId !== tabId) continue;
+    queue.splice(i, 1)[0].reject(Object.assign(new Error("annulé"), { cancelled: true }));
+    n++;
+  }
+  return n;
+}
+
+/** Onglets en pause: leurs images déjà lancées s'arrêtent avant l'OCR et avant l'appel au LLM (rien n'est dépensé de plus). */
+const pausedTabs = new Set();
+const cancelled = () => Object.assign(new Error("annulé"), { cancelled: true });
+
+// ── Langue source par site ──
+const hostOf = (u) => { try { return new URL(u).hostname; } catch { return ""; } };
+/** Langue source pour ce site: celle choisie pour lui dans le menu (siteLangs), sinon le réglage général. */
+const srcFor = (s, host) => s.siteLangs?.[host]?.src || s.src;
+
+// ── Consommation: chaque appel LLM ajoute ses jetons et son coût estimé au compteur du jour ──
+KomaTranslate.setUsageHook(({ cfg, tin, tout }) =>
+  KomaStore.usageAdd(KomaPresets.activeId(cfg), { req: 1, tin, tout, cost: KomaPresets.costOf(cfg, tin, tout) }));
+
+// ── Statistiques de la page (envoyées par les content scripts, une entrée par frame) ──
+const pageStats = new Map(); // tabId → Map(frameId → stats)
+function setStats(tabId, frameId, stats) {
+  if (tabId == null) return;
+  let m = pageStats.get(tabId);
+  if (!m) pageStats.set(tabId, (m = new Map()));
+  m.set(frameId ?? 0, stats);
+}
+function aggregateStats(tabId) {
+  const out = { tracked: 0, done: 0, empty: 0, busy: 0, queued: 0, failed: 0, errors: [], paused: false, original: false, enabled: false };
+  for (const st of pageStats.get(tabId)?.values() || []) {
+    for (const k of ["tracked", "done", "empty", "busy", "queued", "failed"]) out[k] += st[k] || 0;
+    out.errors.push(...(st.errors || []));
+    out.paused ||= !!st.paused; out.original ||= !!st.original; out.enabled ||= !!st.enabled;
+  }
+  out.errors = out.errors.slice(0, 8);
+  return out;
+}
+chrome.tabs.onRemoved.addListener((id) => { pageStats.delete(id); pausedTabs.delete(id); });
+chrome.tabs.onUpdated.addListener((id, info) => { if (info.status === "loading") pageStats.delete(id); });
 function pump() {
   while (active < MAX_PARALLEL && queue.length) {
     const { job, resolve, reject } = queue.shift();
@@ -153,26 +197,40 @@ function providerSig(cfg) {
  *   Chaque bloc: texte d'origine, traduction, boîtes, couleurs, patch effacé (voir engine/ocr.js).
  */
 async function translate(msg) {
+  if (pausedTabs.has(msg.tabId)) throw cancelled();
   const s = await getSettings();
+  const src = srcFor(s, msg.host || hostOf(msg.pageUrl));
   const img = msg.bytes ? { bytes: b64ToBytes(msg.bytes), type: msg.mime || "image/png" } : await fetchImage(msg.url, msg.pageUrl);
   const skey = KomaStore.seriesKey(msg.pageUrl);
   // La clé change avec l'image, les langues, le traducteur, la version du prompt et le glossaire/résumé de la série
   const sig = await KomaStore.seriesSig(await KomaStore.load(skey));
-  const cacheKey = `${await KomaStore.sha1(img.bytes)}|${s.src}|${s.tgt}|${providerSig(s.cfg)}|p${KomaTranslate.PROMPT_VERSION}|${sig}`;
+  const cacheKey = `${await KomaStore.sha1(img.bytes)}|${src}|${s.tgt}|${providerSig(s.cfg)}|p${KomaTranslate.PROMPT_VERSION}|${sig}`;
 
-  let data = await KomaStore.cacheGet(cacheKey);
+  let data = msg.fresh ? null : await KomaStore.cacheGet(cacheKey); // fresh: « retraduire cette image »
   if (!data) {
     const t0 = performance.now();
-    const ocr = await runOcr(img.bytes, img.type, s.src);
+    const ocr = await runOcr(img.bytes, img.type, src);
     const blocks = KomaTranslate.dropCredits(ocr.blocks);
     const t1 = performance.now();
     const texts = blocks.map((b) => b.text);
     // Phase ordonnée par série: chaque image voit l'historique de la précédente (voir KomaStore.acquire)
     const release = await KomaStore.acquire(skey, msg.pos ?? 0);
     try {
+      if (pausedTabs.has(msg.tabId)) throw cancelled(); // mis en pause pendant l'attente: aucune dépense
       const ctx = await KomaStore.contextFor(skey, texts);
       const info = {};
-      const tr = await KomaTranslate.translateAll(texts, s.src, s.tgt, s.cfg, ctx, info);
+      let cfg = s.cfg;
+      // Plafond de dépense du jour: au-delà, Google (affiché cette fois, ni mis en cache ni retenu comme contexte)
+      if (cfg.provider !== "google" && Number(cfg.dailyCapCents) > 0) {
+        const spent = (await KomaStore.usageCostToday()) * 100;
+        if (spent >= Number(cfg.dailyCapCents)) {
+          cfg = { ...cfg, provider: "google" };
+          info.degraded = true;
+          KomaTranslate.setLastError(`Plafond du jour atteint (${spent.toFixed(1)} ¢ sur ${cfg.dailyCapCents} ¢) : repli sur Google`);
+        }
+      }
+      const tr = await KomaTranslate.translateAll(texts, src, s.tgt, cfg, ctx, info);
+      if (cfg.provider !== "google" && blocks.length) KomaStore.usageAdd(KomaPresets.activeId(cfg), { pages: 1 });
       blocks.forEach((b, i) => (b.translation = tr[i]));
       data = { width: ocr.width, height: ocr.height, blocks };
       if (info.degraded) {
@@ -251,7 +309,7 @@ async function importWiki(msg) {
     subpages = (await mapLimit(links, 4, async (url) => ({ url, html: await fetchText(url) }))).filter((p) => p.html);
   }
   const key = KomaStore.seriesKey(msg.page);
-  const d = await KomaStore.importWiki(key, msg.wiki, html, subpages, s.src, s.tgt, s.cfg);
+  const d = await KomaStore.importWiki(key, msg.wiki, html, subpages, srcFor(s, hostOf(msg.page)), s.tgt, s.cfg);
   return { key, terms: d.glossary.length, summary: d.summary, wiki: d.wiki };
 }
 
@@ -272,6 +330,31 @@ const HANDLERS = {
   async memDelete(msg) { await KomaStore.deleteSeries(msg.key); return {}; },
   async cacheInfo() { return { count: await KomaStore.cacheCount() }; },
   async cacheClear() { await KomaStore.cacheClear(); return {}; },
+  async usageReset() { await chrome.storage.local.remove("usage"); return {}; },
+  async usageInfo() { return { usage: await KomaStore.usageSummary() }; },
+  /** Solde du compte DeepSeek (GET /user/balance: aucun jeton consommé). */
+  async balance() {
+    const { cfg } = await getSettings();
+    const key = cfg.provider === "openai" && KomaPresets.activeId(cfg) === "deepseek" ? cfg.apiKey : cfg.profiles?.deepseek?.apiKey;
+    if (!key) throw new Error("pas de clé DeepSeek");
+    const r = await KomaTranslate.fetchTimeout("https://api.deepseek.com/user/balance", {
+      headers: { Authorization: "Bearer " + key, Accept: "application/json" }, timeout: 15000, retries: 1,
+    });
+    if (r.status === 401) throw new Error("clé refusée (401)");
+    if (!r.ok) throw new Error("DeepSeek HTTP " + r.status);
+    const out = { ...KomaPresets.parseBalance(await r.json()), at: Date.now() };
+    await chrome.storage.local.set({ balanceCache: out });
+    return out;
+  },
+  async memGet(msg) { return { serie: await KomaStore.load(msg.key) }; },
+  async memPut(msg) { await KomaStore.putSeries(msg.serie); return {}; },
+  async memExport(msg) { return { data: await KomaStore.exportSeries(msg.keys) }; },
+  async memImport(msg) { return { result: await KomaStore.importSeries(msg.data) }; },
+  async tabStats(msg) { return { stats: aggregateStats(msg.tabId) }; },
+  async pageStats(msg, sender) { setStats(sender.tab?.id, sender.frameId, msg.stats); return {}; },
+  /** Pause demandée depuis la page: les images en attente de cet onglet sont retirées de la file. */
+  async cancelQueue(msg, sender) { pausedTabs.add(sender.tab?.id); return { cancelled: cancelQueued(sender.tab?.id) }; },
+  async resumeQueue(msg, sender) { pausedTabs.delete(sender.tab?.id); return {}; },
   async correct(msg) { await KomaStore.setCorrection(KomaStore.seriesKey(msg.page), msg.text, msg.translation); return {}; },
   async retranslate(msg) {
     await KomaStore.cacheClear();
@@ -310,16 +393,17 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.target === "offscreen") return false; // destiné au document offscreen
   if (msg.type === "translate") {
     const tabId = sender.tab?.id;
+    msg.tabId = tabId;
     badge(tabId, +1);
-    schedule(() => withKeepAlive(() => translate(msg)))
+    schedule(() => withKeepAlive(() => translate(msg)), tabId)
       .then((res) => sendResponse({ ok: true, ...res }))
-      .catch((e) => sendResponse({ ok: false, error: String(e.message || e) }))
+      .catch((e) => sendResponse({ ok: false, error: String(e.message || e), cancelled: !!e.cancelled }))
       .finally(() => badge(tabId, -1));
     return true;
   }
   const h = HANDLERS[msg.type];
   if (!h) return false;
-  h(msg).then((r) => sendResponse({ ok: true, ...r })).catch((e) => sendResponse({ ok: false, error: String(e.message || e) }));
+  h(msg, sender).then((r) => sendResponse({ ok: true, ...r })).catch((e) => sendResponse({ ok: false, error: String(e.message || e) }));
   return true;
 });
 

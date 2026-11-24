@@ -32,7 +32,12 @@
   .serie .acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
   .serie .acts button { padding: 4px 10px; font-size: 12.5px; }
   .size { float: right; color: var(--muted); font-size: 12px; }
-  #msg { font-size: 13px; }
+  #msg { font-size: 13px; min-height: 20px; }
+  #msg button { margin-left: 8px; padding: 2px 10px; font-size: 12.5px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+  th, td { text-align: right; padding: 4px 6px; border-bottom: 1px solid var(--line); }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--muted); font-weight: 600; }
   #msg.ok { color: var(--ok); }
   #msg.ko { color: var(--ko); }
 </style>
@@ -53,6 +58,23 @@
     <div id="cacheInfo" class="muted">…</div>
     <div class="row"><button class="danger" id="clearCache">Vider le cache</button></div>
     <div class="muted" style="margin-top:8px">Les pages déjà lues seront retraduites au besoin (donc consommeront un peu de jetons avec un LLM). Glossaires, corrections et historiques ne sont pas touchés.</div>
+  </section>
+
+  <section class="card" id="conso">
+    <h2>Consommation</h2>
+    <div class="muted">Jetons et coût estimé de chaque jour (UTC), par traducteur. Estimation : elle ne remplace pas la facture du fournisseur.</div>
+    <div id="usageTable"></div>
+    <div class="row"><button class="danger" id="resetUsage">Réinitialiser le compteur</button></div>
+  </section>
+
+  <section class="card">
+    <h2>Sauvegarde et partage</h2>
+    <div class="muted">Un export contient les glossaires, résumés, corrections et URL de wiki des séries — jamais tes clés ni ta configuration. Un import fusionne avec l'existant : le glossaire importé complète le tien, tes corrections restent prioritaires.</div>
+    <div class="row">
+      <button id="exportAll" class="sec">Exporter toutes les séries</button>
+      <button id="importBtn" class="sec">Importer un fichier…</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+    </div>
   </section>
 
   <section class="card">

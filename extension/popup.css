@@ -62,3 +62,17 @@ button:disabled { opacity: .5; cursor: default; }
 .result { font-size: 12px; }
 .result.ok { color: var(--ok); }
 .result.ko { color: var(--ko); }
+
+/* cette page */
+.bar { height: 6px; border-radius: 99px; background: var(--line); overflow: hidden; margin: 8px 0 2px; }
+.bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+.row button { flex: 1; }
+#errs { margin-top: 8px; }
+#errs summary { color: var(--ko); }
+#errList div { margin: 2px 0; word-break: break-all; }
+#usageCard[hidden] { display: none; }
+.kv { display: flex; justify-content: space-between; gap: 8px; margin: 3px 0; }
+.kv b { font-weight: 600; }
+.numin { width: 90px; text-align: right; }
+.inline { display: flex; align-items: center; gap: 6px; margin: 6px 0; flex-wrap: wrap; }
+.inline input { width: 80px; }

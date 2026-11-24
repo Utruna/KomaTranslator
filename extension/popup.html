@@ -14,11 +14,25 @@
   <button id="grant" hidden>Autoriser l'accès aux sites</button>
   <div id="status" class="pill">…</div>
 
+  <section class="card" id="pageCard">
+    <h2>Cette page</h2>
+    <div id="progress" class="small">…</div>
+    <div class="bar"><i id="barFill"></i></div>
+    <div class="row">
+      <button id="pause" class="sec" type="button">⏸ Pause</button>
+      <button id="orig" class="sec" type="button" title="Affiche les images d'origine sans rien perdre">👁 Voir l'original</button>
+    </div>
+    <details id="errs" hidden><summary class="small"><span id="errCount"></span></summary><div id="errList" class="small muted"></div></details>
+    <div class="line"><span>Mode économie <small class="muted">(seulement ce qui est à l'écran)</small></span><label class="switch"><input type="checkbox" id="eco"><span></span></label></div>
+  </section>
+
   <section class="card">
-    <h2>Langues</h2>
+    <h2>Langues <span class="muted small" style="text-transform:none;letter-spacing:0">(source : pour ce site)</span></h2>
     <div class="langs">
-      <select id="src" aria-label="Langue source">
-        <option value="auto">Chinois</option>
+      <select id="src" aria-label="Langue source de ce site">
+        <option value="">Général</option>
+        <option value="auto">Auto (chinois, japonais, anglais)</option>
+        <option value="zh">Chinois</option>
         <option value="ja">Japonais</option>
         <option value="ko">Coréen</option>
         <option value="en">Anglais</option>
@@ -40,6 +54,11 @@
     <div class="chips" id="chips"></div>
     <div id="prov"></div>
   </section>
+
+  <details class="card" id="usageCard" hidden>
+    <summary>Consommation <span id="usageSum" class="muted small"></span></summary>
+    <div id="usageBody"></div>
+  </details>
 
   <section class="card">
     <h2>Texte traduit</h2>

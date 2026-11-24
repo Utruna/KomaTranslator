@@ -44,6 +44,13 @@
   // À augmenter quand le prompt ou le traitement change: invalide le cache des pages déjà traduites.
   const PROMPT_VERSION = 2;
 
+  // Consommation: le background branche ici une fonction qui reçoit { cfg, tin, tout } après chaque appel LLM réussi.
+  let usageHook = null;
+  const setUsageHook = (fn) => { usageHook = fn; };
+  function reportUsage(cfg, tin, tout) {
+    try { Promise.resolve(usageHook?.({ cfg, tin: tin || 0, tout: tout || 0 })).catch(() => {}); } catch { /* jamais bloquant */ }
+  }
+
   /** Dernière erreur du traducteur, pour le popup. Aussi dans storage.session: Chrome peut redémarrer le service worker. */
   function setLastError(msg) {
     self.KomaLastError = msg;
@@ -176,7 +183,9 @@
       });
       if (r.status === 403) throw new Error("Ollama refuse l'extension (403) : définir OLLAMA_ORIGINS, voir les options");
       if (!r.ok) throw new Error("Ollama HTTP " + r.status);
-      return extractJson((await r.json()).message.content);
+      const j = await r.json();
+      reportUsage(cfg, j.prompt_eval_count, j.eval_count);
+      return extractJson(j.message.content);
     }
     if (p === "openai") {
       const base = (cfg.apiBase || "https://api.openai.com/v1").replace(/\/+$/, "");
@@ -190,7 +199,9 @@
         }),
       });
       if (!r.ok) throw new Error("API HTTP " + r.status + " " + (await r.text()).slice(0, 200));
-      return extractJson((await r.json()).choices[0].message.content || "");
+      const j = await r.json();
+      reportUsage(cfg, j.usage?.prompt_tokens, j.usage?.completion_tokens);
+      return extractJson(j.choices[0].message.content || "");
     }
     if (p === "anthropic") {
       const r = await fetchTimeout("https://api.anthropic.com/v1/messages", {
@@ -205,6 +216,7 @@
       });
       if (!r.ok) throw new Error("Claude HTTP " + r.status + " " + (await r.text()).slice(0, 200));
       const j = await r.json();
+      reportUsage(cfg, j.usage?.input_tokens, j.usage?.output_tokens);
       return extractJson(j.content.filter((b) => b.type === "text").map((b) => b.text).join(""));
     }
     throw new Error("fournisseur inconnu: " + p);
@@ -343,5 +355,5 @@
     return google(texts, src, tgt, info);
   }
 
-  self.KomaTranslate = { translateAll, llmJson, fetchTimeout, dropCredits, setLastError, PROMPT_VERSION, LANG_NAMES, similarity, _internals: { decaps, extractJson, similarity, mentions } };
+  self.KomaTranslate = { translateAll, llmJson, fetchTimeout, dropCredits, setLastError, setUsageHook, PROMPT_VERSION, LANG_NAMES, similarity, _internals: { decaps, extractJson, similarity, mentions } };
 })();

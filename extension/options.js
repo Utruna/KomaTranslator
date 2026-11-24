@@ -33,7 +33,8 @@ function readForm() {
   document.querySelector(`input[name=provider][value=${provider}]`).checked = true;
   for (const f of FIELDS) if (cfg[f]) $(f).value = cfg[f];
   $("review").checked = cfg.review !== false; // activée par défaut
-  const st = await chrome.storage.sync.get(["font", "caps"]);
+  const st = await chrome.storage.sync.get(["font", "caps", "src"]);
+  $("defSrc").value = st.src || "auto";
   $("font").value = st.font || "";
   $("caps").checked = !!st.caps;
   profiles = { ...(cfg.profiles || {}) };
@@ -45,6 +46,7 @@ function readForm() {
 
 document.querySelectorAll("input[name=provider]").forEach((r) => (r.onchange = showPanels));
 
+$("defSrc").onchange = () => chrome.storage.sync.set({ src: $("defSrc").value });
 $("caps").onchange = () => chrome.storage.sync.set({ caps: $("caps").checked });
 $("font").onchange = () => chrome.storage.sync.set({ font: $("font").value.trim() });
 

@@ -15,6 +15,9 @@
     anthropicKey: "",
     anthropicModel: "claude-haiku-5-5",
     review: true,                // relecture (seulement avec un LLM)
+    dailyCapCents: 0,            // plafond de dépense par jour en centimes (0 = aucun): au-delà, repli sur Google
+    priceIn: "",                 // tarif saisi à la main ($ par million de jetons), pour une API sans tarif connu
+    priceOut: "",
     profiles: {},                // { deepseek: { apiKey, apiModel }, gemini: {…}, custom: { apiBase, apiKey, apiModel } }
   };
 
@@ -31,6 +34,13 @@
         + "Les modèles changent vite : si le test répond 404, prends un autre « gemini-…-flash-lite ».",
     },
   };
+
+  /** Tarif DeepSeek V4.1 Flash (page officielle, relevé le 2026-11-24): $ par million de jetons, hors cache. */
+  function deepseekPrice(now = new Date()) {
+    const h = now.getUTCHours(), d = now.getUTCDay();
+    const peak = d >= 1 && d <= 5 && ((h >= 1 && h < 4) || (h >= 6 && h < 10)); // jours fériés chinois ignorés
+    return { in: peak ? 0.3 : 0.15, out: peak ? 1.2 : 0.6, label: peak ? "heures de pointe" : "heures creuses" };
+  }
 
   /** Les traducteurs proposés dans le menu, dans l'ordre d'affichage. */
   const PROVIDERS = [
@@ -49,6 +59,34 @@
   function activeId(cfg) {
     const p = cfg.provider || "google";
     return p === "openai" ? presetOfBase(cfg.apiBase) : p;
+  }
+
+  /** Tarif ($ par million de jetons) du traducteur actif: { in, out, label }, ou null s'il est inconnu (ex. Claude sans tarif saisi). */
+  function priceOf(cfg, now = new Date()) {
+    const p = cfg.provider || "google";
+    if (p === "google") return null;
+    if (p === "ollama") return { in: 0, out: 0, label: "local" };
+    if (cfg.priceIn !== "" && cfg.priceIn != null || cfg.priceOut !== "" && cfg.priceOut != null) {
+      return { in: Number(cfg.priceIn) || 0, out: Number(cfg.priceOut) || 0, label: "tarif saisi" };
+    }
+    const id = activeId(cfg);
+    if (id === "deepseek") return deepseekPrice(now);
+    if (id === "gemini") return { in: 0, out: 0, label: "palier gratuit" };
+    return null;
+  }
+
+  /** Coût estimé en dollars de ces jetons, ou null si le tarif est inconnu. */
+  function costOf(cfg, tin, tout, now = new Date()) {
+    const p = priceOf(cfg, now);
+    return p ? ((tin || 0) * p.in + (tout || 0) * p.out) / 1e6 : null;
+  }
+
+  /** Réponse de GET https://api.deepseek.com/user/balance → { available, balances: [{ currency, total }] }. */
+  function parseBalance(j) {
+    return {
+      available: !!j?.is_available,
+      balances: (j?.balance_infos || []).map((b) => ({ currency: String(b.currency || ""), total: Number(b.total_balance) || 0 })),
+    };
   }
 
   /** Copie de cfg où le profil du traducteur « API » actif est mis à jour (clé et modèle ne se perdent pas en changeant). */
@@ -100,5 +138,5 @@
     return c;
   }
 
-  self.KomaPresets = { CFG_DEFAULTS, PRESETS, PROVIDERS, DEFAULT_BASE, presetOfBase, activeId, remember, isReady, select, modelOf, setModel };
+  self.KomaPresets = { CFG_DEFAULTS, PRESETS, PROVIDERS, DEFAULT_BASE, deepseekPrice, priceOf, costOf, parseBalance, presetOfBase, activeId, remember, isReady, select, modelOf, setModel };
 })();

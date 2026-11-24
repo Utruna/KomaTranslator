@@ -32,12 +32,17 @@ Ordre de grandeur : 0,5–2 s d'OCR par page (CPU), + 0,1 s (Google) à 1–2 s 
    Chrome affiche parfois un avertissement « extensions en mode développeur » au démarrage : c'est normal hors store.
 
 ### Le menu de l'icône
-- **Traduire ce site** (interrupteur), langues source et cible.
+- **Traduire ce site** (interrupteur). **Cette page** : progression (traduites, en cours, en attente, sans texte, en échec), **Pause** (plus aucune requête, et rien de plus n'est dépensé),
+  **Voir l'original** (sans retraduire), **mode économie** (ne prépare que ce qui est à l'écran : moins de jetons gaspillés, moins de charge).
+  **Alt+Maj+clic** sur une image la retraduit sans utiliser le cache.
+- **Langues** : la langue **source se règle par site** (un site coréen et un site chinois n'ont plus à être rechangés) ; « Général » reprend le réglage de la page d'options. Cible commune.
 - **Traducteur** : un clic pour passer de Google à DeepSeek, Gemini, Ollama, Claude ou une autre API compatible OpenAI. Chaque traducteur garde sa clé et son modèle ;
   celui dont la clé manque est grisé (« clé à ajouter »). Modèle, relecture, bouton **Tester** ; pour Ollama : adresse, durée en VRAM et **Libérer la VRAM**.
+- **Consommation** (avec un LLM) : pages, jetons et coût estimé du jour et du mois, **plafond de dépense par jour** (au-delà, Google prend le relais),
+  **solde DeepSeek** sur demande. Tarif DeepSeek connu (heures creuses / de pointe) ; pour une autre API, saisis le tarif en $ par million de jetons.
 - **Texte traduit** : police installée et majuscules, appliquées tout de suite.
 - **Série** : glossaire et import depuis un wiki. **Retraduire la page**, **Mémoire** et **Options**.
-- **Mémoire** : toutes les séries retenues (wiki, glossaire, résumé, corrections, historique, taille) avec suppression partielle (retirer le wiki et le glossaire, vider les corrections ou l'historique) ou totale, et le cache des pages (nombre, stockage utilisé, vider).
+- **Mémoire** : toutes les séries retenues (wiki, glossaire, résumé, corrections, historique, taille) avec suppression partielle ou totale — **annulable** —, le cache des pages, le détail de la consommation par jour, et l'**export / import** des séries en fichier JSON (glossaires et corrections, jamais les clés ; l'import fusionne).
 
 ### Utilisation
 - Sur le site de lecture : icône de l'extension → **Traduire ce site** (raccourci `Alt+Shift+T`).

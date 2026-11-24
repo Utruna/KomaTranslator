@@ -62,3 +62,26 @@ test("modelOf / setModel", () => {
   assert.equal(P.setModel(cfg, "ollama", "llama3").ollamaModel, "llama3");
   assert.equal(P.setModel(cfg, "anthropic", "claude-x").anthropicModel, "claude-x");
 });
+
+test("tarifs: DeepSeek (pointe / creuses), Gemini gratuit, Ollama local, inconnu → null, tarif saisi prioritaire", () => {
+  const ds = { provider: "openai", apiBase: P.PRESETS.deepseek.apiBase };
+  const lundi10h = new Date("2026-11-23T08:00:00Z"), dimanche = new Date("2026-11-22T08:00:00Z"), lundi12h = new Date("2026-11-23T12:00:00Z");
+  assert.deepEqual([P.priceOf(ds, lundi10h).in, P.priceOf(ds, lundi10h).out], [0.3, 1.2], "heures de pointe");
+  assert.deepEqual([P.priceOf(ds, dimanche).in, P.priceOf(ds, dimanche).out], [0.15, 0.6], "week-end");
+  assert.equal(P.priceOf(ds, lundi12h).label, "heures creuses");
+  assert.equal(P.priceOf({ provider: "openai", apiBase: P.PRESETS.gemini.apiBase }).out, 0);
+  assert.equal(P.priceOf({ provider: "ollama" }).label, "local");
+  assert.equal(P.priceOf({ provider: "google" }), null);
+  assert.equal(P.priceOf({ provider: "anthropic" }), null, "Claude: tarif non connu");
+  assert.deepEqual(P.priceOf({ provider: "anthropic", priceIn: "1", priceOut: "5" }), { in: 1, out: 5, label: "tarif saisi" });
+  assert.equal(P.priceOf({ ...ds, priceIn: 2, priceOut: 4 }).in, 2, "le tarif saisi l'emporte");
+  assert.ok(Math.abs(P.costOf(ds, 1_000_000, 1_000_000, dimanche) - 0.75) < 1e-12);
+  assert.equal(P.costOf({ provider: "anthropic" }, 10, 10), null);
+});
+
+test("parseBalance: réponse de GET /user/balance de DeepSeek", () => {
+  const r = P.parseBalance({ is_available: true, balance_infos: [{ currency: "USD", total_balance: "4.52", granted_balance: "0.00", topped_up_balance: "4.52" }, { currency: "CNY", total_balance: "110.00" }] });
+  assert.deepEqual(r, { available: true, balances: [{ currency: "USD", total: 4.52 }, { currency: "CNY", total: 110 }] });
+  assert.deepEqual(P.parseBalance({ is_available: false, balance_infos: [] }), { available: false, balances: [] });
+  assert.deepEqual(P.parseBalance(null), { available: false, balances: [] });
+});

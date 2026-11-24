@@ -14,7 +14,31 @@
   const HOST = anc && anc.length ? new URL(anc[anc.length - 1]).hostname : location.hostname;
 
   let enabled = false;
-  const state = new Map(); // img → {origSrc, origSrcset, url, translatedUrl, busy}
+  let ECO = false;          // mode économie (storage.sync « eco »): seulement ce qui est à l'écran
+  let paused = false;       // pause demandée depuis le menu: plus aucune image n'est envoyée
+  let originalView = false; // « voir l'original »: les images traduites sont masquées, sans rien perdre
+  const state = new Map(); // img → {origSrc, origSrcset, url, translatedUrl, res, busy}
+  const tracked = new Set();   // images assez grandes, sous surveillance
+  const failed = new Map();    // img → message, pour les échecs définitifs
+  const freshNext = new Set(); // images à retraduire sans passer par le cache (Alt+Maj+clic)
+
+  /** Remet l'image d'origine à l'écran (srcset et <source> compris), en gardant la traduction pour y revenir. */
+  function showOriginal(img, st) {
+    if (st.origSrcset) img.setAttribute("srcset", st.origSrcset);
+    img.parentElement?.querySelectorAll("source[data-kt-srcset]").forEach((s) => { s.srcset = s.dataset.ktSrcset; });
+    img.src = st.origSrc || st.url;
+  }
+  /** Affiche l'image traduite (les srcset d'origine sont mis de côté dans data-kt-srcset). */
+  function showTranslated(img, st) {
+    img.removeAttribute("srcset");
+    if (img.parentElement?.tagName === "PICTURE") {
+      img.parentElement.querySelectorAll("source").forEach((s) => {
+        if (s.dataset.ktSrcset === undefined) s.dataset.ktSrcset = s.srcset;
+        s.removeAttribute("srcset");
+      });
+    }
+    img.src = st.translatedUrl;
+  }
 
   /** Police des options: un nom de police installée sur le système, placé avant la pile par défaut (vide = défaut). */
   function applyFont(name) {
@@ -28,12 +52,13 @@
     const id = ++rerenderId; // un nouveau changement de police interrompt le précédent
     for (const [img, st] of state) {
       if (id !== rerenderId) return;
-      if (!st.res || !st.translatedUrl || img.src !== st.translatedUrl) continue;
+      if (!st.res || !st.translatedUrl) continue;
+      const old = st.translatedUrl, showing = img.src === old; // en « voir l'original »: on met à jour sans afficher
       const out = await render(st.res.image, st.res.data);
-      if (id !== rerenderId || img.src !== st.translatedUrl) { URL.revokeObjectURL(out); continue; }
-      URL.revokeObjectURL(st.translatedUrl);
+      if (id !== rerenderId || st.translatedUrl !== old) { URL.revokeObjectURL(out); continue; }
+      URL.revokeObjectURL(old);
       st.translatedUrl = out;
-      img.src = out;
+      if (showing) img.src = out;
     }
   }
 
@@ -56,10 +81,18 @@
   const MAX_INFLIGHT = 2;
   let inflight = 0;
 
-  const io = new IntersectionObserver((entries) => {
+  /** Zone autour de l'écran où l'on prépare les images: 4000 px normalement, 700 px en mode économie (moins de jetons gaspillés). */
+  const makeIo = () => new IntersectionObserver((entries) => {
     for (const e of entries) e.isIntersecting ? near.add(e.target) : near.delete(e.target);
     pump();
-  }, { rootMargin: "4000px 0px" });
+  }, { rootMargin: ECO ? "700px 0px" : "4000px 0px" });
+  let io = makeIo();
+  /** Reprend la surveillance de toutes les images (après une pause, un changement de mode...). */
+  function rewatch() {
+    io.disconnect();
+    near.clear();
+    scan(document);
+  }
 
   /** Plus petit = plus urgent: 0 si visible, sinon distance sous l'écran (ordre de lecture), les images dépassées en dernier. */
   function priority(img) {
@@ -71,7 +104,7 @@
 
   /** Lance le traitement des images proches, la plus prioritaire d'abord, MAX_INFLIGHT à la fois. */
   function pump() {
-    while (enabled && inflight < MAX_INFLIGHT && near.size) {
+    while (enabled && !paused && !(ECO && document.hidden) && inflight < MAX_INFLIGHT && near.size) {
       let best = null, bestP = Infinity;
       for (const img of near) {
         if (!img.isConnected) { near.delete(img); continue; }
@@ -88,7 +121,7 @@
 
   /** Met une image sous surveillance si elle est assez grande (attend son chargement sinon). */
   function watch(img) {
-    if (!enabled) return;
+    if (!enabled || originalView) return;
     const st = state.get(img);
     if (st && (st.busy || (st.translatedUrl && img.src === st.translatedUrl))) return;
     if (!img.complete || !img.naturalWidth) {
@@ -96,6 +129,7 @@
       return;
     }
     if (img.naturalWidth < MIN_W || img.naturalHeight < MIN_H) return;
+    tracked.add(img);
     io.observe(img);
   }
 
@@ -124,14 +158,17 @@
     state.set(img, st);
     img.classList.add("kt-busy");
     try {
-      const msg = { type: "translate", url, pageUrl: location.href, pos: Math.round(img.getBoundingClientRect().top + scrollY) };
+      const msg = { type: "translate", url, pageUrl: location.href, host: HOST, pos: Math.round(img.getBoundingClientRect().top + scrollY) };
+      if (freshNext.delete(img)) msg.fresh = true; // retraduction demandée: pas de cache
       if (url.startsWith("blob:") || url.startsWith("data:")) {
         const blob = await (await fetch(url)).blob();
         msg.bytes = await blobToB64(blob);
         msg.mime = blob.type;
       }
       const res = await chrome.runtime.sendMessage(msg);
+      if (res?.cancelled) { state.delete(img); return; } // pause: l'image sera reprise plus tard
       if (!res?.ok) throw new Error(res?.error || "pas de réponse");
+      failed.delete(img);
       if (!enabled || (img.currentSrc || img.src) !== url) return; // l'image a changé entre-temps
       io.unobserve(img);
       if (!res.data.blocks.length) return;
@@ -139,13 +176,7 @@
       st.translatedUrl = out;
       st.res = res; // pour l'infobulle et les corrections
       attachInteractions(img);
-      img.removeAttribute("srcset");
-      const pic = img.parentElement?.tagName === "PICTURE" ? img.parentElement : null;
-      pic?.querySelectorAll("source").forEach((s) => {
-        s.dataset.ktSrcset = s.srcset;
-        s.removeAttribute("srcset");
-      });
-      img.src = out;
+      if (!originalView) showTranslated(img, st);
     } catch (e) {
       console.warn("[KomaTranslator]", url, e);
       const n = retries.get(img) || 0;
@@ -153,7 +184,7 @@
         retries.set(img, n + 1);
         state.delete(img);
         setTimeout(() => { near.add(img); pump(); }, 1500 * (n + 1));
-      } else img.title = "KomaTranslator: " + e.message;
+      } else { img.title = "KomaTranslator: " + e.message; failed.set(img, e.message); }
     } finally {
       st.busy = false;
       img.classList.remove("kt-busy");
@@ -180,12 +211,13 @@
     img.addEventListener("mousemove", (ev) => {
       if (!enabled) return;
       const b = blockAt(img, ev);
-      const t = b ? `${b.text}\n→ ${b.translation}\n(Alt+clic pour corriger)` : "";
+      const t = b ? `${b.text}\n→ ${b.translation}\n(Alt+clic : corriger · Alt+Maj+clic : retraduire l'image)` : "";
       if (img.title !== t) img.title = t;
       img.style.cursor = b && ev.altKey ? "text" : "";
     });
     img.addEventListener("click", async (ev) => {
       if (!enabled || !ev.altKey) return;
+      if (ev.shiftKey) { ev.preventDefault(); ev.stopPropagation(); retranslateImg(img); return; }
       const b = blockAt(img, ev);
       if (!b) return;
       ev.preventDefault();
@@ -202,9 +234,76 @@
     }, true);
   }
 
+  /** Retraduit une seule image sans utiliser le cache (Alt+Maj+clic). */
+  function retranslateImg(img) {
+    const st = state.get(img);
+    if (!st) return;
+    if (st.translatedUrl) { showOriginal(img, st); URL.revokeObjectURL(st.translatedUrl); }
+    state.delete(img);
+    failed.delete(img);
+    freshNext.add(img);
+    img.addEventListener("load", () => { near.add(img); pump(); }, { once: true });
+  }
+
+  // ── Statistiques envoyées au menu (via le background) ──
+  const shortUrl = (u) => decodeURIComponent(String(u).split("?")[0].split("/").pop() || u).slice(0, 40);
+  function stats() {
+    let done = 0, empty = 0, busy = 0;
+    for (const [img, st] of state) {
+      if (!img.isConnected) continue;
+      if (st.busy) busy++;
+      else if (st.translatedUrl) done++;
+      else if (!failed.has(img)) empty++;
+    }
+    const bad = [...failed].filter(([img]) => img.isConnected);
+    return {
+      tracked: [...tracked].filter((i) => i.isConnected).length, done, empty, busy, queued: near.size, failed: bad.length,
+      errors: bad.slice(0, 5).map(([img, error]) => ({ url: shortUrl(img.currentSrc || img.src), error })),
+      paused, original: originalView, enabled,
+    };
+  }
+  let lastStats = JSON.stringify(stats()), statsTimer = null;
+  function sendStats() {
+    const s = JSON.stringify(stats());
+    if (s === lastStats) return;
+    lastStats = s;
+    chrome.runtime.sendMessage({ type: "pageStats", stats: JSON.parse(s) }).catch(() => {});
+  }
+
+  /** Pause: plus aucune image n'est envoyée et celles qui attendent dans la file sont retirées. */
+  function setPaused(on) {
+    if (on === paused) return;
+    paused = on;
+    if (on) { near.clear(); chrome.runtime.sendMessage({ type: "cancelQueue" }).catch(() => {}); }
+    else { chrome.runtime.sendMessage({ type: "resumeQueue" }).catch(() => {}); rewatch(); }
+    sendStats();
+  }
+
+  /** « Voir l'original »: bascule entre les images d'origine et les images traduites, sans retraduire. */
+  function setOriginal(on) {
+    if (on === originalView) return;
+    originalView = on;
+    for (const [img, st] of state) {
+      if (!st.translatedUrl) continue;
+      if (on) showOriginal(img, st); else showTranslated(img, st);
+    }
+    if (!on) rewatch();
+    sendStats();
+  }
+
+  /** Mode économie: change la zone de préparation et reprend la surveillance. */
+  function setEco(on) {
+    if (on === ECO) return;
+    ECO = on;
+    io.disconnect();
+    io = makeIo();
+    if (enabled) { near.clear(); scan(document); }
+  }
+
   /** Remet toutes les images dans leur état d'origine (désactivation du site). */
   function restoreAll() {
     for (const [img, st] of state) {
+      if (st.translatedUrl) URL.revokeObjectURL(st.translatedUrl);
       if (st.translatedUrl && img.src === st.translatedUrl) {
         if (st.origSrcset) img.setAttribute("srcset", st.origSrcset);
         img.parentElement?.querySelectorAll("source[data-kt-srcset]").forEach((s) => {
@@ -212,11 +311,12 @@
           delete s.dataset.ktSrcset;
         });
         img.src = st.origSrc || st.url;
-        URL.revokeObjectURL(st.translatedUrl);
       }
       img.classList.remove("kt-busy");
     }
     state.clear();
+    tracked.clear();
+    failed.clear();
   }
 
   // ── Rendu: image d'origine + zones nettoyées + texte traduit ──
@@ -336,25 +436,42 @@
     if (on) {
       mo.observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ["src", "srcset"] });
       scan(document);
+      statsTimer = setInterval(sendStats, 1500);
+      setTimeout(sendStats, 300); // le menu n'attend pas la première minuterie
     } else {
       mo.disconnect();
       io.disconnect();
       near.clear();
       restoreAll();
+      if (paused) chrome.runtime.sendMessage({ type: "resumeQueue" }).catch(() => {});
+      paused = false;
+      originalView = false;
+      clearInterval(statsTimer);
+      sendStats();
     }
   }
 
+  // Commandes du menu: { type: "koma", cmd: "pause" | "resume" | "original" | "translated" }
   chrome.runtime.onMessage.addListener((msg) => {
     if (msg.type === "retranslate" && enabled) { setEnabled(false); setEnabled(true); }
+    if (msg.type === "koma" && enabled) {
+      if (msg.cmd === "pause") setPaused(true);
+      else if (msg.cmd === "resume") setPaused(false);
+      else if (msg.cmd === "original") setOriginal(true);
+      else if (msg.cmd === "translated") setOriginal(false);
+    }
   });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) pump(); });
 
-  chrome.storage.sync.get(["sites", "font", "caps"]).then(({ sites = {}, font, caps }) => { applyFont(font); CAPS = !!caps; setEnabled(!!sites[HOST]); });
+  chrome.storage.sync.get(["sites", "font", "caps", "eco"]).then(({ sites = {}, font, caps, eco }) => { applyFont(font); CAPS = !!caps; setEco(!!eco); setEnabled(!!sites[HOST]); });
   chrome.storage.onChanged.addListener((ch) => {
     if (ch.font || ch.caps) {
       if (ch.font) applyFont(ch.font.newValue);
       if (ch.caps) CAPS = !!ch.caps.newValue;
       if (enabled) rerenderAll();
     }
+    if (ch.eco) setEco(!!ch.eco.newValue);
+    if (ch.siteLangs && enabled && ch.siteLangs.oldValue?.[HOST]?.src !== ch.siteLangs.newValue?.[HOST]?.src) { setEnabled(false); setEnabled(true); } // langue de ce site changée
     if (ch.sites) setEnabled(!!(ch.sites.newValue || {})[HOST]);
     if ((ch.src || ch.tgt) && enabled) { setEnabled(false); setEnabled(true); } // langue changée → retraduire
   });

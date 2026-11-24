@@ -2,16 +2,7 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const { S } = require("./setup");
 
-// chrome.storage.local en mémoire
-function fakeStorage(init) {
-  const data = { ...init };
-  globalThis.chrome = { storage: { local: {
-    get: async (k) => (k == null ? { ...data } : typeof k === "string" ? (k in data ? { [k]: data[k] } : {}) : {}),
-    set: async (o) => { Object.assign(data, o); },
-    remove: async (k) => { delete data[k]; },
-  } } };
-  return data;
-}
+const { fakeStorage } = require("./helpers");
 const serie = (key, extra = {}) => ({ key, wiki: "", summary: "", glossary: [], corrections: {}, history: [], ...extra });
 
 test("listSeries: séries seulement, de la plus volumineuse à la plus petite, avec les compteurs", async () => {
@@ -53,4 +44,72 @@ test("deleteSeries: supprime la série et seulement celle-là", async () => {
 
 test("cacheCount: 0 quand IndexedDB est indisponible", async () => {
   assert.equal(await S.cacheCount(), 0);
+});
+
+test("sanitizeSeries: refuse sans clé, borne les tailles, ne garde que les champs connus", () => {
+  assert.equal(S.sanitizeSeries(null), null);
+  assert.equal(S.sanitizeSeries({ glossary: [] }), null);
+  assert.equal(S.sanitizeSeries({ key: "  " }), null);
+  const c = S.sanitizeSeries({ key: "a.com/x", evil: "x", summary: "s".repeat(9000), glossary: [{ src: "A", tgt: "B", extra: 1 }, { src: "", tgt: "x" }, null], corrections: { "": "x", t: "u", v: "" }, history: [["a", "b"], "nope"] });
+  assert.deepEqual(Object.keys(c).sort(), ["corrections", "glossary", "history", "key", "summary", "wiki"]);
+  assert.equal(c.summary.length, 5000);
+  assert.deepEqual(c.glossary, [{ src: "A", orig: "", tgt: "B", type: "", note: "" }]);
+  assert.deepEqual(c.corrections, { t: "u" });
+  assert.deepEqual(c.history, [["a", "b"]]);
+});
+
+test("exportSeries: toutes les séries ou celles demandées, sans l'historique", async () => {
+  fakeStorage({ "series:a.com/x": serie("a.com/x", { glossary: [{ src: "A", tgt: "B" }], history: [["a", "b"]] }), "series:b.com/y": serie("b.com/y"), cfg: { apiKey: "secret" } });
+  const all = await S.exportSeries();
+  assert.equal(all.app, "KomaTranslator");
+  assert.deepEqual(all.series.map((s) => s.key).sort(), ["a.com/x", "b.com/y"]);
+  assert.equal("history" in all.series[0], false);
+  assert.equal(JSON.stringify(all).includes("secret"), false, "la config et les clés API ne sont jamais exportées");
+  assert.deepEqual((await S.exportSeries(["b.com/y"])).series.map((s) => s.key), ["b.com/y"]);
+});
+
+test("importSeries: série nouvelle ajoutée; existante fusionnée (glossaire importé gagne, corrections locales gagnent)", async () => {
+  const data = fakeStorage({ "series:a.com/x": serie("a.com/x", { summary: "mien", glossary: [{ src: "Xiao Yan", orig: "", tgt: "ancien", type: "", note: "" }], corrections: { t: "ma version" } }) });
+  const file = { app: "KomaTranslator", version: 1, series: [
+    { key: "a.com/x", summary: "importé", wiki: "https://w.org", glossary: [{ src: "xiao yan", tgt: "Xiao Yan" }, { src: "Nouveau", tgt: "Neuf" }], corrections: { t: "version importée", u: "v" } },
+    { key: "n.com/z", glossary: [{ src: "A", tgt: "B" }] },
+    { nokey: true },
+  ] };
+  assert.deepEqual(await S.importSeries(file), { added: 1, merged: 1, skipped: 1 });
+  const d = data["series:a.com/x"];
+  assert.equal(d.summary, "mien", "le résumé existant est gardé");
+  assert.equal(d.wiki, "https://w.org", "le wiki manquant est repris");
+  assert.deepEqual(d.glossary.map((t) => t.tgt).sort(), ["Neuf", "Xiao Yan"], "même terme source (sans casse): l'importé gagne");
+  assert.deepEqual(d.corrections, { t: "ma version", u: "v" });
+  assert.ok(data["series:n.com/z"]);
+  await assert.rejects(S.importSeries({ app: "autre" }), /export KomaTranslator/);
+  await assert.rejects(S.importSeries(null), /export KomaTranslator/);
+});
+
+test("putSeries: restaure une série supprimée telle quelle", async () => {
+  const data = fakeStorage({});
+  await S.putSeries(serie("a.com/x", { summary: "s", corrections: { a: "b" } }));
+  assert.equal(data["series:a.com/x"].corrections.a, "b");
+  await assert.rejects(S.putSeries({ summary: "sans clé" }), /invalide/);
+});
+
+test("consommation: cumul par jour et traducteur, coût du jour, résumé du mois, purge", async () => {
+  fakeStorage({});
+  const d1 = new Date("2026-11-24T10:00:00Z"), d2 = new Date("2026-11-25T10:00:00Z");
+  await Promise.all([
+    S.usageAdd("deepseek", { req: 1, tin: 1000, tout: 200, cost: 0.001 }, d1),
+    S.usageAdd("deepseek", { req: 1, tin: 500, tout: 100, pages: 1, cost: 0.0005 }, d1), // en parallèle: aucune perte
+    S.usageAdd("gemini", { req: 1, tin: 300, tout: 50, cost: 0 }, d1),
+    S.usageAdd("anthropic", { req: 1, tin: 10, tout: 5, cost: null }, d1), // tarif inconnu
+    S.usageAdd("deepseek", { req: 1, tin: 100, tout: 10, cost: 0.0001 }, d2),
+  ]);
+  assert.ok(Math.abs((await S.usageCostToday(d1)) - 0.0015) < 1e-9);
+  const sum = await S.usageSummary(d1);
+  assert.deepEqual({ req: sum.today.deepseek.req, tin: sum.today.deepseek.tin, pages: sum.today.deepseek.pages }, { req: 2, tin: 1500, pages: 1 });
+  assert.equal(sum.today.anthropic.cost, 0, "tarif inconnu: pas de coût compté");
+  assert.equal(sum.month.deepseek.req, 3);
+  assert.deepEqual(sum.days.map((x) => x.day), ["2026-11-25", "2026-11-24"], "jours récents d'abord");
+  // purge au-delà de 62 jours
+  for (let i = 0; i < 70; i++) await S.usageAdd("deepseek", { req: 1 }, new Date(Date.UTC(2026, 0, 1 + i)));
+  assert.ok((await S.usageSummary(d1)).days.length <= 62);
 });

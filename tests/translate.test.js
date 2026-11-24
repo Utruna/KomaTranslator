@@ -223,3 +223,26 @@ test("DeepSeek: le mode réflexion est désactivé; les autres API ne reçoivent
   assert.deepEqual(bodies[0].thinking, { type: "disabled" });
   assert.equal("thinking" in bodies[1], false);
 });
+
+test("consommation: les jetons de chaque appel LLM sont remontés (OpenAI, Ollama, Claude)", async () => {
+  const got = [];
+  T.setUsageHook((u) => got.push([u.cfg.provider, u.tin, u.tout]));
+  globalThis.fetch = async (url) => {
+    const u = String(url);
+    if (u.includes("/api/chat")) return json({ message: { content: '{"1":"x"}' }, prompt_eval_count: 11, eval_count: 3 });
+    if (u.includes("anthropic")) return json({ content: [{ type: "text", text: '{"1":"x"}' }], usage: { input_tokens: 21, output_tokens: 4 } });
+    return json({ choices: [{ message: { content: '{"1":"x"}' } }], usage: { prompt_tokens: 31, completion_tokens: 5 } });
+  };
+  try {
+    await T.translateAll(["a"], "en", "fr", { provider: "ollama", ollamaUrl: "http://o.test", review: false });
+    await T.translateAll(["a"], "en", "fr", { provider: "anthropic", anthropicKey: "k", review: false });
+    await T.translateAll(["a"], "en", "fr", LLM);
+  } finally { T.setUsageHook(null); }
+  assert.deepEqual(got, [["ollama", 11, 3], ["anthropic", 21, 4], ["openai", 31, 5]]);
+});
+
+test("consommation: un hook qui échoue ne casse pas la traduction", async () => {
+  T.setUsageHook(() => { throw new Error("boum"); });
+  globalThis.fetch = async () => llmReply('{"1":"x"}');
+  try { assert.deepEqual(await T.translateAll(["a"], "en", "fr", LLM), ["x"]); } finally { T.setUsageHook(null); }
+});

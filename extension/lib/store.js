@@ -94,6 +94,115 @@
   /** Supprime une série entière (glossaire, résumé, corrections, historique). */
   const deleteSeries = (key) => locked(() => chrome.storage.local.remove(sk(key)));
 
+  // ── Export / import / restauration d'une série ──
+  const str = (v, n) => String(v ?? "").slice(0, n);
+  const cleanTerm = (t) => Object.fromEntries(["src", "orig", "tgt", "type", "note"].map((k) => [k, str(t?.[k], 300)]));
+
+  /** Série valide (champs connus seulement, tailles bornées) à partir d'un objet quelconque, ou null s'il n'a pas de clé. */
+  function sanitizeSeries(raw) {
+    if (!raw || typeof raw !== "object" || typeof raw.key !== "string" || !raw.key.trim()) return null;
+    const corr = raw.corrections && typeof raw.corrections === "object" && !Array.isArray(raw.corrections) ? raw.corrections : {};
+    return {
+      key: str(raw.key.trim(), 300),
+      wiki: str(raw.wiki, 500),
+      summary: str(raw.summary, 5000),
+      glossary: (Array.isArray(raw.glossary) ? raw.glossary : []).filter((t) => t && t.src && t.tgt).slice(0, 2000).map(cleanTerm),
+      corrections: Object.fromEntries(Object.entries(corr).filter(([k, v]) => k && v).slice(0, 5000).map(([k, v]) => [str(k, 1000), str(v, 1000)])),
+      history: (Array.isArray(raw.history) ? raw.history : []).filter((p) => Array.isArray(p) && p.length >= 2).slice(-HISTORY_MAX).map((p) => [str(p[0], 1000), str(p[1], 1000)]),
+    };
+  }
+
+  /** Remet une série telle quelle (annulation d'une suppression). */
+  const putSeries = (serie) => locked(async () => {
+    const c = sanitizeSeries(serie);
+    if (!c) throw new Error("série invalide");
+    await save(c);
+  });
+
+  /** Fichier d'export: les séries demandées (toutes par défaut), sans l'historique des répliques (inutile à partager). */
+  async function exportSeries(keys) {
+    const all = await listSeries();
+    const series = [];
+    for (const s of all) {
+      if (keys && !keys.includes(s.key)) continue;
+      const d = await load(s.key);
+      series.push({ key: d.key, wiki: d.wiki, summary: d.summary, glossary: d.glossary, corrections: d.corrections });
+    }
+    return { app: "KomaTranslator", version: 1, exportedAt: new Date().toISOString(), series };
+  }
+
+  /**
+   * Importe un fichier d'export en fusionnant avec l'existant: glossaire par terme source (l'importé l'emporte),
+   * corrections (les tiennes l'emportent), résumé et wiki gardés s'ils existent déjà, historique inchangé.
+   * → { added (séries nouvelles), merged (séries existantes), skipped (entrées invalides) }.
+   */
+  const importSeries = (data) => locked(async () => {
+    if (!data || data.app !== "KomaTranslator" || !Array.isArray(data.series)) throw new Error("ce fichier n'est pas un export KomaTranslator");
+    const out = { added: 0, merged: 0, skipped: 0 };
+    for (const raw of data.series.slice(0, 500)) {
+      const c = sanitizeSeries(raw);
+      if (!c) { out.skipped++; continue; }
+      const existing = (await chrome.storage.local.get(sk(c.key)))[sk(c.key)];
+      if (!existing) { await save(c); out.added++; continue; }
+      const d = { ...empty(c.key), ...existing };
+      const terms = new Map(d.glossary.map((t) => [t.src.toLowerCase(), t]));
+      for (const t of c.glossary) terms.set(t.src.toLowerCase(), t);
+      d.glossary = [...terms.values()];
+      d.corrections = { ...c.corrections, ...d.corrections };
+      d.summary = d.summary || c.summary;
+      d.wiki = d.wiki || c.wiki;
+      await save(d);
+      out.merged++;
+    }
+    return out;
+  });
+
+  // ── Consommation: jetons et coût estimé, par jour (UTC) et par traducteur ──
+  const USAGE_DAYS = 62;
+  const dayOf = (d = new Date()) => d.toISOString().slice(0, 10);
+  let usageChain = Promise.resolve();
+
+  /** Ajoute à la consommation du jour pour ce traducteur: { req, tin, tout, pages, cost (dollars; null si le tarif est inconnu) }. */
+  function usageAdd(id, delta, now = new Date()) {
+    const run = async () => {
+      const { usage = {} } = await chrome.storage.local.get("usage");
+      const rec = (usage[dayOf(now)] ||= {});
+      const r = (rec[id] ||= { req: 0, tin: 0, tout: 0, pages: 0, cost: 0 });
+      for (const k of ["req", "tin", "tout", "pages"]) r[k] += delta[k] || 0;
+      if (delta.cost != null) r.cost += delta.cost;
+      for (const d of Object.keys(usage).sort().slice(0, -USAGE_DAYS)) delete usage[d];
+      await chrome.storage.local.set({ usage });
+    };
+    return (usageChain = usageChain.then(run, run));
+  }
+  const usageAll = async () => (await chrome.storage.local.get("usage")).usage || {};
+
+  /** Dollars dépensés aujourd'hui (tous traducteurs dont le tarif est connu). */
+  async function usageCostToday(now = new Date()) {
+    return Object.values((await usageAll())[dayOf(now)] || {}).reduce((s, r) => s + (r.cost || 0), 0);
+  }
+
+  /** { today: { id: rec }, month: { id: rec }, days: [{ day, req, tin, tout, pages, cost }] (récents d'abord) }. */
+  async function usageSummary(now = new Date()) {
+    const usage = await usageAll();
+    const sum = (recs) => {
+      const out = {};
+      for (const rec of recs) for (const [id, r] of Object.entries(rec)) {
+        const o = (out[id] ||= { req: 0, tin: 0, tout: 0, pages: 0, cost: 0 });
+        for (const k of Object.keys(o)) o[k] += r[k] || 0;
+      }
+      return out;
+    };
+    const month = dayOf(now).slice(0, 7);
+    const days = Object.keys(usage).sort().reverse().map((day) => {
+      const t = Object.values(sum([usage[day]]));
+      const tot = { day, req: 0, tin: 0, tout: 0, pages: 0, cost: 0 };
+      for (const r of t) for (const k of ["req", "tin", "tout", "pages", "cost"]) tot[k] += r[k];
+      return tot;
+    });
+    return { today: sum([usage[dayOf(now)] || {}]), month: sum(Object.keys(usage).filter((d) => d.startsWith(month)).map((d) => usage[d])), days };
+  }
+
   /** Empreinte (8 hex) de ce qui change la traduction d'une page: résumé + glossaire de la série (pas l'historique). */
   async function seriesSig(serie) {
     return (await sha1(new TextEncoder().encode(JSON.stringify([serie.summary || "", serie.glossary || []])))).slice(0, 8);
@@ -261,5 +370,5 @@
     return [...h].map((b) => b.toString(16).padStart(2, "0")).join("");
   }
 
-  self.KomaStore = { seriesKey, load, save, addHistory, setCorrection, saveEdit, contextFor, seriesSig, bestCorrection, listSeries, clearPart, deleteSeries, cacheCount, acquire, importWiki, cacheGet, cachePut, cacheClear, sha1 };
+  self.KomaStore = { seriesKey, load, save, addHistory, setCorrection, saveEdit, contextFor, seriesSig, bestCorrection, listSeries, clearPart, deleteSeries, sanitizeSeries, putSeries, exportSeries, importSeries, usageAdd, usageCostToday, usageSummary, cacheCount, acquire, importWiki, cacheGet, cachePut, cacheClear, sha1 };
 })();
