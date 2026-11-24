@@ -7,6 +7,25 @@
     zh: "Chinese", ja: "Japanese", ko: "Korean", auto: "the source language",
   };
 
+  // ── Crédits / pubs de scantrad: ni effacés ni traduits ──
+  const CREDITS = /(https?:\/\/|www\.|\w\.(com|net|org|io|gg|me|xyz|to|cc|fr)\b|discord|patreon|ko-?fi|paypal|\b\w+ ?scans\b|\bscantrad|read (the )?(latest|this|new|more)? ?chapters? (on|at)|translat(or|ed by)|proofread|typeset|clean(er|ed by)|\braw provider)/i;
+
+  /**
+   * Retire les blocs de crédits, et aussi leurs fragments sur la même rangée: l'OCR coupe parfois une ligne
+   * (« PLEASE » | « READ THIS SERIES… EN-SCANS.COM », « - SCANS » | « TEAM ») et un fragment sans URL serait traduit seul.
+   */
+  function dropCredits(blocks) {
+    const credit = blocks.filter((b) => CREDITS.test(b.text));
+    if (!credit.length) return blocks;
+    const sameRow = (a, b) => {
+      const ha = a[3] - a[1], hb = b[3] - b[1];
+      const overlap = Math.min(a[3], b[3]) - Math.max(a[1], b[1]);
+      const gap = Math.max(a[0] - b[2], b[0] - a[2]);
+      return overlap > 0.5 * Math.min(ha, hb) && gap < 1.5 * Math.max(ha, hb);
+    };
+    return blocks.filter((b) => !credit.includes(b) && !credit.some((c) => sameRow(b.box, c.box)));
+  }
+
   // ── Texte en MAJUSCULES (lettrage de scan) → casse normale ──
   const LATIN = /[A-Za-zÀ-ÿ]/g;
   /** Si le texte est (presque) tout en majuscules, le repasse en casse normale en gardant les noms du glossaire. */
@@ -238,5 +257,5 @@
     return google(texts, src, tgt, info);
   }
 
-  self.KomaTranslate = { translateAll, llmJson, fetchTimeout, LANG_NAMES, _internals: { decaps, extractJson, similarity } };
+  self.KomaTranslate = { translateAll, llmJson, fetchTimeout, dropCredits, LANG_NAMES, _internals: { decaps, extractJson, similarity } };
 })();

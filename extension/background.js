@@ -28,9 +28,6 @@ async function getSettings() {
   return { ...DEFAULTS, ...sync, cfg: { ...CFG_DEFAULTS, ...(local.cfg || {}) } };
 }
 
-// Crédits / pubs de scantrad: ni effacés ni traduits
-const CREDITS = /(https?:\/\/|www\.|\w\.(com|net|org|io|gg|me|xyz|to|cc|fr)\b|discord|patreon|ko-?fi|paypal|\b\w+ ?scans\b|\bscantrad|read (the )?(latest|this|new|more)? ?chapters? (on|at)|translat(or|ed by)|proofread|typeset|clean(er|ed by)|\braw provider)/i;
-
 // ── File d'attente ──
 // Limite le nombre d'images traitées en parallèle (MAX_PARALLEL), le reste attend son tour.
 let active = 0;
@@ -169,7 +166,7 @@ async function translate(msg) {
   if (!data) {
     const t0 = performance.now();
     const ocr = await runOcr(img.bytes, img.type, s.src);
-    const blocks = ocr.blocks.filter((b) => !CREDITS.test(b.text));
+    const blocks = KomaTranslate.dropCredits(ocr.blocks);
     const t1 = performance.now();
     const texts = blocks.map((b) => b.text);
     // Phase ordonnée par série: chaque image voit l'historique de la précédente (voir KomaStore.acquire)

@@ -270,6 +270,18 @@
     const lh = (ha + hb) / 2;
     const vgap = Math.max(B[1] - A[3], A[1] - B[3]);
     if (vgap > 0.9 * lh) return false;
+    if (!va) {
+      // Un bloc est aligné à gauche ou centré: deux lignes qui ne partagent ni le bord gauche ni le centre
+      // (ex. une colonne « niveau » à droite d'un nom) ne sont pas du même bloc.
+      const acx0 = (A[0] + A[2]) / 2, bcx0 = (B[0] + B[2]) / 2;
+      if (Math.abs(A[0] - B[0]) > 3 * lh && Math.abs(acx0 - bcx0) > 3 * lh) return false;
+      // Fin de paragraphe: une ligne alignée à gauche nettement plus courte que la suivante (écart > 3 hauteurs de ligne;
+      // dans un paragraphe l'écart reste de quelques pixels). Les bulles centrées ne sont pas concernées: leur bord
+      // gauche bouge de la moitié de l'écart.
+      const [U, D] = A[1] <= B[1] ? [A, B] : [B, A];
+      const shortfall = D[2] - U[2];
+      if (shortfall > 3 * lh && Math.abs(U[0] - D[0]) < 0.3 * shortfall) return false;
+    }
     if (Math.min(A[2], B[2]) - Math.max(A[0], B[0]) > 0) return true;
     if (va) return false;
     const acx = (A[0] + A[2]) / 2, bcx = (B[0] + B[2]) / 2;
@@ -517,6 +529,7 @@
   const serial = (fn) => (...a) => { const p = chain.then(() => fn(...a)); chain = p.catch(() => {}); return p; };
 
   self.KomaOCR = {
+    _internals: { sameBlock, groupBlocks, joinLines }, // pour les tests
     analyze: serial(analyze),
     warmup: serial(warmup),
     readLines: serial(async (blob, lang) => readLines(await decode(blob), lang)),
