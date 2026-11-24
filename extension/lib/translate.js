@@ -82,9 +82,21 @@
     const j = await r.json();
     return j[0].map((p) => p[0]).filter(Boolean).join("").trim();
   }
+  const GOOGLE_CONCURRENCY = 3; // l'endpoint public répond 429 au-delà de quelques requêtes simultanées
+
+  /** Comme Promise.all(items.map(fn)) mais avec au plus n appels simultanés (ordre conservé). */
+  async function mapLimit(items, n, fn) {
+    const out = new Array(items.length);
+    let next = 0;
+    await Promise.all(Array.from({ length: Math.min(n, items.length) }, async () => {
+      while (next < items.length) { const k = next++; out[k] = await fn(items[k]); }
+    }));
+    return out;
+  }
+
   /** Une bulle qui échoue garde son texte d'origine et marque le résultat comme dégradé (info.degraded). */
   async function google(texts, src, tgt, info = {}) {
-    return Promise.all(texts.map((t) => googleOne(t, src, tgt).catch(() => { info.degraded = true; return t; })));
+    return mapLimit(texts, GOOGLE_CONCURRENCY, (t) => googleOne(t, src, tgt).catch(() => { info.degraded = true; return t; }));
   }
 
   // ── Prompt LLM ──
@@ -105,6 +117,7 @@
       "- Each item is a separate bubble: translate it in place, never move words from one item to another, even if a sentence continues in the next item.",
     ];
     if (ctx.lowercased) p.push("- The source was in ALL CAPS and was lowercased automatically: some proper names may appear in lowercase (e.g. 'ye wuxian'). Recognize them and keep them as capitalized names.");
+    if (ctx.strict) p.push("- MANDATORY: in a previous attempt the glossary renderings below were NOT applied. Use them exactly, character for character, wherever the term appears.");
     if (ctx.summary) p.push("", "STORY CONTEXT:", ctx.summary);
     if (ctx.terms?.length) {
       p.push("", `GLOSSARY (always use these ${T} renderings):`);
@@ -134,6 +147,9 @@
   }
 
   // ── Appel LLM selon le fournisseur ──
+  // Température 0: la même bulle donne la même traduction (cohérence d'un passage à l'autre).
+  /** keep_alive d'Ollama: durée (« 5m », « 30s »), ou nombre de secondes (« 0 » libère tout de suite, « -1 » garde toujours). */
+  const keepAlive = (v) => (/^-?\d+$/.test(String(v ?? "").trim()) ? Number(v) : String(v || "").trim() || "5m");
   /** Envoie le prompt au fournisseur choisi (ollama | openai | anthropic) et renvoie le JSON de la réponse. */
   async function llmJson(text, cfg, { numCtx } = {}) {
     const p = cfg.provider;
@@ -145,8 +161,8 @@
         body: JSON.stringify({
           model: cfg.ollamaModel || "qwen3.5:latest",
           messages: [{ role: "user", content: text }],
-          format: "json", stream: false, think: false, keep_alive: "30m",
-          options: { temperature: 0.3, num_ctx: numCtx || 8192 },
+          format: "json", stream: false, think: false, keep_alive: keepAlive(cfg.ollamaKeepAlive),
+          options: { temperature: 0, num_ctx: numCtx || 8192 },
         }),
       });
       if (r.status === 403) throw new Error("Ollama refuse l'extension (403) : définir OLLAMA_ORIGINS, voir les options");
@@ -158,7 +174,7 @@
       const r = await fetchTimeout(base + "/chat/completions", {
         method: "POST", timeout: REMOTE_TIMEOUT, retries: 1, retryOnTimeout: false,
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + (cfg.apiKey || "none") },
-        body: JSON.stringify({ model: cfg.apiModel, temperature: 0.3, messages: [{ role: "user", content: text }] }),
+        body: JSON.stringify({ model: cfg.apiModel, temperature: 0, messages: [{ role: "user", content: text }] }),
       });
       if (!r.ok) throw new Error("API HTTP " + r.status + " " + (await r.text()).slice(0, 200));
       return extractJson((await r.json()).choices[0].message.content || "");
@@ -172,7 +188,7 @@
           "anthropic-version": "2023-06-01",
           "anthropic-dangerous-direct-browser-access": "true",
         },
-        body: JSON.stringify({ model: cfg.anthropicModel || "claude-haiku-5-5", max_tokens: 8192, messages: [{ role: "user", content: text }] }),
+        body: JSON.stringify({ model: cfg.anthropicModel || "claude-haiku-5-5", max_tokens: 8192, temperature: 0, messages: [{ role: "user", content: text }] }),
       });
       if (!r.ok) throw new Error("Claude HTTP " + r.status + " " + (await r.text()).slice(0, 200));
       const j = await r.json();
@@ -225,10 +241,55 @@
     }
   }
 
+  // ── Traduction par LLM ──
+  /** Réponse du LLM → objet { "1": "…" }, ou null si ce n'est pas un objet. */
+  function asMap(out) {
+    if (out && typeof out.translations === "object" && !Array.isArray(out.translations)) out = out.translations;
+    return out && typeof out === "object" ? out : null;
+  }
+
+  /** Traduit `list` par le LLM en une requête → tableau de même longueur (null pour une bulle absente de la réponse). */
+  async function llmBatch(list, src, tgt, cfg, c) {
+    const out = asMap(await llmJson(prompt(list, src, tgt, c), cfg));
+    if (!out) throw new Error("réponse LLM invalide");
+    return list.map((_, i) => (typeof out[String(i + 1)] === "string" ? out[String(i + 1)] : null));
+  }
+
+  const isCjk = (s) => /[\u3000-\u9fff\uac00-\ud7af]/.test(s);
+  /** Le terme du glossaire (forme d'origine ou source) apparaît-il dans ce texte ? Les mots très courts sont ignorés. */
+  function mentions(text, g) {
+    const t = text.toLowerCase();
+    return [g.orig, g.src].some((k) => k && k.length >= (isCjk(k) ? 2 : 3) && t.includes(k.toLowerCase()));
+  }
+
+  /**
+   * Vérifie le glossaire après coup: si le terme source est dans la bulle mais pas sa forme imposée dans la traduction,
+   * redemande ces bulles seules au LLM avec les termes en cause (une seule relance; en cas d'échec on garde le résultat).
+   */
+  async function enforceGlossary(texts, result, src, tgt, cfg, ctx) {
+    const terms = (ctx.terms || []).filter((g) => g.tgt);
+    if (!terms.length) return result;
+    const bad = [];
+    texts.forEach((t, i) => {
+      const miss = terms.filter((g) => mentions(t, g) && !result[i].toLowerCase().includes(g.tgt.toLowerCase()));
+      if (miss.length) bad.push({ i, miss });
+    });
+    if (!bad.length) return result;
+    const strictTerms = [...new Map(bad.flatMap((b) => b.miss).map((g) => [g.src + "|" + g.orig, g])).values()];
+    try {
+      const fixed = await llmBatch(bad.map((b) => texts[b.i]), src, tgt, cfg, { ...ctx, terms: strictTerms, strict: true, history: [] });
+      bad.forEach((b, k) => { if (fixed[k] != null) result[b.i] = fixed[k]; });
+    } catch (e) {
+      console.warn("[KomaTranslator] vérification du glossaire échouée", e.message);
+    }
+    return result;
+  }
+
   // ── Point d'entrée ──
   /**
    * Traduit toutes les bulles d'une page → tableau de traductions, dans le même ordre.
-   * LLM si configuré (puis relecture éventuelle); Google pour les bulles manquantes ou si le LLM échoue
+   * LLM si configuré: les bulles absentes de la réponse sont redemandées une fois au LLM, puis (en dernier recours)
+   * traduites par Google; relecture éventuelle, puis vérification du glossaire. Si le LLM échoue, tout part chez Google
    * (l'erreur est alors gardée dans self.KomaLastError pour le popup).
    * `info.degraded` passe à true si le résultat n'est pas celui attendu (repli, bulle non traduite):
    * l'appelant ne doit alors ni le mettre en cache ni le retenir comme contexte.
@@ -241,16 +302,25 @@
     texts = dec;
     if (cfg.provider && cfg.provider !== "google") {
       try {
-        let out = await llmJson(prompt(texts, src, tgt, c), cfg);
-        if (out && typeof out.translations === "object" && !Array.isArray(out.translations)) out = out.translations;
-        if (!out || typeof out !== "object") throw new Error("réponse LLM invalide");
-        const missing = texts.map((_, i) => i).filter((i) => typeof out[String(i + 1)] !== "string");
+        const result = await llmBatch(texts, src, tgt, cfg, c);
+        const absent = () => result.map((r, i) => (r == null ? i : -1)).filter((i) => i >= 0);
+        let missing = absent();
         if (missing.length > texts.length / 2) throw new Error(`réponse LLM incomplète (${texts.length - missing.length}/${texts.length})`);
-        if (missing.length) info.degraded = true;
-        const fb = missing.length ? await google(missing.map((i) => texts[i]), src, tgt, info) : [];
-        let result = texts.map((_, i) => (missing.includes(i) ? fb[missing.indexOf(i)] : out[String(i + 1)]));
-        if (cfg.review) result = await review(texts, result, tgt, cfg);
-        return result;
+        if (missing.length) {
+          try { // une seule relance, pour les seules bulles manquantes
+            const again = await llmBatch(missing.map((i) => texts[i]), src, tgt, cfg, c);
+            missing.forEach((i, k) => { if (again[k] != null) result[i] = again[k]; });
+          } catch (e) { console.warn("[KomaTranslator] relance des bulles manquantes échouée", e.message); }
+          missing = absent();
+        }
+        if (missing.length) {
+          info.degraded = true;
+          const fb = await google(missing.map((i) => texts[i]), src, tgt, info);
+          missing.forEach((i, k) => { result[i] = fb[k]; });
+        }
+        let final = result;
+        if (cfg.review) final = await review(texts, final, tgt, cfg);
+        return await enforceGlossary(texts, final, src, tgt, cfg, c);
       } catch (e) {
         console.warn(`[KomaTranslator] ${cfg.provider} a échoué, repli sur Google:`, e.message);
         self.KomaLastError = e.message;
@@ -260,5 +330,5 @@
     return google(texts, src, tgt, info);
   }
 
-  self.KomaTranslate = { translateAll, llmJson, fetchTimeout, dropCredits, LANG_NAMES, _internals: { decaps, extractJson, similarity } };
+  self.KomaTranslate = { translateAll, llmJson, fetchTimeout, dropCredits, LANG_NAMES, similarity, _internals: { decaps, extractJson, similarity, mentions } };
 })();

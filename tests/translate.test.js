@@ -73,11 +73,101 @@ test("translateAll (LLM): réponse complète → pas dégradé", async () => {
   assert.equal(info.degraded, undefined);
 });
 
-test("translateAll (LLM): une bulle manquante → complétée par Google, dégradé", async () => {
-  globalThis.fetch = async (url) => (String(url).startsWith("http://llm.test") ? llmReply('{"1": "un", "2": "deux"}') : googleStub()(url));
+// LLM simulé: répond selon les bulles numérotées de la requête (après « ITEMS: »); compte les appels
+const llmStub = (answer, { google = googleStub() } = {}) => {
+  const calls = [];
+  const f = async (url, opts) => {
+    if (!String(url).startsWith("http://llm.test")) return google(url);
+    const content = JSON.parse(opts.body).messages[0].content;
+    const items = JSON.parse(content.split("ITEMS:\n")[1]);
+    calls.push({ content, items, body: JSON.parse(opts.body) });
+    return llmReply(JSON.stringify(answer(items, calls.length)));
+  };
+  f.calls = calls;
+  return f;
+};
+
+test("translateAll (LLM): une bulle manquante est redemandée au LLM, sans repli Google", async () => {
+  const stub = llmStub((items, n) => (n === 1 ? { 1: "un", 2: "deux" } : { 1: "trois" }));
+  globalThis.fetch = stub;
+  const info = {};
+  assert.deepEqual(await T.translateAll(["a", "b", "c"], "en", "fr", LLM, {}, info), ["un", "deux", "trois"]);
+  assert.equal(info.degraded, undefined);
+  assert.equal(stub.calls.length, 2);
+  assert.deepEqual(stub.calls[1].items, { 1: "c" }, "la relance ne contient que la bulle manquante");
+});
+
+test("translateAll (LLM): toujours manquante après la relance → Google, dégradé", async () => {
+  globalThis.fetch = llmStub((items) => (Object.keys(items).length === 3 ? { 1: "un", 2: "deux" } : {}));
   const info = {};
   assert.deepEqual(await T.translateAll(["a", "b", "c"], "en", "fr", LLM, {}, info), ["un", "deux", "TR:c"]);
   assert.equal(info.degraded, true);
+});
+
+test("Google: au plus 3 requêtes simultanées", async () => {
+  let now = 0, max = 0;
+  globalThis.fetch = async (url) => {
+    now++; max = Math.max(max, now);
+    await new Promise((r) => setTimeout(r, 10));
+    now--;
+    return googleStub()(url);
+  };
+  const out = await T.translateAll(Array.from({ length: 10 }, (_, i) => "t" + i), "en", "fr", { provider: "google" });
+  assert.equal(out.length, 10);
+  assert.ok(max <= 3 && max >= 2, `max simultané = ${max}`);
+});
+
+test("température 0 pour les trois fournisseurs; keep_alive d'Ollama réglable", async () => {
+  const bodies = [];
+  globalThis.fetch = async (url, opts) => {
+    bodies.push([String(url), JSON.parse(opts.body)]);
+    if (String(url).includes("/api/chat")) return json({ message: { content: '{"1":"x"}' } });
+    if (String(url).includes("anthropic")) return json({ content: [{ type: "text", text: '{"1":"x"}' }] });
+    return llmReply('{"1":"x"}');
+  };
+  await T.translateAll(["a"], "en", "fr", { provider: "ollama", ollamaUrl: "http://o.test", review: false });
+  await T.translateAll(["a"], "en", "fr", { provider: "ollama", ollamaUrl: "http://o.test", ollamaKeepAlive: "30s", review: false });
+  await T.translateAll(["a"], "en", "fr", { provider: "ollama", ollamaUrl: "http://o.test", ollamaKeepAlive: "-1", review: false });
+  await T.translateAll(["a"], "en", "fr", LLM);
+  await T.translateAll(["a"], "en", "fr", { provider: "anthropic", anthropicKey: "k", review: false });
+  const [o1, o2, o3, oai, ant] = bodies.map(([, b]) => b);
+  assert.equal(o1.options.temperature, 0);
+  assert.equal(o1.keep_alive, "5m", "défaut: 5 minutes (et non 30)");
+  assert.equal(o2.keep_alive, "30s");
+  assert.strictEqual(o3.keep_alive, -1, "un nombre est envoyé comme nombre");
+  assert.equal(oai.temperature, 0);
+  assert.equal(ant.temperature, 0);
+});
+
+test("glossaire: un terme non appliqué est corrigé par une relance ciblée", async () => {
+  const ctx = { terms: [{ src: "Sword Sect", orig: "", tgt: "Secte de l'Épée", type: "organization" }], summary: "s" };
+  const stub = llmStub((items, n) => (n === 1 ? { 1: "La secte d'épée attaque." } : { 1: "La Secte de l'Épée attaque." }));
+  globalThis.fetch = stub;
+  const out = await T.translateAll(["The Sword Sect attacks."], "en", "fr", LLM, ctx);
+  assert.deepEqual(out, ["La Secte de l'Épée attaque."]);
+  assert.equal(stub.calls.length, 2);
+  assert.match(stub.calls[1].content, /MANDATORY/);
+  assert.match(stub.calls[1].content, /Secte de l'Épée/);
+});
+
+test("glossaire: déjà appliqué ou terme absent → pas de relance", async () => {
+  const ctx = { terms: [{ src: "Sword Sect", tgt: "Secte de l'Épée" }] };
+  let stub = llmStub(() => ({ 1: "La Secte de l'Épée attaque." }));
+  globalThis.fetch = stub;
+  await T.translateAll(["The Sword Sect attacks."], "en", "fr", LLM, ctx);
+  assert.equal(stub.calls.length, 1);
+  stub = llmStub(() => ({ 1: "Il pleut." }));
+  globalThis.fetch = stub;
+  await T.translateAll(["It rains."], "en", "fr", LLM, ctx);
+  assert.equal(stub.calls.length, 1);
+});
+
+test("glossaire: les termes très courts sont ignorés", () => {
+  const { mentions } = T._internals;
+  assert.equal(mentions("A quiet day", { src: "Qi" }), false);
+  assert.equal(mentions("Qi is power", { src: "Qi" }), false);
+  assert.equal(mentions("萧炎来了", { orig: "萧炎" }), true);
+  assert.equal(mentions("Xiao Yan came", { src: "Xiao Yan" }), true);
 });
 
 test("translateAll (LLM): erreur HTTP → repli Google, dégradé, erreur mémorisée", async () => {
