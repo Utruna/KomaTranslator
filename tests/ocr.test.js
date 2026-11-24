@@ -44,3 +44,26 @@ test("dropCredits: une bulle voisine mais sur une autre rangée est conservée",
   const bulle = { text: "Attention !", box: [100, 300, 300, 340] };
   assert.deepEqual(T.dropCredits([credit, bulle]).map((x) => x.text), ["Attention !"]);
 });
+
+// Image synthétique: fond gris, deux « lignes de texte » sombres l'une sous l'autre (4 px d'écart)
+function fakeImage() {
+  const w = 200, h = 80, data = new Uint8ClampedArray(w * h * 4).fill(200);
+  for (let i = 0; i < w * h; i++) data[i * 4 + 3] = 255;
+  for (const [y0, y1] of [[20, 32], [36, 48]]) {
+    for (let y = y0; y < y1; y++) for (let x = 20; x < 150; x++) { const i = (y * w + x) * 4; data[i] = data[i + 1] = data[i + 2] = 30; }
+  }
+  return { data, width: w, height: h };
+}
+
+test("cleanBlock: le masque ne couvre que le texte du bloc, pas celui du voisin", () => {
+  const { cleanBlock, withAlpha } = self.KomaOCR._internals;
+  const { patchBox, clean, mask } = cleanBlock(fakeImage(), [[20, 20, 150, 32]]);
+  const pw = patchBox[2] - patchBox[0];
+  const at = (x, y) => mask[(y - patchBox[1]) * pw + (x - patchBox[0])];
+  assert.equal(at(80, 26), 1, "le texte du bloc est effacé");
+  assert.equal(at(80, 42), 0, "le texte du bloc voisin (dans la marge du patch) n'est pas touché");
+  const rgba = withAlpha(clean, mask);
+  const a = (x, y) => rgba[((y - patchBox[1]) * pw + (x - patchBox[0])) * 4 + 3];
+  assert.equal(a(80, 26), 255);
+  assert.equal(a(80, 42), 0, "transparent: ne recouvre pas le patch du voisin");
+});

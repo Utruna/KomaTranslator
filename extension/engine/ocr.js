@@ -377,7 +377,7 @@
     }
   }
 
-  /** Efface le texte d'un bloc → { patchBox, clean (RGBA du rectangle nettoyé), bg, fg (couleurs du fond et du texte) }. */
+  /** Efface le texte d'un bloc → { patchBox, clean (RGBA du rectangle nettoyé), mask (1 = pixel effacé), bg, fg (couleurs du fond et du texte) }. */
   function cleanBlock(img, lineBoxes) {
     const { data, width, height } = img;
     const ctxPad = 12;
@@ -429,7 +429,7 @@
     if (Math.abs(fg[0] - bg[0]) + Math.abs(fg[1] - bg[1]) + Math.abs(fg[2] - bg[2]) < 150) {
       fg = (bg[0] + bg[1] + bg[2]) / 3 > 127 ? [0, 0, 0] : [255, 255, 255];
     }
-    return { patchBox: [X0, Y0, X1, Y1], clean: crop, bg: hex(bg), fg: hex(fg) };
+    return { patchBox: [X0, Y0, X1, Y1], clean: crop, mask: dil, bg: hex(bg), fg: hex(fg) };
   }
 
   // Intérieur de la bulle (remplissage depuis le centre) → zone utilisable pour le texte
@@ -478,6 +478,13 @@
     return [Math.floor(Math.min(cx - hw, x0)), Math.floor(Math.min(cy - hh, y0)), Math.ceil(Math.max(cx + hw, x1)), Math.ceil(Math.max(cy + hh, y1))];
   }
 
+  /** Copie de `rgba` transparente partout sauf là où mask = 1: le patch ne modifie que les pixels de texte effacés. */
+  function withAlpha(rgba, mask) {
+    const out = new Uint8ClampedArray(rgba);
+    for (let i = 0; i < mask.length; i++) out[i * 4 + 3] = mask[i] ? 255 : 0;
+    return out;
+  }
+
   async function pngB64(rgba, w, h) {
     const c = new OffscreenCanvas(w, h);
     c.getContext("2d").putImageData(new ImageData(rgba, w, h), 0, 0);
@@ -490,7 +497,8 @@
   // ── API ────────────────────────────────────────────────────────────────
   /**
    * Point d'entrée: image → { width, height, blocks[], ms }.
-   * Un bloc = { box, fit_box (intérieur de bulle ou null), lines, text, bg, fg, patch_box, patch (PNG base64) }.
+   * Un bloc = { box, fit_box (intérieur de bulle ou null), lines, text, bg, fg, patch_box,
+   *   patch (PNG base64, transparent sauf sur le texte effacé: des patchs voisins ne s'écrasent pas) }.
    */
   async function analyze(blob, lang = "auto") {
     const t0 = performance.now();
@@ -501,7 +509,7 @@
       const boxes = group.map((l) => l.box);
       const box = [Math.min(...boxes.map((b) => b[0])), Math.min(...boxes.map((b) => b[1])),
         Math.max(...boxes.map((b) => b[2])), Math.max(...boxes.map((b) => b[3]))];
-      const { patchBox, clean, bg, fg } = cleanBlock(img, boxes);
+      const { patchBox, clean, mask, bg, fg } = cleanBlock(img, boxes);
       blocks.push({
         box,
         fit_box: bubbleBox(img, clean, patchBox, box),
@@ -509,7 +517,7 @@
         text: joinLines(group.map((l) => l.text)),
         bg, fg,
         patch_box: patchBox,
-        patch: await pngB64(clean, patchBox[2] - patchBox[0], patchBox[3] - patchBox[1]),
+        patch: await pngB64(withAlpha(clean, mask), patchBox[2] - patchBox[0], patchBox[3] - patchBox[1]),
       });
     }
     // une zone de bulle ne doit jamais empiéter sur le texte d'une autre bulle
@@ -529,7 +537,7 @@
   const serial = (fn) => (...a) => { const p = chain.then(() => fn(...a)); chain = p.catch(() => {}); return p; };
 
   self.KomaOCR = {
-    _internals: { sameBlock, groupBlocks, joinLines }, // pour les tests
+    _internals: { sameBlock, groupBlocks, joinLines, cleanBlock, withAlpha }, // pour les tests
     analyze: serial(analyze),
     warmup: serial(warmup),
     readLines: serial(async (blob, lang) => readLines(await decode(blob), lang)),
