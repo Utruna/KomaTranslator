@@ -19,6 +19,23 @@ test("fetchTimeout: abandonne après le délai", async () => {
   await assert.rejects(T.fetchTimeout("http://x", { timeout: 30, retries: 0 }), /délai dépassé/);
 });
 
+test("fetchTimeout: retryOnTimeout=false ne réattend pas un serveur qui ne répond pas", async () => {
+  let calls = 0;
+  globalThis.fetch = (url, { signal }) => new Promise((_, rej) => { calls++; signal.addEventListener("abort", () => rej(Object.assign(new Error("x"), { name: "AbortError" }))); });
+  await assert.rejects(T.fetchTimeout("http://x", { timeout: 20, retries: 2, retryOnTimeout: false }), /délai dépassé/);
+  assert.equal(calls, 1);
+});
+
+test("fetchTimeout: par défaut, un délai dépassé est retenté", async () => {
+  let calls = 0;
+  globalThis.fetch = (url, { signal }) => new Promise((res, rej) => {
+    if (++calls === 1) signal.addEventListener("abort", () => rej(Object.assign(new Error("x"), { name: "AbortError" })));
+    else res(json({}, 200));
+  });
+  assert.equal((await T.fetchTimeout("http://x", { timeout: 20, retries: 1 })).status, 200);
+  assert.equal(calls, 2);
+});
+
 test("fetchTimeout: réessaie après un 503 puis réussit", async () => {
   let calls = 0;
   globalThis.fetch = async () => json({}, ++calls === 1 ? 503 : 200);

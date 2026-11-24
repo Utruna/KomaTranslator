@@ -43,7 +43,7 @@ Ordre de grandeur : 0,5–2 s d'OCR par page (CPU), + 0,1 s (Google) à 1–2 s 
 |---|---|---|
 | **Google** (défaut) | littérale, sans contexte | rien |
 | **Ollama** | bonne, gratuite, locale | [Ollama](https://ollama.com/download) + `ollama pull qwen3.5` + carte graphique 8 Go+ |
-| **API compatible OpenAI** | très bonne, quelques centimes / chapitre | clé DeepSeek, OpenAI, OpenRouter, Mistral… |
+| **API compatible OpenAI** | très bonne, quelques centimes / chapitre | clé DeepSeek, OpenAI, OpenRouter, Mistral… ; préréglage **Gemini** (palier gratuit, clé sur aistudio.google.com/apikey) |
 | **Claude** | la meilleure | clé API Anthropic |
 
 Avec un LLM : toute la page part en une requête (contexte entre bulles), avec le glossaire et les dernières répliques

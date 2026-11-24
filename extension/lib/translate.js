@@ -43,15 +43,17 @@
 
   // ── Réseau: délai maximal + nouvelles tentatives ──
   const RETRY_STATUS = new Set([429, 502, 503, 504]);
-  const LLM_TIMEOUT = 180000; // un modèle local peut mettre longtemps à se charger
+  const OLLAMA_TIMEOUT = 180000; // un modèle local peut mettre longtemps à se charger en mémoire
+  const REMOTE_TIMEOUT = 60000;  // API distante (OpenAI-compatible, Claude): au-delà, mieux vaut passer au repli
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
   /**
    * fetch avec délai maximal (`timeout`, 30 s par défaut) et `retries` nouvelles tentatives (2 par défaut)
    * si le réseau échoue ou si le serveur répond 429 / 502 / 503 / 504 (attente 0,6 s, 1,2 s…).
+   * `retryOnTimeout: false` : un délai dépassé n'est pas retenté (inutile de réattendre un serveur qui ne répond pas).
    * Le délai ne couvre que l'attente des en-têtes, pas la lecture du corps de la réponse.
    */
-  async function fetchTimeout(url, { timeout = 30000, retries = 2, ...opts } = {}) {
+  async function fetchTimeout(url, { timeout = 30000, retries = 2, retryOnTimeout = true, ...opts } = {}) {
     for (let attempt = 0; ; attempt++) {
       const ctl = new AbortController();
       const timer = setTimeout(() => ctl.abort(), timeout);
@@ -60,7 +62,8 @@
         r = await fetch(url, { ...opts, signal: ctl.signal });
       } catch (e) {
         clearTimeout(timer);
-        if (attempt >= retries) throw e.name === "AbortError" ? new Error(`délai dépassé (${Math.round(timeout / 1000)} s)`) : e;
+        const timedOut = e.name === "AbortError";
+        if (attempt >= retries || (timedOut && !retryOnTimeout)) throw timedOut ? new Error(`délai dépassé (${Math.round(timeout / 1000)} s)`) : e;
         await sleep(600 * 2 ** attempt);
         continue;
       }
@@ -137,7 +140,7 @@
     if (p === "ollama") {
       const base = (cfg.ollamaUrl || "http://localhost:11434").replace(/\/+$/, "").replace(/\/v1$/, "");
       const r = await fetchTimeout(base + "/api/chat", {
-        method: "POST", timeout: LLM_TIMEOUT, retries: 1,
+        method: "POST", timeout: OLLAMA_TIMEOUT, retries: 1,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: cfg.ollamaModel || "qwen3.5:latest",
@@ -153,7 +156,7 @@
     if (p === "openai") {
       const base = (cfg.apiBase || "https://api.openai.com/v1").replace(/\/+$/, "");
       const r = await fetchTimeout(base + "/chat/completions", {
-        method: "POST", timeout: LLM_TIMEOUT, retries: 1,
+        method: "POST", timeout: REMOTE_TIMEOUT, retries: 1, retryOnTimeout: false,
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + (cfg.apiKey || "none") },
         body: JSON.stringify({ model: cfg.apiModel, temperature: 0.3, messages: [{ role: "user", content: text }] }),
       });
@@ -162,7 +165,7 @@
     }
     if (p === "anthropic") {
       const r = await fetchTimeout("https://api.anthropic.com/v1/messages", {
-        method: "POST", timeout: LLM_TIMEOUT, retries: 1,
+        method: "POST", timeout: REMOTE_TIMEOUT, retries: 1, retryOnTimeout: false,
         headers: {
           "Content-Type": "application/json",
           "x-api-key": cfg.anthropicKey || "",

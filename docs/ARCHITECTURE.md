@@ -43,8 +43,9 @@ Un **bloc** (une bulle) contient : `text`, `translation`, `box` (texte d'origine
 
 - Un résultat **dégradé** (repli Google, bulle non traduite : `info.degraded` dans `translateAll`) est affiché mais ni mis
   en cache ni ajouté à l'historique de la série.
-- Les requêtes réseau passent par `KomaTranslate.fetchTimeout` : délai maximal (15 s Google, 30 s images et wiki, 180 s LLM)
-  et nouvelles tentatives sur erreur réseau, 429, 502, 503, 504.
+- Les requêtes réseau passent par `KomaTranslate.fetchTimeout` : délai maximal (15 s Google, 30 s images et wiki, 60 s API distante, 180 s Ollama local)
+  et nouvelles tentatives sur erreur réseau, 429, 502, 503, 504. Un délai dépassé d'une API distante n'est pas retenté :
+  on passe directement au repli Google.
 - Pour une même série, la phase contexte → traduction → historique est ordonnée (`KomaStore.acquire`) : les images attendent
   leur tour, la plus haute dans la page (`pos`) d'abord.
 
