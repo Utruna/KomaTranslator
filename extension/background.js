@@ -11,6 +11,10 @@ const DEFAULTS = { src: "auto", tgt: "fr", sites: {}, siteLangs: {} };
 // Réglages du traducteur (chrome.storage.local, clé "cfg"; les clés API ne sont donc jamais synchronisées): voir presets.js
 const CFG_DEFAULTS = KomaPresets.CFG_DEFAULTS;
 const MAX_PARALLEL = 2; // images traduites en même temps (l'OCR est de toute façon sérialisé)
+// À augmenter quand l'OCR (lignes, bulles, effacement) change: les pages déjà en cache sont refaites.
+// 2: lignes penchées, lignes serrées, queue des bulles. 3: morceaux d'une même ligne, ordre de lecture.
+// 4: sans dilatation, petites images agrandies (manga japonais vertical).
+const OCR_VERSION = 4;
 
 /** Fusionne valeurs par défaut + réglages enregistrés → { src, tgt, sites, cfg }. */
 async function getSettings() {
@@ -202,9 +206,9 @@ async function translate(msg) {
   const src = srcFor(s, msg.host || hostOf(msg.pageUrl));
   const img = msg.bytes ? { bytes: b64ToBytes(msg.bytes), type: msg.mime || "image/png" } : await fetchImage(msg.url, msg.pageUrl);
   const skey = KomaStore.seriesKey(msg.pageUrl);
-  // La clé change avec l'image, les langues, le traducteur, la version du prompt et le glossaire/résumé de la série
+  // La clé change avec l'image, les langues, le traducteur, la version du prompt et de l'OCR, et le glossaire/résumé de la série
   const sig = await KomaStore.seriesSig(await KomaStore.load(skey));
-  const cacheKey = `${await KomaStore.sha1(img.bytes)}|${src}|${s.tgt}|${providerSig(s.cfg)}|p${KomaTranslate.PROMPT_VERSION}|${sig}`;
+  const cacheKey = `${await KomaStore.sha1(img.bytes)}|${src}|${s.tgt}|${providerSig(s.cfg)}|p${KomaTranslate.PROMPT_VERSION}|o${OCR_VERSION}|${sig}`;
 
   let data = msg.fresh ? null : await KomaStore.cacheGet(cacheKey); // fresh: « retraduire cette image »
   if (!data) {
@@ -217,7 +221,7 @@ async function translate(msg) {
     const release = await KomaStore.acquire(skey, msg.pos ?? 0);
     try {
       if (pausedTabs.has(msg.tabId)) throw cancelled(); // mis en pause pendant l'attente: aucune dépense
-      const ctx = await KomaStore.contextFor(skey, texts);
+      const ctx = await KomaStore.contextFor(skey, texts, s.tgt);
       const info = {};
       let cfg = s.cfg;
       // Plafond de dépense du jour: au-delà, Google (affiché cette fois, ni mis en cache ni retenu comme contexte)
@@ -237,7 +241,7 @@ async function translate(msg) {
         // repli ou bulle non traduite: affiché cette fois, mais ni mis en cache ni retenu comme contexte
         console.warn("[KomaTranslator] traduction dégradée, non mise en cache");
       } else {
-        if (blocks.length) await KomaStore.addHistory(skey, texts.map((t, i) => [t, tr[i]]));
+        if (blocks.length) await KomaStore.addHistory(skey, texts.map((t, i) => [t, tr[i], s.tgt]));
         await KomaStore.cachePut(cacheKey, data);
       }
     } finally {
@@ -245,8 +249,8 @@ async function translate(msg) {
     }
     console.log(`[KomaTranslator] ${ocr.width}x${ocr.height}: ${blocks.length} bulles, OCR ${Math.round(t1 - t0)} ms, trad ${Math.round(performance.now() - t1)} ms`);
   }
-  // corrections manuelles de la série (toujours prioritaires, même sur le cache)
-  const { corrections } = await KomaStore.load(skey);
+  // corrections manuelles de la série (toujours prioritaires, même sur le cache), seulement dans leur langue
+  const corrections = await KomaStore.correctionsFor(skey, s.tgt);
   data = { ...data, blocks: data.blocks.map((b) => ({ ...b, translation: KomaStore.bestCorrection(corrections, b.text) ?? b.translation })) };
   return { data, image: `data:${img.type};base64,${bufToB64(img.bytes)}` };
 }
@@ -355,7 +359,9 @@ const HANDLERS = {
   /** Pause demandée depuis la page: les images en attente de cet onglet sont retirées de la file. */
   async cancelQueue(msg, sender) { pausedTabs.add(sender.tab?.id); return { cancelled: cancelQueued(sender.tab?.id) }; },
   async resumeQueue(msg, sender) { pausedTabs.delete(sender.tab?.id); return {}; },
-  async correct(msg) { await KomaStore.setCorrection(KomaStore.seriesKey(msg.page), msg.text, msg.translation); return {}; },
+  /** Réglages changés (langue...): les images en attente de cet onglet sont retirées de la file, sans mise en pause. */
+  async flushQueue(msg, sender) { return { cancelled: cancelQueued(sender.tab?.id) }; },
+  async correct(msg) { await KomaStore.setCorrection(KomaStore.seriesKey(msg.page), msg.text, msg.translation, (await getSettings()).tgt); return {}; },
   async retranslate(msg) {
     await KomaStore.cacheClear();
     await chrome.tabs.sendMessage(msg.tabId, { type: "retranslate" });

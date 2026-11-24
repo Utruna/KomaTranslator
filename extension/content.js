@@ -80,6 +80,7 @@
   const retries = new WeakMap();
   const MAX_INFLIGHT = 2;
   let inflight = 0;
+  let generation = 0; // augmente à chaque (ré)activation: les résultats des travaux plus anciens sont ignorés
 
   /** Zone autour de l'écran où l'on prépare les images: 4000 px normalement, 700 px en mode économie (moins de jetons gaspillés). */
   const makeIo = () => new IntersectionObserver((entries) => {
@@ -114,7 +115,8 @@
       if (!best) return;
       near.delete(best);
       inflight++;
-      processImg(best).finally(() => { inflight--; pump(); });
+      const g = generation;
+      processImg(best).finally(() => { if (g === generation) inflight--; pump(); }); // périmé: sa place est déjà libérée
     }
   }
   addEventListener("scroll", () => { if (inflight < MAX_INFLIGHT) pump(); }, { passive: true });
@@ -154,6 +156,7 @@
     let st = state.get(img);
     if (st && st.url === url) return; // déjà fait (ou sans texte)
     if (st?.translatedUrl) URL.revokeObjectURL(st.translatedUrl);
+    const gen = generation; // un changement de langue / une réactivation rend ce travail périmé
     st = { origSrc: img.getAttribute("src"), origSrcset: img.getAttribute("srcset"), url, busy: true };
     state.set(img, st);
     img.classList.add("kt-busy");
@@ -166,6 +169,7 @@
         msg.mime = blob.type;
       }
       const res = await chrome.runtime.sendMessage(msg);
+      if (gen !== generation) return; // résultat d'avant le changement (ex. ancienne langue): ignoré, l'image est déjà relancée
       if (res?.cancelled) { state.delete(img); return; } // pause: l'image sera reprise plus tard
       if (!res?.ok) throw new Error(res?.error || "pas de réponse");
       failed.delete(img);
@@ -173,11 +177,13 @@
       io.unobserve(img);
       if (!res.data.blocks.length) return;
       const out = await render(res.image, res.data);
+      if (gen !== generation) { URL.revokeObjectURL(out); return; }
       st.translatedUrl = out;
       st.res = res; // pour l'infobulle et les corrections
       attachInteractions(img);
       if (!originalView) showTranslated(img, st);
     } catch (e) {
+      if (gen !== generation) return;
       console.warn("[KomaTranslator]", url, e);
       const n = retries.get(img) || 0;
       if (n < 2 && enabled) { // requête perdue / serveur occupé: on réessaie (le serveur garde le résultat en cache)
@@ -187,7 +193,7 @@
       } else { img.title = "KomaTranslator: " + e.message; failed.set(img, e.message); }
     } finally {
       st.busy = false;
-      img.classList.remove("kt-busy");
+      if (gen === generation) img.classList.remove("kt-busy"); // sinon c'est le nouveau travail qui gère l'image
     }
   }
 
@@ -389,7 +395,9 @@
   // Découpe en lignes; null si un mot ne rentre pas (sauf force=true)
   function wrap(ctx, text, size, maxW, force = false) {
     ctx.font = `bold ${size}px ${FONT}`;
-    const words = text.split(/\s+/);
+    // ponctuation française (« ! ? : ; » et guillemets) collée à son mot: jamais seule en début ou fin de ligne
+    text = text.replace(/[ \t]+([!?:;»])/g, " $1").replace(/«[ \t]+/g, "« ");
+    const words = text.split(/[ \t\r\n]+/);
     const lines = [];
     let cur = "";
     for (const word of words) {
@@ -430,9 +438,18 @@
 
   // ── Activation / désactivation ──
   /** Active/désactive la traduction sur ce site (observateurs DOM + restauration des images). */
+  /** Retraduit la page (langue changée...): annule d'abord les images en attente dans la file, avec les anciens réglages. */
+  function restart() {
+    chrome.runtime.sendMessage({ type: "flushQueue" }).catch(() => {});
+    setEnabled(false);
+    setEnabled(true);
+  }
+
   function setEnabled(on) {
     if (on === enabled) return;
     enabled = on;
+    generation++;
+    inflight = 0; // les travaux en cours sont périmés: ils ne comptent plus
     if (on) {
       mo.observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ["src", "srcset"] });
       scan(document);
@@ -453,7 +470,7 @@
 
   // Commandes du menu: { type: "koma", cmd: "pause" | "resume" | "original" | "translated" }
   chrome.runtime.onMessage.addListener((msg) => {
-    if (msg.type === "retranslate" && enabled) { setEnabled(false); setEnabled(true); }
+    if (msg.type === "retranslate" && enabled) restart();
     if (msg.type === "koma" && enabled) {
       if (msg.cmd === "pause") setPaused(true);
       else if (msg.cmd === "resume") setPaused(false);
@@ -471,8 +488,8 @@
       if (enabled) rerenderAll();
     }
     if (ch.eco) setEco(!!ch.eco.newValue);
-    if (ch.siteLangs && enabled && ch.siteLangs.oldValue?.[HOST]?.src !== ch.siteLangs.newValue?.[HOST]?.src) { setEnabled(false); setEnabled(true); } // langue de ce site changée
+    if (ch.siteLangs && enabled && ch.siteLangs.oldValue?.[HOST]?.src !== ch.siteLangs.newValue?.[HOST]?.src) restart(); // langue de ce site changée
     if (ch.sites) setEnabled(!!(ch.sites.newValue || {})[HOST]);
-    if ((ch.src || ch.tgt) && enabled) { setEnabled(false); setEnabled(true); } // langue changée → retraduire
+    if ((ch.src || ch.tgt) && enabled) restart(); // langue changée → retraduire
   });
 })();

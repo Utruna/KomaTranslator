@@ -10,6 +10,7 @@
   const TILE_H = 1600;     // hauteur max d'une tranche (webtoons très longs)
   const OVERLAP = 240;
   const DET_LIMIT = 1600;  // côté max envoyé au détecteur
+  const DET_MIN = 736;     // plus petit côté min envoyé au détecteur (agrandissement des petites images)
   const MIN_SCORE = 0.6;
   const REC_H = 48;
 
@@ -93,7 +94,10 @@
   /** Trouve les lignes de texte d'une tranche (y0, hauteur th) → boîtes [x0,y0,x1,y1] relatives à la tranche. */
   async function detect(img, y0, th) {
     const w = img.width;
-    let ratio = Math.max(w, th) > DET_LIMIT ? DET_LIMIT / Math.max(w, th) : 1;
+    // Comme RapidOCR: les petites images sont agrandies (plus petit côté ≥ DET_MIN), sinon le petit texte
+    // (colonnes verticales de 20 px d'une page de 1200 px) n'est pas détecté. Les grandes sont réduites à DET_LIMIT.
+    let ratio = Math.min(w, th) < DET_MIN ? DET_MIN / Math.min(w, th) : 1;
+    ratio = Math.min(ratio, DET_LIMIT / Math.max(w, th));
     const rw = Math.max(32, Math.round((w * ratio) / 32) * 32);
     const rh = Math.max(32, Math.round((th * ratio) / 32) * 32);
     const rgba = resample(img, 0, y0, w, th, rw, rh);
@@ -101,17 +105,11 @@
     const out = await sess.run({ [sess.inputNames[0]]: new ort.Tensor("float32", toTensor(rgba, rw, rh), [1, 3, rh, rw]) });
     const prob = out[sess.outputNames[0]].data; // [1,1,rh,rw]
 
-    // binarisation + dilatation 2x2
+    // binarisation, sans dilatation: une dilatation 2x2 soude les colonnes verticales serrées du manga japonais
+    // (3 px d'écart) en une zone illisible. Testé sur webtoons et manga: lecture égale ou meilleure sans.
     const n = rw * rh;
-    const bin = new Uint8Array(n);
-    for (let i = 0; i < n; i++) bin[i] = prob[i] > 0.3 ? 1 : 0;
     const mask = new Uint8Array(n);
-    for (let y = 0; y < rh; y++) {
-      for (let x = 0; x < rw; x++) {
-        const i = y * rw + x;
-        mask[i] = bin[i] || (x > 0 && bin[i - 1]) || (y > 0 && bin[i - rw]) || (x > 0 && y > 0 && bin[i - rw - 1]) ? 1 : 0;
-      }
-    }
+    for (let i = 0; i < n; i++) mask[i] = prob[i] > 0.3 ? 1 : 0;
 
     // composantes connexes (8-connexité)
     const seen = new Uint8Array(n);
@@ -119,10 +117,11 @@
     const boxes = [];
     for (let s = 0; s < n; s++) {
       if (!mask[s] || seen[s]) continue;
-      let top = 0, minx = rw, miny = rh, maxx = 0, maxy = 0;
+      let top = 0, minx = rw, miny = rh, maxx = 0, maxy = 0, sum = 0, count = 0;
       stack[top++] = s; seen[s] = 1;
       while (top) {
         const p = stack[--top];
+        sum += prob[p]; count++;
         const px = p % rw, py = (p - px) / rw;
         if (px < minx) minx = px; if (px > maxx) maxx = px;
         if (py < miny) miny = py; if (py > maxy) maxy = py;
@@ -139,13 +138,15 @@
       }
       const bw = maxx - minx, bh = maxy - miny;
       if (Math.min(bw, bh) < 3) continue;
-      // score = moyenne de la probabilité dans la boîte
-      let sum = 0;
-      for (let y = miny; y <= maxy; y++) for (let x = minx; x <= maxx; x++) sum += prob[y * rw + x];
-      const score = sum / ((bw + 1) * (bh + 1));
+      // score = moyenne de la probabilité sur les pixels de la zone (comme le score « polygone » de RapidOCR).
+      // Pas sur le rectangle englobant: pour une ligne penchée, ses coins vides font chuter la moyenne sous le seuil
+      // et la ligne disparaît (bulles en italique / texte incliné).
+      const score = sum / count;
       if (score < 0.5) continue;
-      // unclip (ratio 1.6)
-      const d = (bw * bh * 1.6) / (2 * (bw + bh));
+      // unclip (ratio 1.6): aire / périmètre de la ligne réelle (longueur × épaisseur), pas du rectangle englobant,
+      // sinon une ligne penchée gonfle jusqu'à chevaucher ses voisines.
+      const len = Math.max(bw, bh) + 1, thick = Math.min(count / len, Math.min(bw, bh) + 1);
+      const d = (len * thick * 1.6) / (2 * (len + thick));
       const ex0 = minx - d, ey0 = miny - d, ex1 = maxx + d, ey1 = maxy + d;
       if (Math.min(ex1 - ex0, ey1 - ey0) < 5) continue;
       const sx = w / rw, sy = th / rh;
@@ -239,7 +240,13 @@
   async function readLines(img, lang) {
     const recName = REC_MODEL[lang] || "rec_ch";
     const lines = [];
+    let tile = 0;
+    // Doublon = la même ligne lue par deux tranches qui se chevauchent: autre tranche, boîtes superposées ET même hauteur.
+    // (Deux lignes voisines et serrées d'une bulle se recouvrent aussi beaucoup: il ne faut pas en jeter une.)
+    const isDup = (box, l) => l.tile !== tile && iou(box, l.box) > 0.4
+      && Math.abs((box[1] + box[3]) - (l.box[1] + l.box[3])) / 2 < 0.4 * Math.min(box[3] - box[1], l.box[3] - l.box[1]);
     for (const [y0, y1] of tiles(img.height)) {
+      tile++;
       if (blankTile(img, y0, y1)) continue;
       const first = y0 === 0, last = y1 >= img.height;
       const boxes = await detect(img, y0, y1 - y0);
@@ -247,13 +254,14 @@
         // lignes coupées par le bord d'une tranche: une autre tranche les verra entières
         if ((!first && by0 <= 3) || (!last && by1 >= y1 - y0 - 3)) continue;
         const box = [bx0, by0 + y0, bx1, by1 + y0];
-        if (lines.some((l) => iou(box, l.box) > 0.4)) continue;
+        if (lines.some((l) => isDup(box, l))) continue;
         const { text, score } = await recognize(img, box, recName);
-        lines.push({ box, text, score });
+        lines.push({ box, text, score, tile });
       }
     }
     return lines.filter((l) => l.score >= MIN_SCORE && l.text && MEANINGFUL.test(l.text)
-      && !(l.text.length === 1 && /^[\x00-\x7f]$/.test(l.text)));
+      && !(l.text.length === 1 && /^[\x00-\x7f]$/.test(l.text)))
+      .map(({ box, text, score }) => ({ box, text, score }));
   }
 
   // ── Regroupement lignes → bulles ──────────────────────────────────────
@@ -271,6 +279,11 @@
     const vgap = Math.max(B[1] - A[3], A[1] - B[3]);
     if (vgap > 0.9 * lh) return false;
     if (!va) {
+      // Deux morceaux d'une même ligne qui se touchent (ex. nom de compétence d'une autre couleur + sa description,
+      // « CORPSE-DRAGON » | « CONTROL: … ») sont du même bloc, avant les règles de colonnes et de paragraphes.
+      const vov = Math.min(A[3], B[3]) - Math.max(A[1], B[1]);
+      const hgap = Math.max(A[0] - B[2], B[0] - A[2]);
+      if (vov > 0.6 * Math.min(ha, hb) && hgap < 0.5 * lh) return true;
       // Un bloc est aligné à gauche ou centré: deux lignes qui ne partagent ni le bord gauche ni le centre
       // (ex. une colonne « niveau » à droite d'un nom) ne sont pas du même bloc.
       const acx0 = (A[0] + A[2]) / 2, bcx0 = (B[0] + B[2]) / 2;
@@ -288,6 +301,23 @@
     return Math.abs(acx - bcx) < 1.5 * lh && vgap > -0.5 * lh;
   }
 
+  /** Lignes horizontales d'un bloc dans l'ordre de lecture: rangées de haut en bas, morceaux d'une rangée de gauche à droite. */
+  function readingOrder(g, rtl) {
+    const rows = [];
+    for (const l of g.slice().sort((a, b) => a.box[1] - b.box[1])) {
+      const row = rows[rows.length - 1];
+      const h = l.box[3] - l.box[1];
+      // même rangée = recouvrement vertical ET côte à côte (des lignes penchées empilées se recouvrent en hauteur,
+      // mais elles sont l'une au-dessus de l'autre: elles se superposent aussi en largeur)
+      const sideBySide = row && row.items.every((o) =>
+        Math.min(l.box[2], o.box[2]) - Math.max(l.box[0], o.box[0]) < 0.3 * Math.min(l.box[2] - l.box[0], o.box[2] - o.box[0]));
+      if (sideBySide && Math.min(l.box[3], row.y1) - Math.max(l.box[1], row.y0) > 0.6 * Math.min(h, row.y1 - row.y0)) {
+        row.items.push(l); row.y0 = Math.min(row.y0, l.box[1]); row.y1 = Math.max(row.y1, l.box[3]);
+      } else rows.push({ y0: l.box[1], y1: l.box[3], items: [l] });
+    }
+    return rows.flatMap((r) => r.items.sort((a, b) => (rtl ? b.box[2] - a.box[2] : a.box[0] - b.box[0])));
+  }
+
   /** Regroupe les lignes en blocs (union-find) et les range dans l'ordre de lecture (rtl = manga japonais). */
   function groupBlocks(lines, rtl) {
     const parent = lines.map((_, i) => i);
@@ -298,7 +328,7 @@
     const groups = new Map();
     lines.forEach((l, i) => { const r = find(i); if (!groups.has(r)) groups.set(r, []); groups.get(r).push(l); });
     const blocks = [...groups.values()].map((g) =>
-      isVertical(g[0]) ? g.sort((a, b) => b.box[2] - a.box[2]) : g.sort((a, b) => a.box[1] - b.box[1]));
+      isVertical(g[0]) ? g.sort((a, b) => b.box[2] - a.box[2]) : readingOrder(g, rtl));
     // ordre de lecture: rangées haut → bas, puis gauche → droite (droite → gauche si rtl)
     const bbox = (g) => [Math.min(...g.map((l) => l.box[0])), Math.min(...g.map((l) => l.box[1])),
       Math.max(...g.map((l) => l.box[2])), Math.max(...g.map((l) => l.box[3]))];
@@ -468,10 +498,23 @@
       }
     }
     if (touches) return null; // pas une bulle fermée
-    const bx0 = minx + WX0, by0 = miny + WY0, bx1 = maxx + WX0, by1 = maxy + WY0;
-    if (bx1 - bx0 < x1 - x0 || by1 - by0 < y1 - y0) return null;
-    const fill = count / ((bx1 - bx0 + 1) * (by1 - by0 + 1));
+    if (maxx - minx < x1 - x0 || maxy - miny < y1 - y0) return null;
+    const fill = count / ((maxx - minx + 1) * (maxy - miny + 1));
     if (fill < 0.45) return null; // forme trop irrégulière: décor, pas une bulle
+    // Corps de la bulle: lignes et colonnes au moins à moitié aussi pleines que la plus pleine. La queue de la bulle
+    // (pointe étroite vers le personnage) est exclue, sinon elle étire la zone et le texte déborde de la bulle.
+    const rows = new Int32Array(wh), cols = new Int32Array(ww);
+    for (let y = miny; y <= maxy; y++) for (let x = minx; x <= maxx; x++) if (inside[y * ww + x]) { rows[y]++; cols[x]++; }
+    const core = (counts, lo, hi) => {
+      let max = 0;
+      for (let i = lo; i <= hi; i++) if (counts[i] > max) max = counts[i];
+      let a = lo, b = hi;
+      while (counts[a] < max / 2) a++;
+      while (counts[b] < max / 2) b--;
+      return [a, b];
+    };
+    const [cy0, cy1] = core(rows, miny, maxy), [cx0, cx1] = core(cols, minx, maxx);
+    const bx0 = cx0 + WX0, by0 = cy0 + WY0, bx1 = cx1 + WX0, by1 = cy1 + WY0;
     const k = fill > 0.93 ? 0.88 : 0.72;
     const cx = (bx0 + bx1) / 2, cy = (by0 + by1) / 2;
     const hw = ((bx1 - bx0) * k) / 2 - 3, hh = ((by1 - by0) * k) / 2 - 3;

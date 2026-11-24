@@ -13,7 +13,7 @@ test("listSeries: séries seulement, de la plus volumineuse à la plus petite, a
   });
   const list = await S.listSeries();
   assert.deepEqual(list.map((s) => s.key), ["a.com/x", "b.com/y"]);
-  assert.deepEqual({ ...list[0], bytes: 0 }, { key: "a.com/x", wiki: "https://w.org/x", terms: 2, summary: true, corrections: 1, history: 1, bytes: 0 });
+  assert.deepEqual({ ...list[0], bytes: 0 }, { key: "a.com/x", wiki: "https://w.org/x", terms: 2, summary: true, corrections: 1, history: 1, langs: ["fr"], bytes: 0 });
   assert.ok(list[0].bytes > list[1].bytes);
 });
 
@@ -51,7 +51,7 @@ test("sanitizeSeries: refuse sans clé, borne les tailles, ne garde que les cham
   assert.equal(S.sanitizeSeries({ glossary: [] }), null);
   assert.equal(S.sanitizeSeries({ key: "  " }), null);
   const c = S.sanitizeSeries({ key: "a.com/x", evil: "x", summary: "s".repeat(9000), glossary: [{ src: "A", tgt: "B", extra: 1 }, { src: "", tgt: "x" }, null], corrections: { "": "x", t: "u", v: "" }, history: [["a", "b"], "nope"] });
-  assert.deepEqual(Object.keys(c).sort(), ["corrections", "glossary", "history", "key", "summary", "wiki"]);
+  assert.deepEqual(Object.keys(c).sort(), ["corrections", "glossary", "history", "key", "lang", "summary", "wiki"]);
   assert.equal(c.summary.length, 5000);
   assert.deepEqual(c.glossary, [{ src: "A", orig: "", tgt: "B", type: "", note: "" }]);
   assert.deepEqual(c.corrections, { t: "u" });
@@ -112,4 +112,32 @@ test("consommation: cumul par jour et traducteur, coût du jour, résumé du moi
   // purge au-delà de 62 jours
   for (let i = 0; i < 70; i++) await S.usageAdd("deepseek", { req: 1 }, new Date(Date.UTC(2026, 0, 1 + i)));
   assert.ok((await S.usageSummary(d1)).days.length <= 62);
+});
+
+test("autre langue cible: pas d'exemples ni de rendus ni de corrections dans l'ancienne langue", async () => {
+  fakeStorage({ "series:a.com/x": serie("a.com/x", {
+    glossary: [{ src: "Sugimoto", orig: "杉元", tgt: "Sugimoto", type: "character" }, { src: "Sect", tgt: "Secte" }],
+    corrections: { "おい": "Hé !" },
+    history: [["a", "en français"], ["b", "in english", "en"], ["c", "encore en français", "fr"]],
+  }) });
+  const fr = await S.contextFor("a.com/x", ["杉元"], "fr");
+  assert.deepEqual(fr.history, [["a", "en français"], ["c", "encore en français"]]); // ancienne entrée sans langue = fr
+  assert.equal(fr.terms.find((t) => t.src === "Sect").tgt, "Secte");
+  assert.deepEqual(fr.corrections, { "おい": "Hé !" });
+  const en = await S.contextFor("a.com/x", ["杉元"], "en");
+  assert.deepEqual(en.history, [["b", "in english"]]);
+  assert.ok(en.terms.every((t) => t.tgt === ""), "les noms restent, sans rendu français");
+  assert.deepEqual(en.corrections, {});
+  assert.deepEqual(await S.correctionsFor("a.com/x", "en"), {});
+  assert.deepEqual(await S.correctionsFor("a.com/x", "fr"), { "おい": "Hé !" });
+});
+
+test("listSeries: langues présentes dans chaque série (étiquettes et filtre de l'écran Mémoire)", async () => {
+  fakeStorage({
+    "series:a.com/x": serie("a.com/x", { glossary: [{ src: "A", tgt: "B" }], history: [["a", "b"], ["c", "d", "en"]] }),
+    "series:b.com/y": serie("b.com/y", { lang: "en", corrections: { t: "u" } }),
+    "series:c.com/z": serie("c.com/z"),
+  });
+  const langs = Object.fromEntries((await S.listSeries()).map((s) => [s.key, s.langs]));
+  assert.deepEqual(langs, { "a.com/x": ["en", "fr"], "b.com/y": ["en"], "c.com/z": [] });
 });

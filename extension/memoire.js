@@ -1,6 +1,8 @@
 // KomaTranslator — écran « Mémoire et cache »: séries retenues (wiki, glossaire, corrections, historique) et cache des pages.
 const $ = (id) => document.getElementById(id);
 const send = (msg) => chrome.runtime.sendMessage(msg);
+const LANGS = { fr: "Français", en: "Anglais", es: "Espagnol", de: "Allemand", it: "Italien", pt: "Portugais" };
+const langName = (l) => LANGS[l] || l;
 
 function h(tag, attrs = {}, ...kids) {
   const e = document.createElement(tag);
@@ -71,7 +73,9 @@ async function exportKeys(keys, name) {
 
 function render() {
   const q = $("filter").value.trim().toLowerCase();
-  const shown = series.filter((s) => !q || s.key.toLowerCase().includes(q) || s.wiki.toLowerCase().includes(q));
+  const lang = $("langFilter").value;
+  const shown = series.filter((s) => (!q || s.key.toLowerCase().includes(q) || s.wiki.toLowerCase().includes(q))
+    && (!lang || (s.langs || []).includes(lang)));
   $("total").textContent = `(${series.length}${shown.length !== series.length ? `, ${shown.length} affichées` : ""})`;
   $("list").replaceChildren(...(shown.length ? shown.map(card) : [h("div", { class: "muted", style: "margin-top:10px" }, series.length ? "Aucune série ne correspond." : "Aucune série retenue pour l'instant.")]));
 }
@@ -85,6 +89,7 @@ function card(s) {
     h("span", { class: "size" }, fmt(s.bytes)),
     h("b", {}, s.key),
     h("div", { class: "meta" },
+      ...(s.langs || []).map((l) => h("span", { class: "tag lang", title: "Traduit en " + langName(l) }, l.toUpperCase())),
       s.wiki ? h("span", { class: "tag", title: s.wiki }, "wiki : " + (wikiHost || s.wiki)) : h("span", { class: "tag none" }, "pas de wiki"),
       tag(s.terms, plural(s.terms, "terme", "termes"), "pas de glossaire"),
       tag(s.summary, "résumé", "pas de résumé"),
@@ -117,6 +122,12 @@ async function loadSeries() {
   const r = await send({ type: "memList" });
   series = r?.ok ? r.series : [];
   if (!r?.ok) say("✘ " + (r?.error || "pas de réponse"), false);
+  // menu des langues: seulement celles présentes (le choix en cours est gardé)
+  const sel = $("langFilter"), cur = sel.value;
+  const langs = [...new Set(series.flatMap((s) => s.langs || []))].sort();
+  sel.replaceChildren(h("option", { value: "" }, "Toutes les langues"), ...langs.map((l) => h("option", { value: l }, langName(l))));
+  sel.value = langs.includes(cur) ? cur : "";
+  sel.hidden = langs.length < 2;
   render();
 }
 
@@ -170,6 +181,7 @@ $("importFile").onchange = async () => {
 };
 
 $("filter").oninput = render;
+$("langFilter").onchange = render;
 $("clearCache").onclick = () => {
   if (confirm("Vider le cache des pages traduites ?\n\nLes pages seront retraduites au besoin.")) run(send({ type: "cacheClear" }), "Cache vidé.");
 };

@@ -39,6 +39,12 @@ test("dropCredits: retire aussi les fragments de la même rangée", () => {
   assert.equal(T.dropCredits([blocks[4]]).length, 1);
 });
 
+test("dropCredits: une grande bulle à côté d'un bandeau de crédits n'est pas un fragment (chapitre 131)", () => {
+  const credit = { text: "YOU CAN READ THE CHAPTER ON: EN-THUNDERSCANS.COM", box: [93, 6983, 307, 7017] };
+  const bulle = { text: "THIS IS IMPOSSIBLE! IN THE WORLD, FINDING A TRUE DRAGON…", box: [415, 6979, 771, 7130] };
+  assert.deepEqual(T.dropCredits([credit, bulle]).map((x) => x.text), [bulle.text]);
+});
+
 test("dropCredits: une bulle voisine mais sur une autre rangée est conservée", () => {
   const credit = { text: "discord.gg/abc", box: [100, 900, 400, 940] };
   const bulle = { text: "Attention !", box: [100, 300, 300, 340] };
@@ -66,4 +72,27 @@ test("cleanBlock: le masque ne couvre que le texte du bloc, pas celui du voisin"
   const a = (x, y) => rgba[((y - patchBox[1]) * pw + (x - patchBox[0])) * 4 + 3];
   assert.equal(a(80, 26), 255);
   assert.equal(a(80, 42), 0, "transparent: ne recouvre pas le patch du voisin");
+});
+
+test("deux morceaux collés d'une même ligne restent dans leur paragraphe, dans l'ordre (chapitre 131)", () => {
+  const l = (text, box) => ({ text, box, score: 1 });
+  const lines = [
+    l("ICONTROL: CONTROLSALL", [342, 2780, 659, 2821]),
+    l("PUPPETS FORMED BY FALLEN SACRED", [106, 2826, 694, 2870]),
+    l("CORPSE-DRAGON", [140, 2780, 354, 2820]),
+    l("DRAGONS, CAN SUMMON OR DISMISS", [110, 2874, 690, 2915]),
+  ];
+  const out = texts(groupBlocks(lines, false));
+  assert.equal(out.length, 1, JSON.stringify(out));
+  assert.ok(out[0].startsWith("CORPSE-DRAGON ICONTROL"), out[0]);
+});
+
+test("lignes très penchées empilées: ordre de haut en bas, pas côte à côte (chapitre 131)", () => {
+  const l = (text, box) => ({ text, box, score: 1 });
+  const lines = [
+    l("IVE NEVER FEARED", [438, 4428, 758, 4518]),
+    l("OUTNUMBERED?", [463, 4400, 729, 4478]),
+    l("THE ODDS!", [517, 4475, 693, 4538]),
+  ];
+  assert.deepEqual(texts(groupBlocks(lines, false)), ["OUTNUMBERED? IVE NEVER FEARED THE ODDS!"]);
 });

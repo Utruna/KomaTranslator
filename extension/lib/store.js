@@ -19,9 +19,12 @@
     return [u.hostname || "local", ...kept.slice(0, 3)].join("/");
   }
 
-  // Une série = { key, wiki, summary, glossary[{src,orig,tgt,type,note}], corrections{texte→traduction}, history[[orig,trad]] }
+  // Une série = { key, wiki, summary, glossary[{src,orig,tgt,type,note}], corrections{texte→traduction}, history[[orig,trad,langue]],
+  //   lang (langue cible du glossaire et des corrections; vide = « fr », la langue par défaut des anciennes séries) }
   const sk = (key) => "series:" + key;
-  const empty = (key) => ({ key, wiki: "", summary: "", glossary: [], corrections: {}, history: [] });
+  const empty = (key) => ({ key, wiki: "", summary: "", glossary: [], corrections: {}, history: [], lang: "" });
+  /** Langue cible dans laquelle le glossaire et les corrections de la série ont été faits. */
+  const langOf = (d) => d.lang || "fr";
 
   async function load(key) {
     const r = await chrome.storage.local.get(sk(key));
@@ -41,8 +44,9 @@
     await save(d);
   });
 
-  const setCorrection = (key, text, translation) => locked(async () => {
+  const setCorrection = (key, text, translation, tgt) => locked(async () => {
     const d = await load(key);
+    if (!Object.keys(d.corrections).length && !d.glossary.length && tgt) d.lang = tgt; // série neuve: sa langue est celle-ci
     d.corrections[text] = translation;
     await save(d);
   });
@@ -58,12 +62,23 @@
   });
 
   /** Contexte donné au LLM pour une page: résumé, glossaire (filtré aux termes présents si > 60), 12 dernières répliques. */
-  async function contextFor(key, texts) {
+  async function contextFor(key, texts, tgt) {
     const d = await load(key);
     const page = texts.join("\n").toLowerCase();
     let terms = d.glossary;
     if (terms.length > 60) terms = terms.filter((t) => ["orig", "src"].some((k) => t[k] && page.includes(t[k].toLowerCase())));
-    return { summary: d.summary, terms, history: d.history.slice(-12), corrections: d.corrections };
+    // Autre langue cible que celle de la mémoire: pas d'exemples ni de rendus dans l'ancienne langue (le LLM la recopierait).
+    // Le glossaire ne garde que les noms (cohérence des personnages), l'historique que les répliques de cette langue.
+    const same = !tgt || tgt === langOf(d);
+    if (!same) terms = terms.map((t) => ({ ...t, tgt: "" }));
+    const history = d.history.filter((h) => !tgt || (h[2] || langOf(d)) === tgt).slice(-12).map((h) => [h[0], h[1]]);
+    return { summary: d.summary, terms, history, corrections: same ? d.corrections : {} };
+  }
+
+  /** Corrections manuelles applicables pour cette langue cible (aucune si la série a été corrigée dans une autre langue). */
+  async function correctionsFor(key, tgt) {
+    const d = await load(key);
+    return !tgt || tgt === langOf(d) ? d.corrections : {};
   }
 
   // ── Gestion de la mémoire (écran « Mémoire et cache ») ──
@@ -77,6 +92,11 @@
       summary: !!v.summary,
       corrections: Object.keys(v.corrections || {}).length,
       history: (v.history || []).length,
+      // langues cibles présentes: celle du glossaire / des corrections, et celles des répliques retenues
+      langs: [...new Set([
+        ...((v.glossary || []).length || Object.keys(v.corrections || {}).length ? [langOf(v)] : []),
+        ...(v.history || []).map((h) => h[2] || langOf(v)),
+      ])].sort(),
       bytes: JSON.stringify(v).length,
     })).sort((a, b) => b.bytes - a.bytes);
   }
@@ -108,7 +128,9 @@
       summary: str(raw.summary, 5000),
       glossary: (Array.isArray(raw.glossary) ? raw.glossary : []).filter((t) => t && t.src && t.tgt).slice(0, 2000).map(cleanTerm),
       corrections: Object.fromEntries(Object.entries(corr).filter(([k, v]) => k && v).slice(0, 5000).map(([k, v]) => [str(k, 1000), str(v, 1000)])),
-      history: (Array.isArray(raw.history) ? raw.history : []).filter((p) => Array.isArray(p) && p.length >= 2).slice(-HISTORY_MAX).map((p) => [str(p[0], 1000), str(p[1], 1000)]),
+      history: (Array.isArray(raw.history) ? raw.history : []).filter((p) => Array.isArray(p) && p.length >= 2).slice(-HISTORY_MAX)
+        .map((p) => (p[2] ? [str(p[0], 1000), str(p[1], 1000), str(p[2], 10)] : [str(p[0], 1000), str(p[1], 1000)])),
+      lang: str(raw.lang, 10),
     };
   }
 
@@ -126,7 +148,7 @@
     for (const s of all) {
       if (keys && !keys.includes(s.key)) continue;
       const d = await load(s.key);
-      series.push({ key: d.key, wiki: d.wiki, summary: d.summary, glossary: d.glossary, corrections: d.corrections });
+      series.push({ key: d.key, wiki: d.wiki, summary: d.summary, glossary: d.glossary, corrections: d.corrections, lang: d.lang });
     }
     return { app: "KomaTranslator", version: 1, exportedAt: new Date().toISOString(), series };
   }
@@ -151,6 +173,7 @@
       d.corrections = { ...c.corrections, ...d.corrections };
       d.summary = d.summary || c.summary;
       d.wiki = d.wiki || c.wiki;
+      d.lang = d.lang || c.lang;
       await save(d);
       out.merged++;
     }
@@ -312,6 +335,7 @@
       d.glossary = [...known.values()];
       if (summary) d.summary = summary;
       d.wiki = url;
+      d.lang = tgt; // les rendus du glossaire sont dans cette langue
       await save(d);
       return d;
     });
@@ -370,5 +394,5 @@
     return [...h].map((b) => b.toString(16).padStart(2, "0")).join("");
   }
 
-  self.KomaStore = { seriesKey, load, save, addHistory, setCorrection, saveEdit, contextFor, seriesSig, bestCorrection, listSeries, clearPart, deleteSeries, sanitizeSeries, putSeries, exportSeries, importSeries, usageAdd, usageCostToday, usageSummary, cacheCount, acquire, importWiki, cacheGet, cachePut, cacheClear, sha1 };
+  self.KomaStore = { seriesKey, load, save, addHistory, setCorrection, saveEdit, contextFor, correctionsFor, seriesSig, bestCorrection, listSeries, clearPart, deleteSeries, sanitizeSeries, putSeries, exportSeries, importSeries, usageAdd, usageCostToday, usageSummary, cacheCount, acquire, importWiki, cacheGet, cachePut, cacheClear, sha1 };
 })();

@@ -29,6 +29,7 @@
   .serie .meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 0; }
   .tag { background: var(--soft); border-radius: 99px; padding: 1px 9px; font-size: 12px; }
   .tag.none { background: none; border: 1px dashed var(--line); color: var(--muted); }
+  .tag.lang { background: var(--accent); color: #fff; font-weight: 600; letter-spacing: .5px; }
   .serie .acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
   .serie .acts button { padding: 4px 10px; font-size: 12.5px; }
   .size { float: right; color: var(--muted); font-size: 12px; }
@@ -80,7 +81,7 @@
   <section class="card">
     <h2>Séries <span id="total" class="muted"></span></h2>
     <div class="muted">Chaque série a son glossaire (souvent importé d'un wiki), son résumé, ses corrections manuelles et les dernières répliques. Retirer le wiki n'invalide que les pages dont la traduction en dépendait.</div>
-    <div class="row"><input id="filter" type="search" placeholder="Filtrer par site ou série…"></div>
+    <div class="row"><input id="filter" type="search" placeholder="Filtrer par site ou série…"><select id="langFilter" aria-label="Filtrer par langue" hidden></select></div>
     <div id="list"></div>
   </section>
 </main>

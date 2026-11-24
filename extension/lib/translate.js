@@ -21,7 +21,10 @@
       const ha = a[3] - a[1], hb = b[3] - b[1];
       const overlap = Math.min(a[3], b[3]) - Math.max(a[1], b[1]);
       const gap = Math.max(a[0] - b[2], b[0] - a[2]);
-      return overlap > 0.5 * Math.min(ha, hb) && gap < 1.5 * Math.max(ha, hb);
+      // un fragment est un morceau de la même ligne: hauteur comparable (une bulle de plusieurs lignes à côté
+      // d'un bandeau de crédits n'en est pas un)
+      return Math.max(ha, hb) <= 2.5 * Math.min(ha, hb)
+        && overlap > 0.5 * Math.min(ha, hb) && gap < 1.5 * Math.max(ha, hb);
     };
     return blocks.filter((b) => !credit.includes(b) && !credit.some((c) => sameRow(b.box, c.box)));
   }
@@ -135,13 +138,20 @@
     if (ctx.lowercased) p.push("- The source was in ALL CAPS and was lowercased automatically: some proper names may appear in lowercase (e.g. 'ye wuxian'). Recognize them and keep them as capitalized names.");
     if (ctx.strict) p.push("- MANDATORY: in a previous attempt the glossary renderings below were NOT applied. Use them exactly, character for character, wherever the term appears.");
     if (ctx.summary) p.push("", "STORY CONTEXT:", ctx.summary);
-    if (ctx.terms?.length) {
+    const rendered = (ctx.terms || []).filter((g) => g.tgt), namesOnly = (ctx.terms || []).filter((g) => !g.tgt);
+    const termLine = (g) => {
+      const names = [g.orig, g.src].filter(Boolean).join(" / ");
+      const note = [g.type, g.note].filter(Boolean).join(", ");
+      return `- ${names}${g.tgt ? ` → ${g.tgt}` : ""}${note ? ` (${note})` : ""}`;
+    };
+    if (rendered.length) {
       p.push("", `GLOSSARY (always use these ${T} renderings):`);
-      for (const g of ctx.terms) {
-        const names = [g.orig, g.src].filter(Boolean).join(" / ");
-        const note = [g.type, g.note].filter(Boolean).join(", ");
-        p.push(`- ${names} → ${g.tgt}${note ? ` (${note})` : ""}`);
-      }
+      for (const g of rendered) p.push(termLine(g));
+    }
+    if (namesOnly.length) {
+      // glossaire fait pour une autre langue cible: seulement les noms, à rendre en ${T}
+      p.push("", `KNOWN NAMES AND TERMS (render them in ${T}, consistently):`);
+      for (const g of namesOnly) p.push(termLine(g));
     }
     if (ctx.history?.length) {
       p.push("", "PREVIOUS LINES (already translated, most recent last):");
