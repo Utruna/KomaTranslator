@@ -1,18 +1,16 @@
 const $ = (id) => document.getElementById(id);
 const FIELDS = ["ollamaUrl", "ollamaModel", "ollamaKeepAlive", "apiBase", "apiKey", "apiModel", "anthropicKey", "anthropicModel"];
 
-// Préréglages du fournisseur « API compatible OpenAI »: remplissent l'URL et le modèle.
-const PRESETS = {
-  gemini: {
-    apiBase: "https://generativelanguage.googleapis.com/v1beta/openai",
-    apiModel: "gemini-3.5-flash-lite",
-    note: "Clé gratuite sur aistudio.google.com/apikey. Le palier gratuit est limité en requêtes par minute et par jour (voir ton compte), "
-      + "et Google peut y réutiliser les textes envoyés pour améliorer ses produits : à vérifier dans leurs conditions. "
-      + "Les modèles changent vite : si le test répond 404, prends un autre « gemini-…-flash-lite ».",
-  },
-  deepseek: { apiBase: "https://api.deepseek.com/v1", apiModel: "deepseek-flash", note: "Clé payante (quelques centimes par chapitre), sur platform.deepseek.com." },
-};
-const presetFor = (base) => Object.keys(PRESETS).find((k) => PRESETS[k].apiBase === base) || "";
+// Préréglages du fournisseur « API compatible OpenAI » (voir presets.js): remplissent l'URL, le modèle et la clé mémorisée.
+const { PRESETS } = KomaPresets;
+const presetFor = (base) => { const k = KomaPresets.presetOfBase(base); return PRESETS[k] ? k : ""; };
+let profiles = {};   // { deepseek: { apiKey, apiModel }, … } (cfg.profiles)
+let shownPreset = ""; // préréglage actuellement affiché dans le formulaire
+
+/** Range les champs « API » du formulaire dans le profil du préréglage affiché. */
+function stashProfile() {
+  if (shownPreset) profiles[shownPreset] = { apiKey: $("apiKey").value.trim(), apiModel: $("apiModel").value.trim() || PRESETS[shownPreset].apiModel };
+}
 function showPreset() {
   $("presetNote").textContent = PRESETS[$("preset").value]?.note || "";
 }
@@ -38,7 +36,9 @@ function readForm() {
   const st = await chrome.storage.sync.get(["font", "caps"]);
   $("font").value = st.font || "";
   $("caps").checked = !!st.caps;
-  $("preset").value = presetFor($("apiBase").value.trim());
+  profiles = { ...(cfg.profiles || {}) };
+  shownPreset = presetFor($("apiBase").value.trim());
+  $("preset").value = shownPreset;
   showPreset();
   showPanels();
 })();
@@ -49,16 +49,26 @@ $("caps").onchange = () => chrome.storage.sync.set({ caps: $("caps").checked });
 $("font").onchange = () => chrome.storage.sync.set({ font: $("font").value.trim() });
 
 $("preset").onchange = () => {
-  const p = PRESETS[$("preset").value];
-  if (p) { $("apiBase").value = p.apiBase; $("apiModel").value = p.apiModel; }
+  stashProfile(); // on ne perd pas la clé du préréglage qu'on quitte
+  shownPreset = $("preset").value;
+  const p = PRESETS[shownPreset];
+  if (p) {
+    $("apiBase").value = p.apiBase;
+    $("apiModel").value = profiles[shownPreset]?.apiModel || p.apiModel;
+    $("apiKey").value = profiles[shownPreset]?.apiKey || "";
+  }
   showPreset();
 };
-$("apiBase").oninput = () => { $("preset").value = presetFor($("apiBase").value.trim()); showPreset(); };
+$("apiBase").oninput = () => { stashProfile(); shownPreset = presetFor($("apiBase").value.trim()); $("preset").value = shownPreset; showPreset(); };
 
 $("save").onclick = async () => {
-  const cfg = readForm();
+  let cfg = readForm();
   // champs vides = valeurs par défaut
   for (const f of FIELDS) if (!cfg[f]) delete cfg[f];
+  stashProfile();
+  cfg.profiles = profiles;
+  cfg = KomaPresets.remember(cfg); // aussi pour « Autre API »
+  profiles = cfg.profiles;
   await chrome.storage.local.set({ cfg });
   $("result").className = "";
   $("result").textContent = "Enregistré, test en cours…";

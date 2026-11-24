@@ -10,6 +10,7 @@ Vue d'ensemble pour lire le code. Tout le code utile est dans `extension/` (le d
 | `background.js` | service worker (Chrome) / page de fond (Firefox) | chef d'orchestre : file d'attente, téléchargement, cache, appels OCR et traduction |
 | `engine/ocr.js` | page de fond (Firefox) / document offscreen (Chrome, `engine/engine.html` + `offscreen.js`) | OCR + bulles + effacement du texte |
 | `lib/translate.js` | background | Google / Ollama / API OpenAI / Claude, prompt, relecture |
+| `presets.js` | background, popup, options | réglages par défaut du traducteur, préréglages DeepSeek / Gemini, profils (une clé par traducteur) |
 | `lib/store.js` | background | mémoire par série (`storage.local`) + cache des pages (IndexedDB) |
 | `popup.*`, `options.*`, `editor.*` | pages de l'extension | interface ; parlent au background par messages |
 

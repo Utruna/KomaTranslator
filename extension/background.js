@@ -4,23 +4,12 @@
 // Chrome: service worker + document "offscreen" pour le moteur OCR (WebAssembly).
 
 const IS_SW = typeof ServiceWorkerGlobalScope !== "undefined" && self instanceof ServiceWorkerGlobalScope;
-if (IS_SW) importScripts("lib/translate.js", "lib/store.js");
+if (IS_SW) importScripts("lib/translate.js", "lib/store.js", "presets.js");
 
 // Réglages synchronisés (chrome.storage.sync): langues et sites activés ({ "site.com": true }).
 const DEFAULTS = { src: "auto", tgt: "fr", sites: {} };
-// Réglages du traducteur (chrome.storage.local, clé "cfg"; les clés API ne sont donc jamais synchronisées).
-const CFG_DEFAULTS = {
-  provider: "google",          // google | ollama | openai | anthropic
-  ollamaUrl: "http://localhost:11434",
-  ollamaModel: "qwen3.5:latest",
-  apiBase: "https://api.deepseek.com/v1",
-  apiKey: "",
-  apiModel: "deepseek-flash",
-  anthropicKey: "",
-  anthropicModel: "claude-haiku-5-5",
-  ollamaKeepAlive: "5m",       // durée pendant laquelle Ollama garde le modèle en VRAM après la dernière requête
-  review: true,                // relecture (seulement avec un LLM)
-};
+// Réglages du traducteur (chrome.storage.local, clé "cfg"; les clés API ne sont donc jamais synchronisées): voir presets.js
+const CFG_DEFAULTS = KomaPresets.CFG_DEFAULTS;
 const MAX_PARALLEL = 2; // images traduites en même temps (l'OCR est de toute façon sérialisé)
 
 /** Fusionne valeurs par défaut + réglages enregistrés → { src, tgt, sites, cfg }. */

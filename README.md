@@ -31,6 +31,13 @@ Ordre de grandeur : 0,5–2 s d'OCR par page (CPU), + 0,1 s (Google) à 1–2 s 
 3. **Charger l'extension non empaquetée** → choisir le dossier dézippé.
    Chrome affiche parfois un avertissement « extensions en mode développeur » au démarrage : c'est normal hors store.
 
+### Le menu de l'icône
+- **Traduire ce site** (interrupteur), langues source et cible.
+- **Traducteur** : un clic pour passer de Google à DeepSeek, Gemini, Ollama, Claude ou une autre API compatible OpenAI. Chaque traducteur garde sa clé et son modèle ;
+  celui dont la clé manque est grisé (« clé à ajouter »). Modèle, relecture, bouton **Tester** ; pour Ollama : adresse, durée en VRAM et **Libérer la VRAM**.
+- **Texte traduit** : police installée et majuscules, appliquées tout de suite.
+- **Série** : glossaire et import depuis un wiki. **Retraduire la page** et **Options**.
+
 ### Utilisation
 - Sur le site de lecture : icône de l'extension → **Traduire ce site** (raccourci `Alt+Shift+T`).
 - Contour pointillé violet = image en cours ; le badge de l'icône = nombre d'images en cours.
