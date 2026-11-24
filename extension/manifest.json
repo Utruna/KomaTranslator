@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "KomaTranslator",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Traduit en direct le texte des manhwa / manhua / manga (OCR dans le navigateur, sans serveur).",
   "permissions": [
     "storage",
@@ -72,7 +72,7 @@
       "strict_min_version": "128.0",
       "data_collection_permissions": {
         "required": [
-          "none"
+          "websiteContent"
         ]
       }
     }
